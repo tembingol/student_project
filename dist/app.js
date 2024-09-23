@@ -11,7 +11,11 @@ exports.app.use(express_1.default.json()); // создание свойств-о
 //app.use(cors()) // разрешить любым фронтам делать запросы на наш бэк
 exports.app.get('/', (req, res) => {
     // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
-    res.status(200).json({ version: '1.0' });
+    res.status(200).json({ version: '1.1' });
+});
+exports.app.get('/videos', (req, res) => {
+    // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
+    res.status(200).json({ version: '1.1', videos: "videos" });
 });
 // app.get(SETTINGS.PATH.VIDEOS, getVideosController)
 // app.use(SETTINGS.PATH.VIDEOS, videosRouter)

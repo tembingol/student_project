@@ -7,7 +7,11 @@ app.use(express.json()) // создание свойств-объектов body
  
 app.get('/', (req, res) => {
     // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
-    res.status(200).json({version: '1.0'})
+    res.status(200).json({version: '1.1'})
+})
+app.get('/videos', (req, res) => {
+    // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
+    res.status(200).json({version: '1.1', videos: "videos"})
 })
 // app.get(SETTINGS.PATH.VIDEOS, getVideosController)
 // app.use(SETTINGS.PATH.VIDEOS, videosRouter)
