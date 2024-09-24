@@ -17,6 +17,14 @@ exports.app.get('/videos', (req, res) => {
     const myArray = db_1.db.videos;
     res.status(200).json(myArray);
 });
+exports.app.get('/videos/:id', (req, res) => {
+    const myArray = db_1.db.videos.filter((e) => +e.id === +req.params.id);
+    if (myArray.length == 0) {
+        res.send(404);
+        return;
+    }
+    res.status(200).json(myArray[0]);
+});
 exports.app.post('/videos', (req, res) => {
     if (!req.body.title || req.body.title.length > 40) {
         const error = {

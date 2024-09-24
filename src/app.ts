@@ -9,9 +9,19 @@ app.get('/', (req, res) => {
     // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
     res.status(200).json({version: '1.1'})
 })
+
 app.get('/videos', (req, res) => {
     const myArray = db.videos
     res.status(200).json(myArray)
+})
+
+app.get('/videos/:id', (req, res) => {
+    const myArray = db.videos.filter( (e) => +e.id === +req.params.id )
+    if (myArray.length==0){
+        res.send(404)
+        return
+    }
+    res.status(200).json(myArray[0])
 })
 
 app.post('/videos', (req, res) => {
