@@ -24,6 +24,18 @@ app.get('/videos/:id', (req, res) => {
     res.status(200).json(myArray[0])
 })
 
+app.delete('/videos/:id', (req, res) => {
+    const myArray = db.videos.filter( (e) => +e.id === +req.params.id )
+    if (myArray.length==0){
+        res.send(404)
+        return
+    }
+    const objectIndex = db.videos.indexOf(myArray[0])
+
+    db.videos.splice(objectIndex, 1)
+    res.send(204)
+})
+
 app.post('/videos', (req, res) => {
  
  
