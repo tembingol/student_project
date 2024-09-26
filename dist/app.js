@@ -60,14 +60,15 @@ exports.app.post('/videos', (req, res) => {
         res.status(400).json(error);
         return;
     }
+    const createdDate = new Date();
     const newVideoObject = {
         "id": db_1.db.videos.length + 1,
         "title": req.body.title,
         "author": req.body.author,
-        "canBeDownloaded": true,
+        "canBeDownloaded": null,
         "minAgeRestriction": null,
-        "createdAt": new Date(),
-        "publicationDate": new Date(),
+        "createdAt": createdDate,
+        "publicationDate": new Date(createdDate.getTime() + 60 * 60 * 24 * 1000),
         "availableResolutions": req.body.availableResolutions,
     };
     db_1.db.videos.push(newVideoObject);
@@ -125,9 +126,36 @@ exports.app.put('/videos/:id', (req, res) => {
             return;
         }
     }
-    if (!req.body.canBeDownloaded) {
+    let canBeDownloaded = false;
+    if ((typeof req.body.canBeDownloaded !== "undefined") && (typeof req.body.canBeDownloaded !== "boolean")) {
+        const error = {
+            "errorsMessages": [
+                {
+                    "message": "incorrect values",
+                    "field": "canBeDownloaded"
+                }
+            ]
+        };
+        res.status(400).json(error);
+        return;
     }
-    if (!req.body.minAgeRestriction || req.body.minAgeRestriction > 18 || req.body.minAgeRestriction < 0) {
+    else if (typeof req.body.canBeDownloaded === "boolean") {
+        canBeDownloaded = req.body.canBeDownloaded;
+    }
+    let minAgeRestriction = null;
+    if ((typeof req.body.minAgeRestriction !== "undefined") && (!Number.isInteger(req.body.minAgeRestriction))) {
+        const error = {
+            "errorsMessages": [
+                {
+                    "message": "incorrect values is not number",
+                    "field": "minAgeRestriction"
+                }
+            ]
+        };
+        res.status(400).json(error);
+        return;
+    }
+    else if (req.body.minAgeRestriction > 18 || req.body.minAgeRestriction < 0) {
         const error = {
             "errorsMessages": [
                 {
@@ -139,16 +167,21 @@ exports.app.put('/videos/:id', (req, res) => {
         res.status(400).json(error);
         return;
     }
+    else {
+        minAgeRestriction = req.body.minAgeRestriction;
+    }
     const index = db_1.db.videos.findIndex((e) => +e.id === +req.params.id);
     if (index !== -1) {
         db_1.db.videos[index].name = 'Alison'; // Alice становится Alison
         db_1.db.videos[index].title = req.body.title;
         db_1.db.videos[index].author = req.body.author;
-        db_1.db.videos[index].minAgeRestriction = req.body.minAgeRestriction;
+        db_1.db.videos[index].canBeDownloaded = canBeDownloaded;
+        db_1.db.videos[index].minAgeRestriction = minAgeRestriction;
         db_1.db.videos[index].availableResolutions = req.body.availableResolutions;
         db_1.db.videos[index].publicationDate = req.body.publicationDate;
     }
-    res.sendStatus(204);
+    //res.sendStatus(204)
+    res.status(204).json(db_1.db.videos[index]);
 });
 const availableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"];
 //app.get(SETTINGS.PATH.VIDEOS, getVideosController)
