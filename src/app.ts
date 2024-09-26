@@ -18,7 +18,7 @@ app.get('/videos', (req, res) => {
 app.get('/videos/:id', (req, res) => {
     const myArray = db.videos.filter( (e) => +e.id === +req.params.id )
     if (myArray.length==0){
-        res.send(404)
+        res.sendStatus(404)
         return
     }
     res.status(200).json(myArray[0])
@@ -27,18 +27,16 @@ app.get('/videos/:id', (req, res) => {
 app.delete('/videos/:id', (req, res) => {
     const myArray = db.videos.filter( (e) => +e.id === +req.params.id )
     if (myArray.length==0){
-        res.send(404)
+        res.sendStatus(404)
         return
     }
     const objectIndex = db.videos.indexOf(myArray[0])
 
     db.videos.splice(objectIndex, 1)
-    res.send(204)
+    res.sendStatus(204)
 })
 
 app.post('/videos', (req, res) => {
- 
- 
     if(!req.body.title || req.body.title.length>40){
         const error =
         {
@@ -82,5 +80,96 @@ app.post('/videos', (req, res) => {
     res.status(200).json(newVideoObject)
 })
 
+
+app.put('/videos/:id', (req, res) => {
+
+    const myArray = db.videos.filter( (e) => +e.id === +req.params.id )
+    if (myArray.length==0){
+        res.sendStatus(404)
+        return
+    }
+
+    if(!req.body.title || req.body.title.length>40){
+        const error =
+        {
+            "errorsMessages": [
+              {
+                "message": "incorrect values",
+                "field": "title"
+              }
+            ]
+          }
+          res.status(400).json(error)
+          return
+    }
+
+    if(!req.body.author || req.body.author.length>20){
+        const error ={
+            "errorsMessages": [
+              {
+                "message": "incorrect values",
+                "field": "author"
+              }
+            ]
+          }
+          res.status(400).json(error)
+          return
+    }
+
+    if(!req.body.availableResolutions ) {
+        const errorsArray = [];
+        const resolutions = req.body.availableResolutions
+        for (let i=0; i<resolutions.length;i++ ){
+            if(availableResolutions.indexOf(resolutions[i])==-1){
+                errorsArray.push(resolutions[i])
+            }
+        }
+        if(errorsArray.length){
+        const error ={
+            "errorsMessages": [
+              {
+                "message": "incorrect values",
+                "field": "availableResolutions"
+              }
+            ]
+          }
+          res.status(400).json(error)
+          return
+        }
+    }
+
+
+    if(!req.body.canBeDownloaded ) {
+
+    }
+
+    if(!req.body.minAgeRestriction || req.body.minAgeRestriction>18 || req.body.minAgeRestriction<0) {
+        const error ={
+            "errorsMessages": [
+              {
+                "message": "incorrect values",
+                "field": "minAgeRestriction"
+              }
+            ]
+          }
+          res.status(400).json(error)
+          return
+    }
+
+    const index = db.videos.findIndex((e) => +e.id === +req.params.id);
+    if (index !== -1) {
+        db.videos[index].name = 'Alison'; // Alice становится Alison
+        db.videos[index].title = req.body.title;
+        db.videos[index].author = req.body.author;
+        db.videos[index].minAgeRestriction = req.body.minAgeRestriction;
+        db.videos[index].availableResolutions = req.body.availableResolutions;
+        db.videos[index].publicationDate = req.body.publicationDate;
+    }
+
+    res.sendStatus(204)
+})
+
+
+const availableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"]
 //app.get(SETTINGS.PATH.VIDEOS, getVideosController)
 // app.use(SETTINGS.PATH.VIDEOS, videosRouter)
