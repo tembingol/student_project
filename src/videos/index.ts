@@ -4,7 +4,7 @@ import {getVideosController} from './getVideosController'
 //import {findVideoController} from './findVideoController'
 //import {deleteVideoController} from './deleteVideoController'
  
-export const videosRouter = Router()
+const videosRouter = Router()
  
 videosRouter.get('/', getVideosController)
 //videosRouter.post('/', createVideoController)
