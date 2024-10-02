@@ -96,15 +96,17 @@ exports.videosRouter.put('/:id', (req, res) => {
         res.status(400).json(error);
         return;
     }
-    if (!req.body.availableResolutions) {
+    if (Array.isArray(req.body.availableResolutions)) {
         const errorsArray = [];
         const resolutions = req.body.availableResolutions;
         for (let i = 0; i < resolutions.length; i++) {
+            console.log(resolutions[i]);
+            console.log(db_1.db.availableResolutions.indexOf(resolutions[i]));
             if (db_1.db.availableResolutions.indexOf(resolutions[i]) == -1) {
                 errorsArray.push(resolutions[i]);
             }
         }
-        if (errorsArray.length) {
+        if (errorsArray.length > 0) {
             const error = {
                 "errorsMessages": [
                     {

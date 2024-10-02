@@ -111,15 +111,17 @@ videosRouter.put('/:id', (req, res) => {
         return
     }
 
-    if (!req.body.availableResolutions) {
+    if (Array.isArray(req.body.availableResolutions)) {
         const errorsArray = [];
         const resolutions = req.body.availableResolutions
         for (let i = 0; i < resolutions.length; i++) {
+            console.log(resolutions[i])
+            console.log(db.availableResolutions.indexOf(resolutions[i]))
             if (db.availableResolutions.indexOf(resolutions[i]) == -1) {
                 errorsArray.push(resolutions[i])
             }
         }
-        if (errorsArray.length) {
+        if (errorsArray.length > 0) {
             const error = {
                 "errorsMessages": [
                     {
