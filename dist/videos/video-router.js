@@ -4,6 +4,10 @@ exports.videosRouter = void 0;
 const express_1 = require("express");
 const db_1 = require("../db/db");
 exports.videosRouter = (0, express_1.Router)({});
+exports.videosRouter.delete('/testing/all-data', (req, res) => {
+    db_1.db.videos = [];
+    res.sendStatus(204);
+});
 exports.videosRouter.get('/', (req, res) => {
     const myArray = db_1.db.videos;
     res.status(200).json(myArray);

@@ -4,7 +4,10 @@ import { db } from "../db/db";
 
 export const videosRouter = Router({})
 
-
+videosRouter.delete('/testing/all-data', (req, res) => {
+    db.videos = []
+    res.sendStatus(204)
+})
 videosRouter.get('/', (req, res) => {
     const myArray = db.videos
     res.status(200).json(myArray)

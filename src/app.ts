@@ -1,6 +1,5 @@
 import express from 'express'
 import { db } from './db/db'
-import { userInfo } from 'os'
 import { videosRouter } from './videos/video-router'
 
 //import { getVideosController } from './videos/getVideosController'
@@ -11,6 +10,11 @@ app.use(express.json()) // создание свойств-объектов body
 app.get('/', (req, res) => {
   // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
   res.status(200).json({ version: '1.1' })
+})
+
+app.delete('/testing/all-data', (req, res) => {
+  db.videos = []
+  res.sendStatus(204)
 })
 
 app.use('/videos', videosRouter)
