@@ -43,6 +43,23 @@ exports.videosRouter.post('/', (req, res) => {
             "field": "title"
         });
     }
+    if (Array.isArray(req.body.availableResolutions)) {
+        const resolutionsEerrorsArray = [];
+        const resolutions = req.body.availableResolutions;
+        for (let i = 0; i < resolutions.length; i++) {
+            console.log(resolutions[i]);
+            console.log(db_1.db.availableResolutions.indexOf(resolutions[i]));
+            if (db_1.db.availableResolutions.indexOf(resolutions[i]) == -1) {
+                resolutionsEerrorsArray.push(resolutions[i]);
+            }
+        }
+        if (resolutionsEerrorsArray.length > 0) {
+            errorsArray.push({
+                "message": "incorrect values",
+                "field": "availableResolutions"
+            });
+        }
+    }
     let createdDate = new Date();
     let publicationDate = new Date(createdDate.getTime() + 60 * 60 * 24 * 1000);
     if (isValidDate(req.body.createdAt)) {
@@ -132,6 +149,12 @@ exports.videosRouter.put('/:id', (req, res) => {
     }
     else {
         minAgeRestriction = req.body.minAgeRestriction;
+    }
+    if (!isValidDate(req.body.publicationDate)) {
+        errorsArray.push({
+            "message": "incorrect values",
+            "field": "publicationDate"
+        });
     }
     if (errorsArray.length) {
         res.status(400).json({

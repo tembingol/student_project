@@ -52,6 +52,24 @@ videosRouter.post('/', (req, res) => {
         )
     }
 
+    if (Array.isArray(req.body.availableResolutions)) {
+        const resolutionsEerrorsArray = [];
+        const resolutions = req.body.availableResolutions
+        for (let i = 0; i < resolutions.length; i++) {
+            console.log(resolutions[i])
+            console.log(db.availableResolutions.indexOf(resolutions[i]))
+            if (db.availableResolutions.indexOf(resolutions[i]) == -1) {
+                resolutionsEerrorsArray.push(resolutions[i])
+            }
+        }
+        if (resolutionsEerrorsArray.length > 0) {
+            errorsArray.push({
+                "message": "incorrect values",
+                "field": "availableResolutions"
+            })
+        }
+    }
+
     let createdDate = new Date()
     let publicationDate = new Date(createdDate.getTime() + 60 * 60 * 24 * 1000)
 
@@ -153,6 +171,12 @@ videosRouter.put('/:id', (req, res) => {
         minAgeRestriction = req.body.minAgeRestriction
     }
 
+    if (!isValidDate(req.body.publicationDate)) {
+        errorsArray.push({
+            "message": "incorrect values",
+            "field": "publicationDate"
+        })
+    }
     if (errorsArray.length) {
         res.status(400).json({
             "errorsMessages": errorsArray
