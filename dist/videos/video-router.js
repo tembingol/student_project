@@ -27,6 +27,9 @@ exports.videosRouter.delete('/:id', (req, res) => {
     res.sendStatus(204);
 });
 exports.videosRouter.post('/', (req, res) => {
+    console.log("handler post++");
+    console.log(req.body);
+    console.log("handler post--");
     let errorsArray = [];
     if (!req.body.author || req.body.author.length > 20) {
         errorsArray.push({
@@ -40,22 +43,29 @@ exports.videosRouter.post('/', (req, res) => {
             "field": "title"
         });
     }
+    let createdDate = new Date();
+    let publicationDate = new Date(createdDate.getTime() + 60 * 60 * 24 * 1000);
+    if (isValidDate(req.body.createdAt)) {
+        createdDate = req.body.createdAt;
+    }
+    if (isValidDate(req.body.publicationDate)) {
+        publicationDate = req.body.publicationDate;
+    }
     if (errorsArray.length) {
         res.status(400).json({
             "errorsMessages": errorsArray
         });
         return;
     }
-    const createdDate = new Date();
     const newVideoObject = {
-        "id": db_1.db.videos.length + 1,
-        "title": req.body.title,
         "author": req.body.author,
-        "canBeDownloaded": !req.body.canBeDownloaded ? req.body.canBeDownloaded : false,
-        "minAgeRestriction": null,
-        "createdAt": createdDate,
-        "publicationDate": new Date(createdDate.getTime() + 60 * 60 * 24 * 1000),
         "availableResolutions": req.body.availableResolutions,
+        "canBeDownloaded": !req.body.canBeDownloaded ? req.body.canBeDownloaded : false,
+        "createdAt": createdDate,
+        "id": db_1.db.videos.length + 1,
+        "minAgeRestriction": null,
+        "publicationDate": publicationDate,
+        "title": req.body.title,
     };
     db_1.db.videos.push(newVideoObject);
     const myArray = db_1.db.videos;
@@ -141,3 +151,8 @@ exports.videosRouter.put('/:id', (req, res) => {
     //res.sendStatus(204)
     res.status(204).json(db_1.db.videos[index]);
 });
+function isValidDate(stringDate) {
+    //const regex = /^\d{4}-\d{2}-\d{2}$/
+    const regex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
+    return regex.test(stringDate);
+}
