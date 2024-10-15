@@ -95,7 +95,7 @@ exports.videosRouter.post('/', (req, res) => {
         "title": req.body.title,
     };
     db_1.db.videos.push(newVideoObject);
-    res.status(200).json(newVideoObject);
+    res.status(201).json(newVideoObject);
 });
 exports.videosRouter.put('/:id', (req, res) => {
     let errorsArray = [];

@@ -110,7 +110,7 @@ videosRouter.post('/', (req, res) => {
     }
 
     db.videos.push(newVideoObject)
-    res.status(200).json(newVideoObject)
+    res.status(201).json(newVideoObject)
 })
 
 videosRouter.put('/:id', (req, res) => {
