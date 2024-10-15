@@ -88,20 +88,29 @@ videosRouter.post('/', (req, res) => {
         return
     }
 
+    let canBeDownloaded = false
+    if ((typeof req.body.canBeDownloaded !== "undefined") && (typeof req.body.canBeDownloaded !== "boolean")) {
+        errorsArray.push({
+            "message": "incorrect values",
+            "field": "canBeDownloaded"
+        })
+    } else if (typeof req.body.canBeDownloaded === "boolean") {
+        canBeDownloaded = req.body.canBeDownloaded
+    }
+
     const newVideoObject = {
         "author": req.body.author,
         "availableResolutions": req.body.availableResolutions,
-        "canBeDownloaded": !req.body.canBeDownloaded ? req.body.canBeDownloaded : false,
+        "canBeDownloaded": canBeDownloaded,
         "createdAt": createdDate,
         "id": db.videos.length + 1,
         "minAgeRestriction": null,
         "publicationDate": publicationDate,
         "title": req.body.title,
+        "me": false,
     }
 
     db.videos.push(newVideoObject)
-
-    const myArray = db.videos
     res.status(200).json(newVideoObject)
 })
 
