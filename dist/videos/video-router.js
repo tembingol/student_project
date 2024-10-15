@@ -93,7 +93,6 @@ exports.videosRouter.post('/', (req, res) => {
         "minAgeRestriction": null,
         "publicationDate": publicationDate,
         "title": req.body.title,
-        "me": false,
     };
     db_1.db.videos.push(newVideoObject);
     res.status(200).json(newVideoObject);
