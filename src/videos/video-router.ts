@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { db } from "../db/db";
+import { OutputErrorsType, OutputType, videoType } from "./models";
 
 export const videosRouter = Router({})
 
@@ -30,44 +31,12 @@ videosRouter.delete('/:id', (req, res) => {
 })
 
 videosRouter.post('/', (req, res) => {
-    console.log("handler post++")
-    console.log(req.body)
-    console.log("handler post--")
 
-    let errorsArray = []
-    if (!req.body.author || req.body.author.length > 20) {
-        errorsArray.push(
-            {
-                "message": "incorrect values",
-                "field": "author"
-            })
-    }
+    let OutputErrors = inputVideoValidation(req.body)
 
-    if (!req.body.title || req.body.title.length > 40) {
-        errorsArray.push(
-            {
-                "message": "incorrect values",
-                "field": "title"
-            }
-        )
-    }
-
-    if (Array.isArray(req.body.availableResolutions)) {
-        const resolutionsEerrorsArray = [];
-        const resolutions = req.body.availableResolutions
-        for (let i = 0; i < resolutions.length; i++) {
-            console.log(resolutions[i])
-            console.log(db.availableResolutions.indexOf(resolutions[i]))
-            if (db.availableResolutions.indexOf(resolutions[i]) == -1) {
-                resolutionsEerrorsArray.push(resolutions[i])
-            }
-        }
-        if (resolutionsEerrorsArray.length > 0) {
-            errorsArray.push({
-                "message": "incorrect values",
-                "field": "availableResolutions"
-            })
-        }
+    if (OutputErrors.errorsMessages.length) {
+        res.status(400).json(OutputErrors)
+        return
     }
 
     let createdDate = new Date()
@@ -81,24 +50,12 @@ videosRouter.post('/', (req, res) => {
         publicationDate = req.body.publicationDate
     }
 
-    if (errorsArray.length) {
-        res.status(400).json({
-            "errorsMessages": errorsArray
-        })
-        return
-    }
-
     let canBeDownloaded = false
-    if ((typeof req.body.canBeDownloaded !== "undefined") && (typeof req.body.canBeDownloaded !== "boolean")) {
-        errorsArray.push({
-            "message": "incorrect values",
-            "field": "canBeDownloaded"
-        })
-    } else if (typeof req.body.canBeDownloaded === "boolean") {
+    if (typeof req.body.canBeDownloaded === "boolean") {
         canBeDownloaded = req.body.canBeDownloaded
     }
 
-    const newVideoObject = {
+    const newVideoObject: videoType = {
         "author": req.body.author,
         "availableResolutions": req.body.availableResolutions,
         "canBeDownloaded": canBeDownloaded,
@@ -114,64 +71,28 @@ videosRouter.post('/', (req, res) => {
 })
 
 videosRouter.put('/:id', (req, res) => {
-    let errorsArray = []
     const myArray = db.videos.filter((e) => +e.id === +req.params.id)
+
     if (myArray.length == 0) {
         res.sendStatus(404)
         return
     }
 
-    if (!req.body.author || req.body.author.length > 20) {
-        errorsArray.push({
-            "message": "incorrect values",
-            "field": "author"
-        })
-    }
-
-    if (!req.body.title || req.body.title.length > 40) {
-        errorsArray.push(
-            {
-                "message": "incorrect values",
-                "field": "title"
-            })
-    }
-
-    if (Array.isArray(req.body.availableResolutions)) {
-        const resolutionsEerrorsArray = [];
-        const resolutions = req.body.availableResolutions
-        for (let i = 0; i < resolutions.length; i++) {
-            console.log(resolutions[i])
-            console.log(db.availableResolutions.indexOf(resolutions[i]))
-            if (db.availableResolutions.indexOf(resolutions[i]) == -1) {
-                resolutionsEerrorsArray.push(resolutions[i])
-            }
-        }
-        if (resolutionsEerrorsArray.length > 0) {
-            errorsArray.push({
-                "message": "incorrect values",
-                "field": "availableResolutions"
-            })
-        }
-    }
+    let OutputErrors = inputVideoValidation(req.body)
 
     let canBeDownloaded = false
-    if ((typeof req.body.canBeDownloaded !== "undefined") && (typeof req.body.canBeDownloaded !== "boolean")) {
-        errorsArray.push({
-            "message": "incorrect values",
-            "field": "canBeDownloaded"
-        })
-    } else if (typeof req.body.canBeDownloaded === "boolean") {
+    if (typeof req.body.canBeDownloaded === "boolean") {
         canBeDownloaded = req.body.canBeDownloaded
     }
 
     let minAgeRestriction = null
     if ((typeof req.body.minAgeRestriction !== "undefined") && (!Number.isInteger(req.body.minAgeRestriction))) {
-        errorsArray.push({
+        OutputErrors.errorsMessages.push({
             "message": "incorrect values is not number",
             "field": "minAgeRestriction"
         })
     } else if (req.body.minAgeRestriction > 18 || req.body.minAgeRestriction < 0) {
-        errorsArray.push({
+        OutputErrors.errorsMessages.push({
             "message": "incorrect values",
             "field": "minAgeRestriction"
         })
@@ -180,15 +101,14 @@ videosRouter.put('/:id', (req, res) => {
     }
 
     if (!isValidDate(req.body.publicationDate)) {
-        errorsArray.push({
+        OutputErrors.errorsMessages.push({
             "message": "incorrect values",
             "field": "publicationDate"
         })
     }
-    if (errorsArray.length) {
-        res.status(400).json({
-            "errorsMessages": errorsArray
-        })
+
+    if (OutputErrors.errorsMessages.length) {
+        res.status(400).json(OutputErrors)
         return
     }
 
@@ -210,4 +130,61 @@ function isValidDate(stringDate: string) {
     //const regex = /^\d{4}-\d{2}-\d{2}$/
     const regex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/
     return regex.test(stringDate)
+}
+
+const inputVideoValidation = (videoObj: videoType) => {
+    let OutputErrors: OutputErrorsType = {
+        "errorsMessages": []
+    }
+
+    if (!videoObj.author || videoObj.author.length > 20) {
+        OutputErrors.errorsMessages.push({
+            "message": "incorrect values",
+            "field": "author"
+        })
+    }
+
+    if (!videoObj.title || videoObj.title.length > 40) {
+        OutputErrors.errorsMessages.push(
+            {
+                "message": "incorrect values",
+                "field": "title"
+            })
+    }
+
+    if (Array.isArray(videoObj.availableResolutions)) {
+        const resolutionsEerrorsArray = [];
+        const resolutions = videoObj.availableResolutions
+
+        for (let i = 0; i < resolutions.length; i++) {
+            console.log(resolutions[i])
+            console.log(db.availableResolutions.indexOf(resolutions[i]))
+            if (db.availableResolutions.indexOf(resolutions[i]) == -1) {
+                resolutionsEerrorsArray.push(resolutions[i])
+            }
+        }
+        if (resolutionsEerrorsArray.length > 0) {
+            OutputErrors.errorsMessages.push({
+                "message": "incorrect values",
+                "field": "availableResolutions"
+            })
+        }
+    }
+
+    if ((typeof videoObj.canBeDownloaded !== "undefined") && (typeof videoObj.canBeDownloaded !== "boolean")) {
+        OutputErrors.errorsMessages.push({
+            "message": "incorrect values",
+            "field": "canBeDownloaded"
+        })
+    }
+    // // ...
+    // if (!Array.isArray(videoObj.availableResolution)
+    //     || videoObj.availableResolution.find(p => !Resolutions[p])
+    // ) {
+    //     OutputErrors.push({
+    //         message: 'error!!!!', field: 'availableResolution'
+    //     })
+    // }
+
+    return OutputErrors
 }
