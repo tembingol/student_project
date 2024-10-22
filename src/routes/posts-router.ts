@@ -1,14 +1,13 @@
 import { Router } from "express";
 import { db } from "../db/db";
-import { PostInputModel, PostViewModel } from "../input-output-types/posts-models";
 import { OutputErrorsType } from "../input-output-types/otput-errors-model";
-import { baseAuthMiddleware } from "../global-middlewares/base-auth-middleware";
+import { PostInputModel, PostViewModel } from "../input-output-types/posts-models";
 
 export const postRouter = Router({})
 
 postRouter.get('/', (req, res) => {
-    const foudPosts = db.posts
-    res.status(200).json(foudPosts)
+    const foudBlogs = db.posts
+    res.status(200).json(foudBlogs)
 })
 
 postRouter.get('/:id', (req, res) => {
@@ -20,8 +19,8 @@ postRouter.get('/:id', (req, res) => {
     res.status(200).json(db.posts[index])
 })
 
-postRouter.post('/', baseAuthMiddleware, (req, res) => {
-    const OutputErrors = inputPostValidation(req.body)
+postRouter.post('/', (req, res) => {
+    const OutputErrors = inputBlogValidation(req.body)
 
     if (OutputErrors.errorsMessages.length) {
         res.status(400).json(OutputErrors)
@@ -41,7 +40,7 @@ postRouter.post('/', baseAuthMiddleware, (req, res) => {
     res.status(201).json(newPost)
 })
 
-postRouter.put('/:id', baseAuthMiddleware, (req, res) => {
+postRouter.put('/:id', (req, res) => {
     const index = db.posts.findIndex((e) => +e.id === +req.params.id);
 
     if (index === -1) {
@@ -49,7 +48,7 @@ postRouter.put('/:id', baseAuthMiddleware, (req, res) => {
         return
     }
 
-    const OutputErrors = inputPostValidation(req.body)
+    const OutputErrors = inputBlogValidation(req.body)
 
     if (OutputErrors.errorsMessages.length) {
         res.status(400).json(OutputErrors)
@@ -64,10 +63,10 @@ postRouter.put('/:id', baseAuthMiddleware, (req, res) => {
         db.posts[index].blogName = req.body.blogName;
     }
 
-    res.sendStatus(204)
+    res.status(204)
 })
 
-postRouter.delete('/:id', baseAuthMiddleware, (req, res) => {
+postRouter.delete('/:id', (req, res) => {
     const index = db.posts.findIndex((e) => +e.id === +req.params.id);
 
     if (index === -1) {
@@ -75,11 +74,11 @@ postRouter.delete('/:id', baseAuthMiddleware, (req, res) => {
         return
     }
 
-    db.posts.splice(index, 1)
+    db.blogs.splice(index, 1)
     res.sendStatus(204)
 })
 
-const inputPostValidation = (postObject: PostInputModel) => {
+const inputBlogValidation = (postObject: PostInputModel) => {
     let OutputErrors: OutputErrorsType = {
         "errorsMessages": []
     }

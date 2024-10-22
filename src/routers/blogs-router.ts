@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "../db/db";
 import { BlogInputModel, BlogViewModel } from "../input-output-types/blogs-types";
 import { OutputErrorsType } from "../input-output-types/otput-errors-model";
+import { baseAuthMiddleware } from "../global-middlewares/base-auth-middleware";
 
 
 export const blogsRouter = Router({})
@@ -20,7 +21,7 @@ blogsRouter.get('/:id', (req, res) => {
     res.status(200).json(db.blogs[index])
 })
 
-blogsRouter.post('/', (req, res) => {
+blogsRouter.post('/', baseAuthMiddleware, (req, res) => {
     const OutputErrors = inputBlogValidation(req.body)
 
     if (OutputErrors.errorsMessages.length) {
@@ -39,7 +40,7 @@ blogsRouter.post('/', (req, res) => {
     res.status(201).json(newBlog)
 })
 
-blogsRouter.put('/:id', (req, res) => {
+blogsRouter.put('/:id', baseAuthMiddleware, (req, res) => {
     const index = db.blogs.findIndex((e) => +e.id === +req.params.id);
 
     if (index === -1) {
@@ -60,18 +61,18 @@ blogsRouter.put('/:id', (req, res) => {
         db.blogs[index].websiteUrl = req.body.websiteUrl;
     }
 
-    res.status(204)
+    res.sendStatus(204)
 })
 
-blogsRouter.delete('/:id', (req, res) => {
-    const index = db.blogs.findIndex((e) => +e.id === +req.params.id);
+blogsRouter.delete('/:id', baseAuthMiddleware, (req, res) => {
+    const index = db.blogs.findIndex((e) => e.id === req.params.id);
 
     if (index === -1) {
         res.sendStatus(404)
         return
     }
 
-    db.videos.splice(index, 1)
+    db.blogs.splice(index, 1)
     res.sendStatus(204)
 })
 

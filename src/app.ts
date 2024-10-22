@@ -4,6 +4,7 @@ import { SETTINGS } from './settings'
 import { videosRouter } from './routers/video-router'
 import { blogsRouter } from './routers/blogs-router'
 import { postRouter } from './routers/posts-router'
+import { testingRouter } from './routers/testing-router'
 
 //import { getVideosController } from './videos/getVideosController'
 
@@ -15,11 +16,7 @@ app.get(SETTINGS.PATH.ROOT, (req, res) => {
   res.status(200).json({ version: '1.1' })
 })
 
-app.delete('/testing/all-data', (req, res) => {
-  db.videos = []
-  res.sendStatus(204)
-})
-
 app.use(SETTINGS.PATH.VIDEOS, videosRouter)
 app.use(SETTINGS.PATH.BLOGS, blogsRouter)
 app.use(SETTINGS.PATH.POSTS, postRouter)
+app.use(SETTINGS.PATH.TESTING, testingRouter)

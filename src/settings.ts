@@ -10,5 +10,7 @@ export const SETTINGS = {
         VIDEOS: '/videos',
         BLOGS: '/blogs',
         POSTS: '/posts',
+        TESTING: '/testing',
     },
+    ADMIN_AUTH: process.env.ADMIN_AUTH || 'admin:qwerty',
 }

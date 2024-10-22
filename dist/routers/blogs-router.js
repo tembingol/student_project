@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRouter = void 0;
 const express_1 = require("express");
 const db_1 = require("../db/db");
+const base_auth_middleware_1 = require("../global-middlewares/base-auth-middleware");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => {
     const allBlogs = db_1.db.blogs;
@@ -16,7 +17,7 @@ exports.blogsRouter.get('/:id', (req, res) => {
     }
     res.status(200).json(db_1.db.blogs[index]);
 });
-exports.blogsRouter.post('/', (req, res) => {
+exports.blogsRouter.post('/', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
     const OutputErrors = inputBlogValidation(req.body);
     if (OutputErrors.errorsMessages.length) {
         res.status(400).json(OutputErrors);
@@ -31,7 +32,7 @@ exports.blogsRouter.post('/', (req, res) => {
     db_1.db.blogs.push(newBlog);
     res.status(201).json(newBlog);
 });
-exports.blogsRouter.put('/:id', (req, res) => {
+exports.blogsRouter.put('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
     const index = db_1.db.blogs.findIndex((e) => +e.id === +req.params.id);
     if (index === -1) {
         res.sendStatus(404);
@@ -47,15 +48,15 @@ exports.blogsRouter.put('/:id', (req, res) => {
         db_1.db.blogs[index].description = req.body.description;
         db_1.db.blogs[index].websiteUrl = req.body.websiteUrl;
     }
-    res.status(204);
+    res.sendStatus(204);
 });
-exports.blogsRouter.delete('/:id', (req, res) => {
-    const index = db_1.db.blogs.findIndex((e) => +e.id === +req.params.id);
+exports.blogsRouter.delete('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
+    const index = db_1.db.blogs.findIndex((e) => e.id === req.params.id);
     if (index === -1) {
         res.sendStatus(404);
         return;
     }
-    db_1.db.videos.splice(index, 1);
+    db_1.db.blogs.splice(index, 1);
     res.sendStatus(204);
 });
 const inputBlogValidation = (blogObj) => {

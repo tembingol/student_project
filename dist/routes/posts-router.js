@@ -3,11 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postRouter = void 0;
 const express_1 = require("express");
 const db_1 = require("../db/db");
-const base_auth_middleware_1 = require("../global-middlewares/base-auth-middleware");
 exports.postRouter = (0, express_1.Router)({});
 exports.postRouter.get('/', (req, res) => {
-    const foudPosts = db_1.db.posts;
-    res.status(200).json(foudPosts);
+    const foudBlogs = db_1.db.posts;
+    res.status(200).json(foudBlogs);
 });
 exports.postRouter.get('/:id', (req, res) => {
     const index = db_1.db.posts.findIndex((e) => +e.id === +req.params.id);
@@ -17,8 +16,8 @@ exports.postRouter.get('/:id', (req, res) => {
     }
     res.status(200).json(db_1.db.posts[index]);
 });
-exports.postRouter.post('/', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
-    const OutputErrors = inputPostValidation(req.body);
+exports.postRouter.post('/', (req, res) => {
+    const OutputErrors = inputBlogValidation(req.body);
     if (OutputErrors.errorsMessages.length) {
         res.status(400).json(OutputErrors);
         return;
@@ -34,13 +33,13 @@ exports.postRouter.post('/', base_auth_middleware_1.baseAuthMiddleware, (req, re
     db_1.db.posts.push(newPost);
     res.status(201).json(newPost);
 });
-exports.postRouter.put('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
+exports.postRouter.put('/:id', (req, res) => {
     const index = db_1.db.posts.findIndex((e) => +e.id === +req.params.id);
     if (index === -1) {
         res.sendStatus(404);
         return;
     }
-    const OutputErrors = inputPostValidation(req.body);
+    const OutputErrors = inputBlogValidation(req.body);
     if (OutputErrors.errorsMessages.length) {
         res.status(400).json(OutputErrors);
         return;
@@ -52,18 +51,18 @@ exports.postRouter.put('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, 
         db_1.db.posts[index].blogId = req.body.blogId;
         db_1.db.posts[index].blogName = req.body.blogName;
     }
-    res.sendStatus(204);
+    res.status(204);
 });
-exports.postRouter.delete('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
+exports.postRouter.delete('/:id', (req, res) => {
     const index = db_1.db.posts.findIndex((e) => +e.id === +req.params.id);
     if (index === -1) {
         res.sendStatus(404);
         return;
     }
-    db_1.db.posts.splice(index, 1);
+    db_1.db.blogs.splice(index, 1);
     res.sendStatus(204);
 });
-const inputPostValidation = (postObject) => {
+const inputBlogValidation = (postObject) => {
     let OutputErrors = {
         "errorsMessages": []
     };
