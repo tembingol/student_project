@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db } from "../db/db";
-import { OutputErrorsType, OutputType, videoType } from "./models";
+import { videoType } from "./models";
+import { OutputErrorsType } from "../models";
 
 export const videosRouter = Router({})
 
@@ -177,14 +178,6 @@ const inputVideoValidation = (videoObj: videoType) => {
             "field": "canBeDownloaded"
         })
     }
-    // // ...
-    // if (!Array.isArray(videoObj.availableResolution)
-    //     || videoObj.availableResolution.find(p => !Resolutions[p])
-    // ) {
-    //     OutputErrors.push({
-    //         message: 'error!!!!', field: 'availableResolution'
-    //     })
-    // }
 
     return OutputErrors
 }
