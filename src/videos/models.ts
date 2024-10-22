@@ -1,12 +1,12 @@
 
 export type videoType = {
     author: string;
-    availableResolutions: string[] | undefined;
+    availableResolutions: Array<string> | undefined;
     canBeDownloaded: boolean | undefined;
     createdAt: Date;
     id: number;
     minAgeRestriction: null | string;
-    publicationDate: Date;
+    publicationDate: Date | undefined;
     title: string;
 
 }
