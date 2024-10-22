@@ -1,7 +1,9 @@
 import express from 'express'
 import { db } from './db/db'
-import { videosRouter } from './videos/video-router'
 import { SETTINGS } from './settings'
+import { videosRouter } from './routers/video-router'
+import { blogsRouter } from './routers/blogs-router'
+import { postRouter } from './routers/posts-router'
 
 //import { getVideosController } from './videos/getVideosController'
 
@@ -19,3 +21,5 @@ app.delete('/testing/all-data', (req, res) => {
 })
 
 app.use(SETTINGS.PATH.VIDEOS, videosRouter)
+app.use(SETTINGS.PATH.BLOGS, blogsRouter)
+app.use(SETTINGS.PATH.POSTS, postRouter)

@@ -6,8 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const db_1 = require("./db/db");
-const video_router_1 = require("./videos/video-router");
 const settings_1 = require("./settings");
+const video_router_1 = require("./routers/video-router");
+const blogs_router_1 = require("./routers/blogs-router");
+const posts_router_1 = require("./routers/posts-router");
 //import { getVideosController } from './videos/getVideosController'
 exports.app = (0, express_1.default)(); // создать приложение
 exports.app.use(express_1.default.json()); // создание свойств-объектов body и query во всех реквестах
@@ -20,3 +22,5 @@ exports.app.delete('/testing/all-data', (req, res) => {
     res.sendStatus(204);
 });
 exports.app.use(settings_1.SETTINGS.PATH.VIDEOS, video_router_1.videosRouter);
+exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
+exports.app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postRouter);

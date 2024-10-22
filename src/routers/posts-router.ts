@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db/db";
-import { postType } from "./models";
-import { OutputErrorsType } from "../models";
+import { PostInputModel, PostViewModel } from "../input-output-types/posts-models";
+import { OutputErrorsType } from "../input-output-types/otput-errors-model";
 
 export const postRouter = Router({})
 
@@ -27,7 +27,7 @@ postRouter.post('/', (req, res) => {
         return
     }
 
-    const newPost: postType = {
+    const newPost: PostViewModel = {
         "id": (db.posts.length + 1).toString(),
         "title": req.body.title,
         "shortDescription": req.body.shortDescription,
@@ -78,43 +78,36 @@ postRouter.delete('/:id', (req, res) => {
     res.sendStatus(204)
 })
 
-const inputBlogValidation = (blogObj: postType) => {
+const inputBlogValidation = (postObject: PostInputModel) => {
     let OutputErrors: OutputErrorsType = {
         "errorsMessages": []
     }
 
-    if (!blogObj.title || blogObj.title.length == 0) {
+    if (!postObject.title || postObject.title.length == 0 || postObject.title.length > 30) {
         OutputErrors.errorsMessages.push({
             "message": "incorrect values",
             "field": "title"
         })
     }
 
-    if (!blogObj.shortDescription || blogObj.shortDescription.length == 0) {
+    if (!postObject.shortDescription || postObject.shortDescription.length == 0 || postObject.shortDescription.length > 100) {
         OutputErrors.errorsMessages.push({
             "message": "incorrect values",
             "field": "shortDescription"
         })
     }
 
-    if (!blogObj.content || blogObj.content.length == 0) {
+    if (!postObject.content || postObject.content.length == 0 || postObject.content.length > 1000) {
         OutputErrors.errorsMessages.push({
             "message": "incorrect values",
             "field": "content"
         })
     }
 
-    if (!blogObj.blogId || blogObj.blogId.length == 0) {
+    if (!postObject.blogId || postObject.blogId.length == 0) {
         OutputErrors.errorsMessages.push({
             "message": "incorrect values",
             "field": "blogId"
-        })
-    }
-
-    if (!blogObj.blogName || blogObj.blogName.length == 0) {
-        OutputErrors.errorsMessages.push({
-            "message": "incorrect values",
-            "field": "blogName"
         })
     }
 

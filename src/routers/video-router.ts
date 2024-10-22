@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db/db";
-import { videoType } from "./models";
-import { OutputErrorsType } from "../models";
+import { VideoInputModel, VideoViewModel } from "../input-output-types/videos-models";
+import { OutputErrorsType } from "../input-output-types/otput-errors-model";
 
 export const videosRouter = Router({})
 
@@ -56,7 +56,7 @@ videosRouter.post('/', (req, res) => {
         canBeDownloaded = req.body.canBeDownloaded
     }
 
-    const newVideoObject: videoType = {
+    const newVideoObject: VideoViewModel = {
         "author": req.body.author,
         "availableResolutions": req.body.availableResolutions,
         "canBeDownloaded": canBeDownloaded,
@@ -133,7 +133,7 @@ function isValidDate(stringDate: string) {
     return regex.test(stringDate)
 }
 
-const inputVideoValidation = (videoObj: videoType) => {
+const inputVideoValidation = (videoObj: VideoInputModel) => {
     let OutputErrors: OutputErrorsType = {
         "errorsMessages": []
     }

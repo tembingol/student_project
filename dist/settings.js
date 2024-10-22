@@ -9,5 +9,7 @@ exports.SETTINGS = {
     PATH: {
         ROOT: '/',
         VIDEOS: '/videos',
+        BLOGS: '/blogs',
+        POSTS: '/posts',
     },
 };

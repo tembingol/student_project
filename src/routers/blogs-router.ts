@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { db } from "../db/db";
-import { blogType } from "./models";
-import { OutputErrorsType } from "../models";
+import { BlogInputModel, BlogViewModel } from "../input-output-types/blogs-types";
+import { OutputErrorsType } from "../input-output-types/otput-errors-model";
+
 
 export const blogsRouter = Router({})
 
 blogsRouter.get('/', (req, res) => {
-    const foudBlogs = db.blogs
-    res.status(200).json(foudBlogs)
+    const allBlogs = db.blogs
+    res.status(200).json(allBlogs)
 })
 
 blogsRouter.get('/:id', (req, res) => {
@@ -27,7 +28,7 @@ blogsRouter.post('/', (req, res) => {
         return
     }
 
-    const newBlog: blogType = {
+    const newBlog: BlogViewModel = {
         "id": (db.blogs.length + 1).toString(),
         "name": req.body.name,
         "description": req.body.description,
@@ -74,7 +75,7 @@ blogsRouter.delete('/:id', (req, res) => {
     res.sendStatus(204)
 })
 
-const inputBlogValidation = (blogObj: blogType) => {
+const inputBlogValidation = (blogObj: BlogInputModel) => {
     let OutputErrors: OutputErrorsType = {
         "errorsMessages": []
     }

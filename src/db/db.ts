@@ -1,14 +1,14 @@
 // import {VideoDBType} from './video-db-type'
 
-import { blogType } from "../blogs/models"
-import { postType } from "../posts/models"
-import { videoType } from "../videos/models"
+import { BlogViewModel } from "../input-output-types/blogs-types"
+import { PostViewModel } from "../input-output-types/posts-models"
+import { VideoViewModel } from "../input-output-types/videos-models"
 
 export type DBType = { // типизация базы данных (что мы будем в ней хранить)
-    videos: videoType[], // VideoDBType[]
+    videos: VideoViewModel[], // VideoDBType[]
     availableResolutions: string[],
-    blogs: blogType[],
-    posts: postType[],
+    blogs: BlogViewModel[],
+    posts: PostViewModel[],
 }
 
 export const db: DBType = { // создаём базу данных (пока это просто переменная)
