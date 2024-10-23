@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { db } from "../db/db";
-import { BlogInputModel, BlogViewModel } from "../input-output-types/blogs-types";
-import { OutputErrorsType } from "../input-output-types/otput-errors-model";
-import { baseAuthMiddleware } from "../global-middlewares/base-auth-middleware";
+import { db } from "../../db/db";
+import { BlogInputModel, BlogViewModel } from "../../input-output-types/blogs-types";
+import { OutputErrorsType } from "../../input-output-types/otput-errors-model";
+import { baseAuthMiddleware } from "../../global-middlewares/base-auth-middleware";
 
 
 export const blogsRouter = Router({})

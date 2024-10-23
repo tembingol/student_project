@@ -1,10 +1,10 @@
 import express from 'express'
 import { db } from './db/db'
 import { SETTINGS } from './settings'
-import { videosRouter } from './routers/video-router'
-import { blogsRouter } from './routers/blogs-router'
-import { postRouter } from './routers/posts-router'
-import { testingRouter } from './routers/testing-router'
+import { videosRouter } from './features/videos/videos-router'
+import { blogsRouter } from './features/blogs/blogs-router'
+import { postRouter } from './features/posts/posts-router'
+import { testingRouter } from './features/testing/testing-router'
 
 //import { getVideosController } from './videos/getVideosController'
 

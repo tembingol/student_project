@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { db } from "../db/db";
-import { OutputErrorsType } from "../input-output-types/otput-errors-model";
-import { VideoInputModel, VideoViewModel } from "../input-output-types/videos-models";
+import { db } from "../../db/db";
+import { VideoInputModel, VideoViewModel } from "../../input-output-types/videos-models";
+import { OutputErrorsType } from "../../input-output-types/otput-errors-model";
 
 export const videosRouter = Router({})
 
