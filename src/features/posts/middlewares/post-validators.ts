@@ -9,6 +9,8 @@ import { blogsRepository } from '../../blogs/blogs-repository'
 // content: string // max 1000
 // blogId: string // valid
 
+export const blogNameValidator = body('blogName')
+    .isString().withMessage('not string')
 export const titleValidator = body('title')
     .isString().withMessage('not string')
     .trim()
@@ -46,6 +48,7 @@ export const findPostValidator = (req: Request<{ id: string }>, res: Response, n
 export const postValidators = [
     baseAuthMiddleware,
 
+    //blogNameValidator,
     blogIdValidator,
     titleValidator,
     shortDescriptionValidator,

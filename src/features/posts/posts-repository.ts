@@ -35,12 +35,15 @@ export const postsRepository = {
         if (index === -1) {
             return false
         }
+        // for (const key in reqBody) {
+        //     db.posts[index][key] = reqBody[key]
+        // }
 
         db.posts[index].title = reqBody.title;
         db.posts[index].shortDescription = reqBody.shortDescription;
         db.posts[index].content = reqBody.content;
         db.posts[index].blogId = reqBody.blogId;
-        db.posts[index].blogName = reqBody.blogName;
+        db.posts[index].blogName = !reqBody.blogName ? "" : reqBody.blogName;
 
         return true
     },

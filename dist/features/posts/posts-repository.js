@@ -36,11 +36,14 @@ exports.postsRepository = {
         if (index === -1) {
             return false;
         }
+        // for (const key in reqBody) {
+        //     db.posts[index][key] = reqBody[key]
+        // }
         db_1.db.posts[index].title = reqBody.title;
         db_1.db.posts[index].shortDescription = reqBody.shortDescription;
         db_1.db.posts[index].content = reqBody.content;
         db_1.db.posts[index].blogId = reqBody.blogId;
-        db_1.db.posts[index].blogName = reqBody.blogName;
+        db_1.db.posts[index].blogName = !reqBody.blogName ? "" : reqBody.blogName;
         return true;
     },
     deletePost: function (id) {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postValidators = exports.findPostValidator = exports.blogIdValidator = exports.contentValidator = exports.shortDescriptionValidator = exports.titleValidator = void 0;
+exports.postValidators = exports.findPostValidator = exports.blogIdValidator = exports.contentValidator = exports.shortDescriptionValidator = exports.titleValidator = exports.blogNameValidator = void 0;
 const express_validator_1 = require("express-validator");
 const input_Check_Errors_Middleware_1 = require("../../../global-middlewares/input-Check-Errors-Middleware");
 const base_auth_middleware_1 = require("../../../global-middlewares/base-auth-middleware");
@@ -10,6 +10,8 @@ const blogs_repository_1 = require("../../blogs/blogs-repository");
 // shortDescription: string // max 100
 // content: string // max 1000
 // blogId: string // valid
+exports.blogNameValidator = (0, express_validator_1.body)('blogName')
+    .isString().withMessage('not string');
 exports.titleValidator = (0, express_validator_1.body)('title')
     .isString().withMessage('not string')
     .trim()
@@ -43,6 +45,7 @@ const findPostValidator = (req, res, next) => {
 exports.findPostValidator = findPostValidator;
 exports.postValidators = [
     base_auth_middleware_1.baseAuthMiddleware,
+    //blogNameValidator,
     exports.blogIdValidator,
     exports.titleValidator,
     exports.shortDescriptionValidator,
