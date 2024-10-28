@@ -27,6 +27,7 @@ export const blogIdValidator = body('blogId')
         const blog = blogsRepository.getBlogByID(blogId)
         // console.log(blog)
         return !!blog
+        //return true
     }).withMessage('no blog')
 
 export const findPostValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {

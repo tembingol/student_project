@@ -8,7 +8,7 @@ import { blogsRepository } from '../blogs-repository'
 // description: string // max 500
 // websiteUrl: string // max 100 ^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$
 
-export const nameValidator = body('websiteUrl')
+export const nameValidator = body('name')
     .isString().withMessage('not string')
     .trim()
     .isLength({ min: 1, max: 15 }).withMessage('more then 15 or 0')
@@ -19,8 +19,8 @@ export const descriptionValidator = body('description')
 export const websiteUrlValidator = body('websiteUrl')
     .isString().withMessage('not string')
     .trim()
-    .isURL().withMessage('not url')
     .isLength({ min: 1, max: 100 }).withMessage('more then 100 or 0')
+    .isURL().withMessage('not url')
 
 
 //export const findBlogValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {

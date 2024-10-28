@@ -8,7 +8,7 @@ const blogs_repository_1 = require("../blogs-repository");
 // name: string // max 15
 // description: string // max 500
 // websiteUrl: string // max 100 ^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$
-exports.nameValidator = (0, express_validator_1.body)('websiteUrl')
+exports.nameValidator = (0, express_validator_1.body)('name')
     .isString().withMessage('not string')
     .trim()
     .isLength({ min: 1, max: 15 }).withMessage('more then 15 or 0');
@@ -19,8 +19,8 @@ exports.descriptionValidator = (0, express_validator_1.body)('description')
 exports.websiteUrlValidator = (0, express_validator_1.body)('websiteUrl')
     .isString().withMessage('not string')
     .trim()
-    .isURL().withMessage('not url')
-    .isLength({ min: 1, max: 100 }).withMessage('more then 100 or 0');
+    .isLength({ min: 1, max: 100 }).withMessage('more then 100 or 0')
+    .isURL().withMessage('not url');
 //export const findBlogValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
 exports.blogIdValidator = (0, express_validator_1.body)('blogId').isString().withMessage('not string')
     .trim().custom(blogId => {

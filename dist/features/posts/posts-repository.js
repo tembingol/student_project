@@ -21,7 +21,7 @@ exports.postsRepository = {
             "shortDescription": reqBody.shortDescription,
             "content": reqBody.content,
             "blogId": reqBody.blogId,
-            blogName: ""
+            "blogName": ""
         };
         try {
             db_1.db.posts.push(newPost);
@@ -40,6 +40,7 @@ exports.postsRepository = {
         db_1.db.posts[index].shortDescription = reqBody.shortDescription;
         db_1.db.posts[index].content = reqBody.content;
         db_1.db.posts[index].blogId = reqBody.blogId;
+        db_1.db.posts[index].blogName = reqBody.blogName;
         return true;
     },
     deletePost: function (id) {

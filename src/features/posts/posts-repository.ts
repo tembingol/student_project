@@ -20,7 +20,7 @@ export const postsRepository = {
             "shortDescription": reqBody.shortDescription,
             "content": reqBody.content,
             "blogId": reqBody.blogId,
-            blogName: ""
+            "blogName": ""
         }
         try {
             db.posts.push(newPost)
@@ -40,6 +40,7 @@ export const postsRepository = {
         db.posts[index].shortDescription = reqBody.shortDescription;
         db.posts[index].content = reqBody.content;
         db.posts[index].blogId = reqBody.blogId;
+        db.posts[index].blogName = reqBody.blogName;
 
         return true
     },

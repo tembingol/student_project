@@ -28,6 +28,7 @@ exports.blogIdValidator = (0, express_validator_1.body)('blogId')
     const blog = blogs_repository_1.blogsRepository.getBlogByID(blogId);
     // console.log(blog)
     return !!blog;
+    //return true
 }).withMessage('no blog');
 const findPostValidator = (req, res, next) => {
     const post = posts_repository_1.postsRepository.getPostByID(req.params.id);
