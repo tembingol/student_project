@@ -1,6 +1,6 @@
 // import {VideoDBType} from './video-db-type'
 
-import { BlogViewModel } from "../input-output-types/blogs-types"
+import { BlogViewModel } from "../input-output-types/blogs-models"
 import { PostViewModel } from "../input-output-types/posts-models"
 import { VideoViewModel } from "../input-output-types/videos-models"
 

@@ -2,84 +2,44 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRouter = void 0;
 const express_1 = require("express");
-const db_1 = require("../../db/db");
 const base_auth_middleware_1 = require("../../global-middlewares/base-auth-middleware");
+const blogs_repository_1 = require("./blogs-repository");
+const blog_validators_1 = require("./middlewares/blog-validators");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => {
-    const allBlogs = db_1.db.blogs;
+    const allBlogs = blogs_repository_1.blogsRepository.getAllBlogs();
     res.status(200).json(allBlogs);
 });
 exports.blogsRouter.get('/:id', (req, res) => {
-    const index = db_1.db.blogs.findIndex((e) => +e.id === +req.params.id);
-    if (index === -1) {
+    const foundBlog = blogs_repository_1.blogsRepository.getBlogByID(req.params.id);
+    if (!foundBlog) {
         res.sendStatus(404);
         return;
     }
-    res.status(200).json(db_1.db.blogs[index]);
+    res.status(200).json(foundBlog);
 });
-exports.blogsRouter.post('/', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
-    const OutputErrors = inputBlogValidation(req.body);
-    if (OutputErrors.errorsMessages.length) {
-        res.status(400).json(OutputErrors);
+exports.blogsRouter.post('/', ...blog_validators_1.blogValidators, (req, res) => {
+    const newBlogID = blogs_repository_1.blogsRepository.createBlog(req.body);
+    if (!newBlogID) {
+        res.sendStatus(400);
         return;
     }
-    const newBlog = {
-        "id": (db_1.db.blogs.length + 1).toString(),
-        "name": req.body.name,
-        "description": req.body.description,
-        "websiteUrl": req.body.websiteUrl,
-    };
-    db_1.db.blogs.push(newBlog);
-    res.status(201).json(newBlog);
+    const foundBlog = blogs_repository_1.blogsRepository.getBlogByID(newBlogID);
+    res.status(201).json(foundBlog);
 });
-exports.blogsRouter.put('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
-    const index = db_1.db.blogs.findIndex((e) => +e.id === +req.params.id);
-    if (index === -1) {
+exports.blogsRouter.put('/:id', ...blog_validators_1.blogValidators, (req, res) => {
+    const isBlogUpdated = blogs_repository_1.blogsRepository.updateBlog(req.params.id, req.body);
+    if (!isBlogUpdated) {
         res.sendStatus(404);
         return;
-    }
-    const OutputErrors = inputBlogValidation(req.body);
-    if (OutputErrors.errorsMessages.length) {
-        res.status(400).json(OutputErrors);
-        return;
-    }
-    if (index !== -1) {
-        db_1.db.blogs[index].name = req.body.name;
-        db_1.db.blogs[index].description = req.body.description;
-        db_1.db.blogs[index].websiteUrl = req.body.websiteUrl;
     }
     res.sendStatus(204);
 });
 exports.blogsRouter.delete('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, res) => {
-    const index = db_1.db.blogs.findIndex((e) => e.id === req.params.id);
-    if (index === -1) {
+    const isBlogDeleted = blogs_repository_1.blogsRepository.deleteBlog(req.params.id);
+    if (!isBlogDeleted) {
         res.sendStatus(404);
         return;
     }
-    db_1.db.blogs.splice(index, 1);
     res.sendStatus(204);
 });
-const inputBlogValidation = (blogObj) => {
-    let OutputErrors = {
-        "errorsMessages": []
-    };
-    if (!blogObj.name || blogObj.name.length == 0) {
-        OutputErrors.errorsMessages.push({
-            "message": "incorrect values",
-            "field": "name"
-        });
-    }
-    if (!blogObj.description || blogObj.description.length == 0) {
-        OutputErrors.errorsMessages.push({
-            "message": "incorrect values",
-            "field": "description"
-        });
-    }
-    if (!blogObj.websiteUrl || blogObj.websiteUrl.length == 0) {
-        OutputErrors.errorsMessages.push({
-            "message": "incorrect values",
-            "field": "websiteUrl"
-        });
-    }
-    return OutputErrors;
-};
