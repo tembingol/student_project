@@ -1,60 +1,71 @@
-import { db } from "../../db/db"
+import { ObjectId } from "mongodb"
+import { postCollection } from "../../db/mongodb"
 import { PostInputModel, PostViewModel } from "../../input-output-types/posts-models"
 
 export const postsRepository = {
-    getAllPosts: function () {
-        const allBlogs = db.posts
-        return allBlogs
+    getAllPosts: async function () {
+        const allPosts = await postCollection.find().toArray()
+        return allPosts
     },
-    getPostByID: function (id: string) {
-        const index = db.posts.findIndex((e) => e.id === id)
-        if (index === -1) {
+    getPostByID: async function (id: string) {
+        const foundPost = await postCollection.findOne({ _id: new ObjectId(id) })
+        if (!foundPost) {
             return false
         }
-        return db.posts[index]
+        return foundPost.id
     },
-    createPost: function (reqBody: PostInputModel) {
+    createPost: async function (reqBody: PostInputModel) {
         const newPost: PostViewModel = {
-            "id": (db.posts.length + 1).toString(),
+            "id": new Date().toISOString(),
             "title": reqBody.title,
             "shortDescription": reqBody.shortDescription,
             "content": reqBody.content,
             "blogId": reqBody.blogId,
-            "blogName": ""
+            "blogName": "",
+            "createdAt": new Date().toISOString(),
         }
         try {
-            db.posts.push(newPost)
-            return newPost.id
+            const result = await postCollection.insertOne(newPost)
+            //if (!result.insertedId) {
+            return result.insertedId.toString()
+            //}
         } catch (err) {
-            return false
+            console.error(err)
         }
+        return false
     },
-    updatePost: function (id: string, reqBody: PostViewModel) {
-        const index = db.posts.findIndex((e) => e.id === id);
+    updatePost: async function (id: string, reqBody: PostViewModel) {
+        try {
+            const result = await postCollection.updateOne({ _id: new ObjectId(id) }, {
+                $set: {
+                    title: reqBody.title,
+                    shortDescription: reqBody.shortDescription,
+                    content: reqBody.content,
+                    blogId: reqBody.blogId,
+                    blogName: !reqBody.blogName ? "" : reqBody.blogName
 
-        if (index === -1) {
-            return false
+                }
+            })
+
+            if (result.upsertedCount > 0) {
+                return true
+            }
+
+        } catch (err) {
+            console.error(err)
         }
-        // for (const key in reqBody) {
-        //     db.posts[index][key] = reqBody[key]
-        // }
-
-        db.posts[index].title = reqBody.title;
-        db.posts[index].shortDescription = reqBody.shortDescription;
-        db.posts[index].content = reqBody.content;
-        db.posts[index].blogId = reqBody.blogId;
-        db.posts[index].blogName = !reqBody.blogName ? "" : reqBody.blogName;
-
-        return true
+        return false
     },
-    deletePost: function (id: string) {
-        const index = db.posts.findIndex((e) => e.id === id);
+    deletePost: async function (id: string) {
+        try {
+            const result = await postCollection.deleteOne({ _id: new ObjectId(id) })
 
-        if (index === -1) {
-            return false
+            if (result.deletedCount > 0) {
+                return true
+            }
+        } catch (err) {
+            console.error(err)
         }
-
-        db.posts.splice(index, 1)
-        return true
+        return false
     }
 }

@@ -1,5 +1,4 @@
 import express from 'express'
-import { db } from './db/db'
 import { SETTINGS } from './settings'
 import { videosRouter } from './features/videos/videos-router'
 import { blogsRouter } from './features/blogs/blogs-router'
@@ -16,7 +15,7 @@ app.get(SETTINGS.PATH.ROOT, (req, res) => {
   res.status(200).json({ version: '1.1' })
 })
 
-app.use(SETTINGS.PATH.VIDEOS, videosRouter)
+//app.use(SETTINGS.PATH.VIDEOS, videosRouter)
 app.use(SETTINGS.PATH.BLOGS, blogsRouter)
 app.use(SETTINGS.PATH.POSTS, postRouter)
 app.use(SETTINGS.PATH.TESTING, testingRouter)

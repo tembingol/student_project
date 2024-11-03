@@ -1,54 +1,61 @@
-import { db } from "../../db/db"
+import { ObjectId } from "mongodb"
+import { blogCollection } from "../../db/mongodb"
 import { BlogInputModel, BlogViewModel } from "../../input-output-types/blogs-models"
 
 export const blogsRepository = {
-    getAllBlogs: function () {
-        const allBlogs = db.blogs
-        return allBlogs
+    getAllBlogs: async function () {
+        const allBlogs = await blogCollection.find({})
+        return allBlogs.toArray()
     },
-    getBlogByID: function (id: string) {
-        const index = db.blogs.findIndex((e) => e.id === id)
-        if (index === -1) {
+    getBlogByID: async function (id: string) {
+        const foundBlog = await blogCollection.findOne({ _id: new ObjectId(id) })
+        if (!foundBlog?._id) {
             return false
         }
-        return db.blogs[index]
+        return foundBlog
     },
-    createBlog: function (reqBody: BlogInputModel) {
+    createBlog: async function (reqBody: BlogInputModel) {
         const newBlog: BlogViewModel = {
-            "id": (db.blogs.length + 1).toString(),
+            "id": new Date().toISOString(),
             "name": reqBody.name,
             "description": reqBody.description,
             "websiteUrl": reqBody.websiteUrl,
+            "createdAt": new Date().toISOString(),
+            "isMembership": false,
         }
         try {
-            db.blogs.push(newBlog)
-            return newBlog.id
+            const result = await blogCollection.insertOne(newBlog)
+            //if (!result) {
+            return result.insertedId.toString()
+            //}
         } catch (err) {
-            return false
+            console.error(err)
         }
-
+        return false
     },
-    updateBlog: function (id: string, reqBody: BlogViewModel) {
-        const index = db.blogs.findIndex((e) => e.id === id);
+    updateBlog: async function (id: string, reqBody: BlogViewModel) {
+        try {
+            const result = await blogCollection.updateOne({ _id: new ObjectId(id) }, { $set: { name: reqBody.name, description: reqBody.description, websiteUrl: reqBody.websiteUrl } })
 
-        if (index === -1) {
-            return false
+            if (result.upsertedCount > 0) {
+                return true
+            }
+
+        } catch (err) {
+            console.error(err)
         }
-
-        db.blogs[index].name = reqBody.name;
-        db.blogs[index].description = reqBody.description;
-        db.blogs[index].websiteUrl = reqBody.websiteUrl;
-
-        return true
+        return false
     },
-    deleteBlog: function (id: string) {
-        const index = db.blogs.findIndex((e) => e.id === id);
+    deleteBlog: async function (id: string) {
+        try {
+            const result = await blogCollection.deleteOne({ _id: new ObjectId(id) })
 
-        if (index === -1) {
-            return false
+            if (result.deletedCount > 0) {
+                return true
+            }
+        } catch (err) {
+            console.error(err)
         }
-
-        db.blogs.splice(index, 1)
-        return true
+        return false
     }
 }
