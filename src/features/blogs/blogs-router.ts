@@ -20,12 +20,13 @@ blogsRouter.get('/:id', async (req, res) => {
 })
 
 blogsRouter.post('/', ...blogValidators, async (req, res) => {
-    const newBlogID = await blogsRepository.createBlog(req.body);
-    if (!newBlogID) {
+
+    const isNewBblogCreated = await blogsRepository.createBlog(req.body);
+    if (isNewBblogCreated.result === false) {
         res.sendStatus(400)
         return
     }
-    const foundBlog = await blogsRepository.getBlogByID(newBlogID);
+    const foundBlog = await blogsRepository.getBlogByID(isNewBblogCreated.id);
     res.status(201).json(foundBlog)
 })
 

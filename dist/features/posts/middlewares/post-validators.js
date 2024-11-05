@@ -1,10 +1,18 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postValidators = exports.findPostValidator = exports.blogIdValidator = exports.contentValidator = exports.shortDescriptionValidator = exports.titleValidator = exports.blogNameValidator = void 0;
+exports.postValidators = exports.blogIdValidator = exports.contentValidator = exports.shortDescriptionValidator = exports.titleValidator = exports.blogNameValidator = void 0;
 const express_validator_1 = require("express-validator");
 const input_Check_Errors_Middleware_1 = require("../../../global-middlewares/input-Check-Errors-Middleware");
 const base_auth_middleware_1 = require("../../../global-middlewares/base-auth-middleware");
-const posts_repository_1 = require("../posts-repository");
 const blogs_repository_1 = require("../../blogs/blogs-repository");
 // title: string // max 30
 // shortDescription: string // max 100
@@ -26,23 +34,32 @@ exports.contentValidator = (0, express_validator_1.body)('content')
     .isLength({ min: 1, max: 1000 }).withMessage('more then 1000 or 0');
 exports.blogIdValidator = (0, express_validator_1.body)('blogId')
     .isString().withMessage('not string')
-    .trim().custom(blogId => {
-    const blog = blogs_repository_1.blogsRepository.getBlogByID(blogId);
-    // console.log(blog)
-    return !!blog;
-    //return true
-}).withMessage('no blog');
-const findPostValidator = (req, res, next) => {
-    const post = posts_repository_1.postsRepository.getPostByID(req.params.id);
-    if (!post) {
-        res
-            .status(404)
-            .json({});
-        return;
+    .trim().custom((blogId) => __awaiter(void 0, void 0, void 0, function* () {
+    const foundBlog = yield blogs_repository_1.blogsRepository.getBlogByID(blogId);
+    if (foundBlog == false) {
+        throw new Error('no blog');
     }
-    next();
-};
-exports.findPostValidator = findPostValidator;
+    return true;
+})).withMessage("no blog");
+function myValodator(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const foundBlog = yield blogs_repository_1.blogsRepository.getBlogByID(id);
+        if (foundBlog == false) {
+            return false;
+        }
+        return false;
+    });
+}
+// export const findPostValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+//     const post = postsRepository.getPostByID(req.params.id)
+//     if (!post) {
+//         res
+//             .status(404)
+//             .json({})
+//         return
+//     }
+//     next()
+// }
 exports.postValidators = [
     base_auth_middleware_1.baseAuthMiddleware,
     //blogNameValidator,

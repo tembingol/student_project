@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const settings_1 = require("./settings");
-const videos_router_1 = require("./features/videos/videos-router");
 const blogs_router_1 = require("./features/blogs/blogs-router");
 const posts_router_1 = require("./features/posts/posts-router");
 const testing_router_1 = require("./features/testing/testing-router");
@@ -17,7 +16,7 @@ exports.app.get(settings_1.SETTINGS.PATH.ROOT, (req, res) => {
     // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
     res.status(200).json({ version: '1.1' });
 });
-exports.app.use(settings_1.SETTINGS.PATH.VIDEOS, videos_router_1.videosRouter);
+//app.use(SETTINGS.PATH.VIDEOS, videosRouter)
 exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postRouter);
 exports.app.use(settings_1.SETTINGS.PATH.TESTING, testing_router_1.testingRouter);

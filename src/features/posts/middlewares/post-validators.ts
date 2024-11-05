@@ -25,25 +25,35 @@ export const contentValidator = body('content')
     .isLength({ min: 1, max: 1000 }).withMessage('more then 1000 or 0')
 export const blogIdValidator = body('blogId')
     .isString().withMessage('not string')
-    .trim().custom(blogId => {
-        const blog = blogsRepository.getBlogByID(blogId)
-        // console.log(blog)
-        return !!blog
-        //return true
-    }).withMessage('no blog')
+    .trim().custom(async (blogId) => {
+        const foundBlog = await blogsRepository.getBlogByID(blogId)
 
-export const findPostValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-    const post = postsRepository.getPostByID(req.params.id)
-    if (!post) {
+        if (foundBlog == false) {
+            throw new Error('no blog');
+        }
+        return true
+    }).withMessage("no blog")
 
-        res
-            .status(404)
-            .json({})
-        return
+async function myValodator(id: string) {
+    const foundBlog = await blogsRepository.getBlogByID(id)
+    if (foundBlog == false) {
+        return false
     }
-
-    next()
+    return false
 }
+
+// export const findPostValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+//     const post = postsRepository.getPostByID(req.params.id)
+//     if (!post) {
+
+//         res
+//             .status(404)
+//             .json({})
+//         return
+//     }
+
+//     next()
+// }
 
 export const postValidators = [
     baseAuthMiddleware,

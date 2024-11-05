@@ -24,12 +24,12 @@ export const websiteUrlValidator = body('websiteUrl')
 
 
 //export const findBlogValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-export const blogIdValidator = body('blogId').isString().withMessage('not string')
-    .trim().custom(blogId => {
-        const blog = blogsRepository.getBlogByID(blogId)
-        // console.log(blog)
-        return !!blog
-    }).withMessage('no blog')
+// export const blogIdValidator = body('blogId').isString().withMessage('not string')
+//     .trim().custom(blogId => {
+//         const blog = blogsRepository.getBlogByID(blogId)
+//         // console.log(blog)
+//         return !!blog
+//     }).withMessage('no blog')
 
 //next()
 //}

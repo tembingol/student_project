@@ -6,11 +6,11 @@ const inputCheckErrorsMiddleware = (req, res, next) => {
     const e = (0, express_validator_1.validationResult)(req);
     if (!e.isEmpty()) {
         const eArray = e.array({ onlyFirstError: true });
-        // console.log(eArray)
+        //console.log(eArray)
         res
             .status(400)
             .json({
-            errorsMessages: eArray.map(x => ({ field: x.path, message: x.msg }))
+            errorsMessages: eArray.map(x => ({ message: x.msg, field: x.path }))
         });
         return;
     }

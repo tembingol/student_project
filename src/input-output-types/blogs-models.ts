@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb"
 
 export type BlogInputModel = {
     name: string // max 15
@@ -6,6 +7,7 @@ export type BlogInputModel = {
 }
 
 export type BlogViewModel = {
+    _id: ObjectId
     id: string
     name: string // max 15
     description: string // max 500

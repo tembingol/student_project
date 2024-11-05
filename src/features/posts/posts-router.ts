@@ -21,11 +21,11 @@ postRouter.get('/:id', async (req, res) => {
 
 postRouter.post('/', ...postValidators, async (req, res) => {
     const newPostId = await postsRepository.createPost(req.body)
-    if (!newPostId) {
+    if (newPostId.result === false) {
         res.sendStatus(400)
         return
     }
-    const foundPost = postsRepository.getPostByID(newPostId);
+    const foundPost = await postsRepository.getPostByID(newPostId.id);
     res.status(201).json(foundPost)
 })
 

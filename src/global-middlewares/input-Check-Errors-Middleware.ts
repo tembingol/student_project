@@ -6,12 +6,12 @@ export const inputCheckErrorsMiddleware = (req: Request, res: Response<OutputErr
     const e = validationResult(req)
     if (!e.isEmpty()) {
         const eArray = e.array({ onlyFirstError: true }) as { path: FieldNamesType, msg: string }[]
-        // console.log(eArray)
+        //console.log(eArray)
 
         res
             .status(400)
             .json({
-                errorsMessages: eArray.map(x => ({ field: x.path, message: x.msg }))
+                errorsMessages: eArray.map(x => ({ message: x.msg, field: x.path }))
             })
         return
     }

@@ -5,18 +5,29 @@ import { PostInputModel, PostViewModel } from "../../input-output-types/posts-mo
 export const postsRepository = {
     getAllPosts: async function () {
         const allPosts = await postCollection.find().toArray()
-        return allPosts
+        return allPosts.map((el) => {
+            let { ["_id"]: _, ...mapped } = el
+            return mapped
+        })
     },
     getPostByID: async function (id: string) {
-        const foundPost = await postCollection.findOne({ _id: new ObjectId(id) })
+        const foundPost = await postCollection.findOne({ id: id })
         if (!foundPost) {
             return false
         }
-        return foundPost.id
+        let { ["_id"]: _, ...mapedPost } = foundPost
+        return mapedPost
     },
     createPost: async function (reqBody: PostInputModel) {
+        const result = {
+            result: false,
+            id: ""
+        }
+        const newPostObjectId = new ObjectId()
+
         const newPost: PostViewModel = {
-            "id": new Date().toISOString(),
+            "_id": newPostObjectId,
+            "id": newPostObjectId.toString(),
             "title": reqBody.title,
             "shortDescription": reqBody.shortDescription,
             "content": reqBody.content,
@@ -25,18 +36,17 @@ export const postsRepository = {
             "createdAt": new Date().toISOString(),
         }
         try {
-            const result = await postCollection.insertOne(newPost)
-            //if (!result.insertedId) {
-            return result.insertedId.toString()
-            //}
+            const insertResult = await postCollection.insertOne(newPost)
+            result.result = true
+            result.id = insertResult.insertedId.toString()
         } catch (err) {
             console.error(err)
         }
-        return false
+        return result
     },
     updatePost: async function (id: string, reqBody: PostViewModel) {
         try {
-            const result = await postCollection.updateOne({ _id: new ObjectId(id) }, {
+            const result = await postCollection.updateOne({ id: id }, {
                 $set: {
                     title: reqBody.title,
                     shortDescription: reqBody.shortDescription,
@@ -47,7 +57,7 @@ export const postsRepository = {
                 }
             })
 
-            if (result.upsertedCount > 0) {
+            if (result.modifiedCount > 0) {
                 return true
             }
 
@@ -58,7 +68,7 @@ export const postsRepository = {
     },
     deletePost: async function (id: string) {
         try {
-            const result = await postCollection.deleteOne({ _id: new ObjectId(id) })
+            const result = await postCollection.deleteOne({ id: id })
 
             if (result.deletedCount > 0) {
                 return true

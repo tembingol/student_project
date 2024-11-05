@@ -4,19 +4,30 @@ import { BlogInputModel, BlogViewModel } from "../../input-output-types/blogs-mo
 
 export const blogsRepository = {
     getAllBlogs: async function () {
-        const allBlogs = await blogCollection.find({})
-        return allBlogs.toArray()
+        const allBlogs = await blogCollection.find({}).toArray()
+        return allBlogs.map((el) => {
+            let { ["_id"]: _, ...mapped } = el
+            return mapped
+        })
     },
     getBlogByID: async function (id: string) {
-        const foundBlog = await blogCollection.findOne({ _id: new ObjectId(id) })
-        if (!foundBlog?._id) {
+        const foundBlog = await blogCollection.findOne({ id: id })
+        if (foundBlog == null) {
             return false
         }
-        return foundBlog
+        let { ["_id"]: _, ...mapedBlog } = foundBlog
+        return mapedBlog
     },
     createBlog: async function (reqBody: BlogInputModel) {
+        const result = {
+            result: false,
+            id: ""
+        }
+
+        const newBlogObjectId = new ObjectId()
         const newBlog: BlogViewModel = {
-            "id": new Date().toISOString(),
+            "_id": newBlogObjectId,
+            "id": newBlogObjectId.toString(),
             "name": reqBody.name,
             "description": reqBody.description,
             "websiteUrl": reqBody.websiteUrl,
@@ -24,20 +35,25 @@ export const blogsRepository = {
             "isMembership": false,
         }
         try {
-            const result = await blogCollection.insertOne(newBlog)
-            //if (!result) {
-            return result.insertedId.toString()
-            //}
+            const insertResult = await blogCollection.insertOne(newBlog)
+            result.result = true
+            result.id = insertResult.insertedId.toString()
         } catch (err) {
             console.error(err)
         }
-        return false
+        return result
     },
     updateBlog: async function (id: string, reqBody: BlogViewModel) {
         try {
-            const result = await blogCollection.updateOne({ _id: new ObjectId(id) }, { $set: { name: reqBody.name, description: reqBody.description, websiteUrl: reqBody.websiteUrl } })
+            const result = await blogCollection.updateOne({ id: id }, {
+                $set: {
+                    name: reqBody.name,
+                    description: reqBody.description,
+                    websiteUrl: reqBody.websiteUrl
+                }
+            })
 
-            if (result.upsertedCount > 0) {
+            if (result.modifiedCount > 0) {
                 return true
             }
 
@@ -48,7 +64,7 @@ export const blogsRepository = {
     },
     deleteBlog: async function (id: string) {
         try {
-            const result = await blogCollection.deleteOne({ _id: new ObjectId(id) })
+            const result = await blogCollection.deleteOne({ id: id })
 
             if (result.deletedCount > 0) {
                 return true
