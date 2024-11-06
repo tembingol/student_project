@@ -10,6 +10,15 @@ export const postsRepository = {
             return mapped
         })
     },
+
+    getAllPostsOfBlog: async function (blogId: string) {
+        const allPosts = await postCollection.find({ "blogId": blogId }).toArray()
+        return allPosts.map((el) => {
+            let { ["_id"]: _, ...mapped } = el
+            return mapped
+        })
+    },
+
     getPostByID: async function (id: string) {
         const foundPost = await postCollection.findOne({ id: id })
         if (!foundPost) {
@@ -19,12 +28,8 @@ export const postsRepository = {
         return mapedPost
     },
     createPost: async function (reqBody: PostInputModel) {
-        const result = {
-            result: false,
-            id: ""
-        }
-        const newPostObjectId = new ObjectId()
 
+        const newPostObjectId = new ObjectId()
         const newPost: PostViewModel = {
             "_id": newPostObjectId,
             "id": newPostObjectId.toString(),
@@ -35,15 +40,10 @@ export const postsRepository = {
             "blogName": "",
             "createdAt": new Date().toISOString(),
         }
-        try {
-            const insertResult = await postCollection.insertOne(newPost)
-            result.result = true
-            result.id = insertResult.insertedId.toString()
-        } catch (err) {
-            console.error(err)
-        }
-        return result
+        const insertResult = await postCollection.insertOne(newPost)
+        return insertResult.insertedId.toString()
     },
+
     updatePost: async function (id: string, reqBody: PostViewModel) {
         try {
             const result = await postCollection.updateOne({ id: id }, {

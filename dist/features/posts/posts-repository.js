@@ -33,6 +33,15 @@ exports.postsRepository = {
             });
         });
     },
+    getAllPostsOfBlog: function (blogId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allPosts = yield mongodb_2.postCollection.find({ "blogId": blogId }).toArray();
+            return allPosts.map((el) => {
+                let { ["_id"]: _ } = el, mapped = __rest(el, ["_id"]);
+                return mapped;
+            });
+        });
+    },
     getPostByID: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundPost = yield mongodb_2.postCollection.findOne({ id: id });
@@ -45,10 +54,6 @@ exports.postsRepository = {
     },
     createPost: function (reqBody) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = {
-                result: false,
-                id: ""
-            };
             const newPostObjectId = new mongodb_1.ObjectId();
             const newPost = {
                 "_id": newPostObjectId,
@@ -60,15 +65,8 @@ exports.postsRepository = {
                 "blogName": "",
                 "createdAt": new Date().toISOString(),
             };
-            try {
-                const insertResult = yield mongodb_2.postCollection.insertOne(newPost);
-                result.result = true;
-                result.id = insertResult.insertedId.toString();
-            }
-            catch (err) {
-                console.error(err);
-            }
-            return result;
+            const insertResult = yield mongodb_2.postCollection.insertOne(newPost);
+            return insertResult.insertedId.toString();
         });
     },
     updatePost: function (id, reqBody) {

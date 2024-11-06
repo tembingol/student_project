@@ -8,100 +8,66 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRepository = void 0;
 const mongodb_1 = require("mongodb");
 const mongodb_2 = require("../../db/mongodb");
 exports.blogsRepository = {
-    getAllBlogs: function () {
+    getAllBlogs: function (pageNumber, pageSize, sortBy, sortDirection, searchNameTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            const allBlogs = yield mongodb_2.blogCollection.find({}).toArray();
-            return allBlogs.map((el) => {
-                let { ["_id"]: _ } = el, mapped = __rest(el, ["_id"]);
-                return mapped;
-            });
+            const filter = {};
+            if (searchNameTerm) {
+                filter.title = { $regex: searchNameTerm, $option: 'i' };
+            }
+            const _pageNumber = +pageNumber;
+            const _pageSize = +pageSize;
+            const _sortDirection = sortDirection === 'asc' ? 1 : -1;
+            const allBlogs = yield mongodb_2.blogCollection.find(filter)
+                .skip((_pageNumber - 1) * _pageSize)
+                .limit(_pageSize)
+                .sort({ [sortBy]: _sortDirection })
+                .toArray();
+            return allBlogs;
         });
     },
     getBlogByID: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundBlog = yield mongodb_2.blogCollection.findOne({ id: id });
-            if (foundBlog == null) {
-                return false;
-            }
-            let { ["_id"]: _ } = foundBlog, mapedBlog = __rest(foundBlog, ["_id"]);
-            return mapedBlog;
+            return foundBlog;
         });
     },
-    createBlog: function (reqBody) {
+    createBlog: function (blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = {
-                result: false,
-                id: ""
-            };
             const newBlogObjectId = new mongodb_1.ObjectId();
             const newBlog = {
                 "_id": newBlogObjectId,
                 "id": newBlogObjectId.toString(),
-                "name": reqBody.name,
-                "description": reqBody.description,
-                "websiteUrl": reqBody.websiteUrl,
+                "name": blogBody.name,
+                "description": blogBody.description,
+                "websiteUrl": blogBody.websiteUrl,
                 "createdAt": new Date().toISOString(),
                 "isMembership": false,
             };
-            try {
-                const insertResult = yield mongodb_2.blogCollection.insertOne(newBlog);
-                result.result = true;
-                result.id = insertResult.insertedId.toString();
-            }
-            catch (err) {
-                console.error(err);
-            }
-            return result;
+            const insertResult = yield mongodb_2.blogCollection.insertOne(newBlog);
+            return insertResult.insertedId.toString();
         });
     },
-    updateBlog: function (id, reqBody) {
+    updateBlog: function (id, blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield mongodb_2.blogCollection.updateOne({ id: id }, {
-                    $set: {
-                        name: reqBody.name,
-                        description: reqBody.description,
-                        websiteUrl: reqBody.websiteUrl
-                    }
-                });
-                if (result.modifiedCount > 0) {
-                    return true;
+            const result = yield mongodb_2.blogCollection.updateOne({ id: id }, {
+                $set: {
+                    name: blogBody.name,
+                    description: blogBody.description,
+                    websiteUrl: blogBody.websiteUrl
                 }
-            }
-            catch (err) {
-                console.error(err);
-            }
-            return false;
+            });
+            return result.matchedCount === 1;
         });
     },
     deleteBlog: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield mongodb_2.blogCollection.deleteOne({ id: id });
-                if (result.deletedCount > 0) {
-                    return true;
-                }
-            }
-            catch (err) {
-                console.error(err);
-            }
-            return false;
+            const result = yield mongodb_2.blogCollection.deleteOne({ id: id });
+            return result.deletedCount === 1;
         });
     }
 };

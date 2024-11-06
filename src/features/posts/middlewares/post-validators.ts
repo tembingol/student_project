@@ -2,8 +2,7 @@ import { body } from 'express-validator'
 import { inputCheckErrorsMiddleware } from '../../../global-middlewares/input-Check-Errors-Middleware'
 import { NextFunction, Request, Response } from 'express'
 import { baseAuthMiddleware } from '../../../global-middlewares/base-auth-middleware'
-import { postsRepository } from '../posts-repository'
-import { blogsRepository } from '../../blogs/blogs-repository'
+import { blogsService } from '../../blogs/services/blogs-service'
 // title: string // max 30
 // shortDescription: string // max 100
 // content: string // max 1000
@@ -26,7 +25,7 @@ export const contentValidator = body('content')
 export const blogIdValidator = body('blogId')
     .isString().withMessage('not string')
     .trim().custom(async (blogId) => {
-        const foundBlog = await blogsRepository.getBlogByID(blogId)
+        const foundBlog = await blogsService.findBlogById(blogId)
 
         if (foundBlog == false) {
             throw new Error('no blog');
@@ -35,7 +34,7 @@ export const blogIdValidator = body('blogId')
     }).withMessage("no blog")
 
 async function myValodator(id: string) {
-    const foundBlog = await blogsRepository.getBlogByID(id)
+    const foundBlog = await blogsService.findBlogById(id)
     if (foundBlog == false) {
         return false
     }

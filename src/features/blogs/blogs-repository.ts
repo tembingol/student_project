@@ -3,75 +3,68 @@ import { blogCollection } from "../../db/mongodb"
 import { BlogInputModel, BlogViewModel } from "../../input-output-types/blogs-models"
 
 export const blogsRepository = {
-    getAllBlogs: async function () {
-        const allBlogs = await blogCollection.find({}).toArray()
-        return allBlogs.map((el) => {
-            let { ["_id"]: _, ...mapped } = el
-            return mapped
-        })
+
+    getAllBlogs: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, searchNameTerm: string,) {
+
+        const filter: any = {}
+        if (searchNameTerm) {
+            filter.title = { $regex: searchNameTerm, $option: 'i' }
+        }
+        const _pageNumber = +pageNumber
+        const _pageSize = +pageSize
+        const _sortDirection = sortDirection === 'asc' ? 1 : -1
+
+        const allBlogs = await blogCollection.find(filter)
+            .skip((_pageNumber - 1) * _pageSize)
+            .limit(_pageSize)
+            .sort({ [sortBy]: _sortDirection })
+            .toArray()
+
+        return allBlogs
+
     },
+
     getBlogByID: async function (id: string) {
+
         const foundBlog = await blogCollection.findOne({ id: id })
-        if (foundBlog == null) {
-            return false
-        }
-        let { ["_id"]: _, ...mapedBlog } = foundBlog
-        return mapedBlog
+        return foundBlog
+
     },
-    createBlog: async function (reqBody: BlogInputModel) {
-        const result = {
-            result: false,
-            id: ""
-        }
+
+    createBlog: async function (blogBody: BlogInputModel) {
 
         const newBlogObjectId = new ObjectId()
         const newBlog: BlogViewModel = {
             "_id": newBlogObjectId,
             "id": newBlogObjectId.toString(),
-            "name": reqBody.name,
-            "description": reqBody.description,
-            "websiteUrl": reqBody.websiteUrl,
+            "name": blogBody.name,
+            "description": blogBody.description,
+            "websiteUrl": blogBody.websiteUrl,
             "createdAt": new Date().toISOString(),
             "isMembership": false,
         }
-        try {
-            const insertResult = await blogCollection.insertOne(newBlog)
-            result.result = true
-            result.id = insertResult.insertedId.toString()
-        } catch (err) {
-            console.error(err)
-        }
-        return result
-    },
-    updateBlog: async function (id: string, reqBody: BlogViewModel) {
-        try {
-            const result = await blogCollection.updateOne({ id: id }, {
-                $set: {
-                    name: reqBody.name,
-                    description: reqBody.description,
-                    websiteUrl: reqBody.websiteUrl
-                }
-            })
+        const insertResult = await blogCollection.insertOne(newBlog)
+        return insertResult.insertedId.toString()
 
-            if (result.modifiedCount > 0) {
-                return true
+    },
+
+    updateBlog: async function (id: string, blogBody: BlogInputModel) {
+
+        const result = await blogCollection.updateOne({ id: id }, {
+            $set: {
+                name: blogBody.name,
+                description: blogBody.description,
+                websiteUrl: blogBody.websiteUrl
             }
+        })
 
-        } catch (err) {
-            console.error(err)
-        }
-        return false
+        return result.matchedCount === 1
+
     },
+
     deleteBlog: async function (id: string) {
-        try {
-            const result = await blogCollection.deleteOne({ id: id })
 
-            if (result.deletedCount > 0) {
-                return true
-            }
-        } catch (err) {
-            console.error(err)
-        }
-        return false
+        const result = await blogCollection.deleteOne({ id: id })
+        return result.deletedCount === 1
     }
 }
