@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { baseAuthMiddleware } from "../../global-middlewares/base-auth-middleware";
-import { blogsRepository } from "./blogs-repository";
 import { blogValidators } from "./middlewares/blog-validators";
 import { blogsService } from "./services/blogs-service";
+import { contentValidator, shortDescriptionValidator, titleValidator } from "../posts/middlewares/post-validators";
+import { inputCheckErrorsMiddleware } from "../../global-middlewares/input-Check-Errors-Middleware";
 
 export const blogsRouter = Router({})
 
@@ -46,16 +47,21 @@ blogsRouter.post('/', ...blogValidators, async (req, res) => {
 
 })
 
-blogsRouter.post('/:id/posts', ...blogValidators, async (req, res) => {
+blogsRouter.post('/:id/posts',
+    baseAuthMiddleware,
+    titleValidator,
+    shortDescriptionValidator,
+    contentValidator,
+    inputCheckErrorsMiddleware, async (req, res) => {
 
-    const newBblogPost = await blogsService.createBlogPost(req.params.id, req.body);
-    if (!newBblogPost) {
-        res.sendStatus(400)
-        return
-    }
-    res.status(201).json(newBblogPost)
+        const newBblogPost = await blogsService.createBlogPost(req.params.id, req.body);
+        if (!newBblogPost) {
+            res.sendStatus(400)
+            return
+        }
+        res.status(201).json(newBblogPost)
 
-})
+    })
 
 blogsRouter.put('/:id', ...blogValidators, async (req, res) => {
 

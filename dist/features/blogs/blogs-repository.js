@@ -69,5 +69,14 @@ exports.blogsRepository = {
             const result = yield mongodb_2.blogCollection.deleteOne({ id: id });
             return result.deletedCount === 1;
         });
+    },
+    getDocumetnsCount: function (searchNameTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = {};
+            if (searchNameTerm) {
+                filter.title = { $regex: searchNameTerm, $option: 'i' };
+            }
+            return yield mongodb_2.blogCollection.countDocuments(filter);
+        });
     }
 };

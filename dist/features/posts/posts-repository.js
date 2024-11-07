@@ -24,13 +24,21 @@ exports.postsRepository = void 0;
 const mongodb_1 = require("mongodb");
 const mongodb_2 = require("../../db/mongodb");
 exports.postsRepository = {
-    getAllPosts: function () {
+    getAllPosts: function (pageNumber, pageSize, sortBy, sortDirection, searchNameTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            const allPosts = yield mongodb_2.postCollection.find().toArray();
-            return allPosts.map((el) => {
-                let { ["_id"]: _ } = el, mapped = __rest(el, ["_id"]);
-                return mapped;
-            });
+            const filter = {};
+            if (searchNameTerm) {
+                filter.title = { $regex: searchNameTerm, $option: 'i' };
+            }
+            const _pageNumber = +pageNumber;
+            const _pageSize = +pageSize;
+            const _sortDirection = sortDirection === 'asc' ? 1 : -1;
+            const allPosts = yield mongodb_2.postCollection.find(filter)
+                .skip((_pageNumber - 1) * _pageSize)
+                .limit(_pageSize)
+                .sort({ [sortBy]: _sortDirection })
+                .toArray();
+            return allPosts;
         });
     },
     getAllPostsOfBlog: function (blogId) {
@@ -45,11 +53,7 @@ exports.postsRepository = {
     getPostByID: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundPost = yield mongodb_2.postCollection.findOne({ id: id });
-            if (!foundPost) {
-                return false;
-            }
-            let { ["_id"]: _ } = foundPost, mapedPost = __rest(foundPost, ["_id"]);
-            return mapedPost;
+            return foundPost;
         });
     },
     createPost: function (reqBody) {
@@ -69,40 +73,33 @@ exports.postsRepository = {
             return insertResult.insertedId.toString();
         });
     },
-    updatePost: function (id, reqBody) {
+    updatePost: function (id, postBody) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield mongodb_2.postCollection.updateOne({ id: id }, {
-                    $set: {
-                        title: reqBody.title,
-                        shortDescription: reqBody.shortDescription,
-                        content: reqBody.content,
-                        blogId: reqBody.blogId,
-                        blogName: !reqBody.blogName ? "" : reqBody.blogName
-                    }
-                });
-                if (result.modifiedCount > 0) {
-                    return true;
+            const result = yield mongodb_2.postCollection.updateOne({ id: id }, {
+                $set: {
+                    title: postBody.title,
+                    shortDescription: postBody.shortDescription,
+                    content: postBody.content,
+                    blogId: postBody.blogId,
+                    blogName: !postBody.blogName ? "" : postBody.blogName
                 }
-            }
-            catch (err) {
-                console.error(err);
-            }
-            return false;
+            });
+            return result.matchedCount === 1;
         });
     },
     deletePost: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield mongodb_2.postCollection.deleteOne({ id: id });
-                if (result.deletedCount > 0) {
-                    return true;
-                }
+            const result = yield mongodb_2.postCollection.deleteOne({ id: id });
+            return result.deletedCount === 1;
+        });
+    },
+    getDocumetnsCount: function (searchNameTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = {};
+            if (searchNameTerm) {
+                filter.title = { $regex: searchNameTerm, $option: 'i' };
             }
-            catch (err) {
-                console.error(err);
-            }
-            return false;
+            return yield mongodb_2.postCollection.countDocuments(filter);
         });
     }
 };

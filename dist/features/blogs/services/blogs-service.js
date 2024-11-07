@@ -26,18 +26,24 @@ const blogs_repository_1 = require("../blogs-repository");
 exports.blogsService = {
     findBlogs: function (queryParams) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("queryParams");
-            console.log(queryParams);
-            const pageNumber = !queryParams.pageNumber ? queryParams.pageNumber : 1;
-            const pageSize = !queryParams.pageSize ? +queryParams.pageSize : 10;
+            const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1;
+            const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10;
             const sortBy = !queryParams.sortBy ? queryParams.sortBy : "createdAt";
             const sortDirection = !queryParams.sortDirection ? queryParams.sortDirection : 'asc';
             const searchNameTerm = !queryParams.searchNameTerm ? queryParams.searchNameTerm : "";
             const allBlogs = yield blogs_repository_1.blogsRepository.getAllBlogs(pageNumber, pageSize, sortBy, sortDirection, searchNameTerm);
-            return allBlogs.map((el) => {
+            allBlogs.map((el) => {
                 let { ["_id"]: _ } = el, mapped = __rest(el, ["_id"]);
                 return mapped;
             });
+            const totalCount = yield blogs_repository_1.blogsRepository.getDocumetnsCount(searchNameTerm);
+            return {
+                pagesCount: Math.ceil(totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount,
+                items: allBlogs,
+            };
         });
     },
     findBlogById: function (id) {
@@ -52,7 +58,6 @@ exports.blogsService = {
     },
     findBlogPosts: function (blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            //to DO
             const trsult = yield post_service_1.postsService.findPostsOfBlog(blogId);
             return trsult;
         });

@@ -14,6 +14,8 @@ const express_1 = require("express");
 const base_auth_middleware_1 = require("../../global-middlewares/base-auth-middleware");
 const blog_validators_1 = require("./middlewares/blog-validators");
 const blogs_service_1 = require("./services/blogs-service");
+const post_validators_1 = require("../posts/middlewares/post-validators");
+const input_Check_Errors_Middleware_1 = require("../../global-middlewares/input-Check-Errors-Middleware");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const allBlogs = yield blogs_service_1.blogsService.findBlogs(req.query);
@@ -43,7 +45,7 @@ exports.blogsRouter.post('/', ...blog_validators_1.blogValidators, (req, res) =>
     }
     res.status(201).json(newBblog);
 }));
-exports.blogsRouter.post('/:id/posts', ...blog_validators_1.blogValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.post('/:id/posts', base_auth_middleware_1.baseAuthMiddleware, post_validators_1.titleValidator, post_validators_1.shortDescriptionValidator, post_validators_1.contentValidator, input_Check_Errors_Middleware_1.inputCheckErrorsMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newBblogPost = yield blogs_service_1.blogsService.createBlogPost(req.params.id, req.body);
     if (!newBblogPost) {
         res.sendStatus(400);

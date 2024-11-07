@@ -20,15 +20,6 @@ exports.websiteUrlValidator = (0, express_validator_1.body)('websiteUrl')
     .trim()
     .isLength({ min: 1, max: 100 }).withMessage('more then 100 or 0')
     .isURL().withMessage('not url');
-//export const findBlogValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-// export const blogIdValidator = body('blogId').isString().withMessage('not string')
-//     .trim().custom(blogId => {
-//         const blog = blogsRepository.getBlogByID(blogId)
-//         // console.log(blog)
-//         return !!blog
-//     }).withMessage('no blog')
-//next()
-//}
 exports.blogValidators = [
     base_auth_middleware_1.baseAuthMiddleware,
     exports.nameValidator,

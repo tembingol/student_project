@@ -66,5 +66,14 @@ export const blogsRepository = {
 
         const result = await blogCollection.deleteOne({ id: id })
         return result.deletedCount === 1
+
+    },
+
+    getDocumetnsCount: async function (searchNameTerm: string) {
+        const filter: any = {}
+        if (searchNameTerm) {
+            filter.title = { $regex: searchNameTerm, $option: 'i' }
+        }
+        return await blogCollection.countDocuments(filter)
     }
 }

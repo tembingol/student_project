@@ -1,17 +1,17 @@
 import { Router } from "express";
 import { baseAuthMiddleware } from "../../global-middlewares/base-auth-middleware";
-import { postsRepository } from "./posts-repository";
 import { postValidators } from "./middlewares/post-validators";
+import { postsService } from "./services/post-service";
 
 export const postRouter = Router({})
 
 postRouter.get('/', async (req, res) => {
-    const foudPosts = await postsRepository.getAllPosts()
+    const foudPosts = await postsService.findPosts(req.query)
     res.status(200).json(foudPosts)
 })
 
 postRouter.get('/:id', async (req, res) => {
-    const fuondPost = await postsRepository.getPostByID(req.params.id)
+    const fuondPost = await postsService.findPostById(req.params.id)
     if (!fuondPost) {
         res.sendStatus(404)
         return
@@ -20,17 +20,16 @@ postRouter.get('/:id', async (req, res) => {
 })
 
 postRouter.post('/', ...postValidators, async (req, res) => {
-    const newPostId = await postsRepository.createPost(req.body)
-    if (newPostId.result === false) {
+    const newBblog = await postsService.createPost(req.body);
+    if (!newBblog) {
         res.sendStatus(400)
         return
     }
-    const foundPost = await postsRepository.getPostByID(newPostId.id);
-    res.status(201).json(foundPost)
+    res.status(201).json(newBblog)
 })
 
 postRouter.put('/:id', ...postValidators, async (req, res) => {
-    const isPostUpdated = await postsRepository.updatePost(req.params.id, req.body);
+    const isPostUpdated = await postsService.updatePost(req.params.id, req.body);
     if (!isPostUpdated) {
         res.sendStatus(404)
         return
@@ -39,7 +38,7 @@ postRouter.put('/:id', ...postValidators, async (req, res) => {
 })
 
 postRouter.delete('/:id', baseAuthMiddleware, async (req, res) => {
-    const isPostDeleted = await postsRepository.deletePost(req.params.id)
+    const isPostDeleted = await postsService.deletePost(req.params.id)
     if (!isPostDeleted) {
         res.sendStatus(404)
         return

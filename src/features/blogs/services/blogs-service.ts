@@ -1,6 +1,5 @@
-import { BlogInputModel, BlogResponseModel, BlogViewModel } from "../../../input-output-types/blogs-models"
+import { BlogInputModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
-import { postsRepository } from "../../posts/posts-repository"
 import { postsService } from "../../posts/services/post-service"
 import { blogsRepository } from "../blogs-repository"
 
@@ -9,11 +8,8 @@ export const blogsService = {
 
     findBlogs: async function (queryParams: any) {
 
-        console.log("queryParams")
-        console.log(queryParams)
-
-        const pageNumber = !queryParams.pageNumber ? queryParams.pageNumber : 1
-        const pageSize = !queryParams.pageSize ? +queryParams.pageSize : 10
+        const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
+        const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = !queryParams.sortBy ? queryParams.sortBy : "createdAt"
         const sortDirection = !queryParams.sortDirection ? queryParams.sortDirection : 'asc'
         const searchNameTerm = !queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
@@ -26,10 +22,19 @@ export const blogsService = {
             searchNameTerm
         )
 
-        return allBlogs.map((el) => {
+        allBlogs.map((el) => {
             let { ["_id"]: _, ...mapped } = el
             return mapped
         })
+        const totalCount = await blogsRepository.getDocumetnsCount(searchNameTerm)
+
+        return {
+            pagesCount: Math.ceil(totalCount / pageSize),
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount,
+            items: allBlogs,
+        }
     },
 
     findBlogById: async function (id: string) {
@@ -43,7 +48,6 @@ export const blogsService = {
     },
 
     findBlogPosts: async function (blogId: string) {
-        //to DO
         const trsult = await postsService.findPostsOfBlog(blogId)
         return trsult
     },
