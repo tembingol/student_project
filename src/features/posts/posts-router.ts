@@ -5,6 +5,15 @@ import { postsService } from "./services/post-service";
 
 export const postRouter = Router({})
 
+// simple logger for this router's requests
+// all requests to this router will first hit this middleware
+postRouter.use(function (req, res, next) {
+    console.log('postRouter Logger \n{--')
+    console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
+    console.log('--}')
+    next()
+})
+
 postRouter.get('/', async (req, res) => {
     const foudPosts = await postsService.findPosts(req.query)
     res.status(200).json(foudPosts)

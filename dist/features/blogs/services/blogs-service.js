@@ -28,11 +28,11 @@ exports.blogsService = {
         return __awaiter(this, void 0, void 0, function* () {
             const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1;
             const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10;
-            const sortBy = !queryParams.sortBy ? queryParams.sortBy : "createdAt";
-            const sortDirection = !queryParams.sortDirection ? queryParams.sortDirection : 'asc';
-            const searchNameTerm = !queryParams.searchNameTerm ? queryParams.searchNameTerm : "";
+            const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt";
+            const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc';
+            const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : "";
             const allBlogs = yield blogs_repository_1.blogsRepository.getAllBlogs(pageNumber, pageSize, sortBy, sortDirection, searchNameTerm);
-            allBlogs.map((el) => {
+            const mappedBlogs = allBlogs.map((el) => {
                 let { ["_id"]: _ } = el, mapped = __rest(el, ["_id"]);
                 return mapped;
             });
@@ -41,8 +41,8 @@ exports.blogsService = {
                 pagesCount: Math.ceil(totalCount / pageSize),
                 page: pageNumber,
                 pageSize: pageSize,
-                totalCount,
-                items: allBlogs,
+                totalCount: totalCount,
+                items: mappedBlogs,
             };
         });
     },
@@ -56,16 +56,29 @@ exports.blogsService = {
             return mapedBlog;
         });
     },
-    findBlogPosts: function (blogId) {
+    findBlogPosts: function (blogId, queryParams) {
         return __awaiter(this, void 0, void 0, function* () {
-            const trsult = yield post_service_1.postsService.findPostsOfBlog(blogId);
-            return trsult;
+            const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1;
+            const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10;
+            const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt";
+            const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc';
+            const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : "";
+            const foundPosts = yield post_service_1.postsService.findPostsOfBlog(blogId, pageNumber, pageSize, sortBy, sortDirection, searchNameTerm);
+            const _totalCount = yield post_service_1.postsService.getDocumetnsCountBlog(blogId, searchNameTerm);
+            console.log("_totalCount " + _totalCount);
+            return {
+                pagesCount: Math.ceil(_totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: _totalCount,
+                items: foundPosts,
+            };
         });
     },
     createBlog: function (blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
             const newBblogId = yield blogs_repository_1.blogsRepository.createBlog(blogBody);
-            const foundBlog = yield blogs_repository_1.blogsRepository.getBlogByID(newBblogId);
+            const foundBlog = yield this.findBlogById(newBblogId);
             return foundBlog;
         });
     },
@@ -88,4 +101,9 @@ exports.blogsService = {
             return isBlogDeleted;
         });
     },
+    getDocumetnsCount: function (searchNameTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield blogs_repository_1.blogsRepository.getDocumetnsCount(searchNameTerm);
+        });
+    }
 };

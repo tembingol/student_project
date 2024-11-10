@@ -17,11 +17,15 @@ exports.blogsRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
             if (searchNameTerm) {
-                filter.title = { $regex: searchNameTerm, $option: 'i' };
+                filter.name = { $regex: searchNameTerm, $options: 'i' };
             }
             const _pageNumber = +pageNumber;
             const _pageSize = +pageSize;
             const _sortDirection = sortDirection === 'asc' ? 1 : -1;
+            console.log("getAllBlogs_sortDirection  %s", _sortDirection);
+            console.log("getAllBlogs_filter  %s", filter);
+            console.log(filter);
+            console.log("getAllBlogs_sortBy  %s", sortBy);
             const allBlogs = yield mongodb_2.blogCollection.find(filter)
                 .skip((_pageNumber - 1) * _pageSize)
                 .limit(_pageSize)
@@ -74,8 +78,12 @@ exports.blogsRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
             if (searchNameTerm) {
-                filter.title = { $regex: searchNameTerm, $option: 'i' };
+                filter.name = { $regex: searchNameTerm, $options: 'i' };
             }
+            console.log('getDocumetnsCount Logger \n{--');
+            console.log('filter %s', filter);
+            console.log(filter);
+            console.log('--}');
             return yield mongodb_2.blogCollection.countDocuments(filter);
         });
     }

@@ -50,16 +50,6 @@ function myValodator(id) {
         return false;
     });
 }
-// export const findPostValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-//     const post = postsRepository.getPostByID(req.params.id)
-//     if (!post) {
-//         res
-//             .status(404)
-//             .json({})
-//         return
-//     }
-//     next()
-// }
 exports.postValidators = [
     base_auth_middleware_1.baseAuthMiddleware,
     //blogNameValidator,

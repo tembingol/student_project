@@ -7,6 +7,15 @@ import { inputCheckErrorsMiddleware } from "../../global-middlewares/input-Check
 
 export const blogsRouter = Router({})
 
+// // simple logger for this router's requests
+// // all requests to this router will first hit this middleware
+// blogsRouter.use(function (req, res, next) {
+//     console.log('blogsRouter Logger \n{--')
+//     console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
+//     console.log('--}')
+//     next()
+// })
+
 blogsRouter.get('/', async (req, res) => {
 
     const allBlogs = await blogsService.findBlogs(req.query)
@@ -27,12 +36,17 @@ blogsRouter.get('/:id', async (req, res) => {
 
 blogsRouter.get('/:id/posts', async (req, res) => {
 
-    const foundBlog = await blogsService.findBlogPosts(req.params.id);
-    if (!foundBlog) {
+    const blog = await blogsService.findBlogById(req.params.id);
+    if (!blog) {
         res.sendStatus(404)
         return
     }
-    res.status(200).json(foundBlog)
+    const allPostsofBlog = await blogsService.findBlogPosts(req.params.id, req.query);
+    if (!allPostsofBlog) {
+        res.sendStatus(404)
+        return
+    }
+    res.status(200).json(allPostsofBlog)
 
 })
 
@@ -53,6 +67,12 @@ blogsRouter.post('/:id/posts',
     shortDescriptionValidator,
     contentValidator,
     inputCheckErrorsMiddleware, async (req, res) => {
+
+        const blog = await blogsService.findBlogById(req.params.id);
+        if (!blog) {
+            res.sendStatus(404)
+            return
+        }
 
         const newBblogPost = await blogsService.createBlogPost(req.params.id, req.body);
         if (!newBblogPost) {

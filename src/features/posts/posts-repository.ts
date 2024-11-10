@@ -4,10 +4,10 @@ import { PostInputModel, PostViewModel } from "../../input-output-types/posts-mo
 
 export const postsRepository = {
     getAllPosts: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, searchNameTerm: string,) {
-
         const filter: any = {}
         if (searchNameTerm) {
-            filter.title = { $regex: searchNameTerm, $option: 'i' }
+            //filter.title = { $regex: searchNameTerm, $options: 'i' }
+            filter[sortBy] = { $regex: searchNameTerm, $options: 'i' }
         }
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
@@ -16,15 +16,26 @@ export const postsRepository = {
         const allPosts = await postCollection.find(filter)
             .skip((_pageNumber - 1) * _pageSize)
             .limit(_pageSize)
-            .sort({ [sortBy]: _sortDirection })
+            .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })
             .toArray()
 
         return allPosts
-
     },
 
-    getAllPostsOfBlog: async function (blogId: string) {
-        const allPosts = await postCollection.find({ "blogId": blogId }).toArray()
+    getAllPostsOfBlog: async function (blogId: string, pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, searchNameTerm: string,) {
+        const filter: any = {}
+        if (searchNameTerm) {
+            filter.title = { $regex: searchNameTerm, $options: 'i' }
+        }
+        const _pageNumber = +pageNumber
+        const _pageSize = +pageSize
+        const _sortDirection = sortDirection === 'asc' ? 1 : -1
+
+        const allPosts = await postCollection.find({ "blogId": blogId })
+            .skip((_pageNumber - 1) * _pageSize)
+            .limit(_pageSize)
+            .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })
+            .toArray()
         return allPosts.map((el) => {
             let { ["_id"]: _, ...mapped } = el
             return mapped
@@ -36,17 +47,16 @@ export const postsRepository = {
         return foundPost
     },
 
-    createPost: async function (reqBody: PostInputModel) {
-
+    createPost: async function (postBody: PostInputModel) {
         const newPostObjectId = new ObjectId()
         const newPost: PostViewModel = {
             "_id": newPostObjectId,
             "id": newPostObjectId.toString(),
-            "title": reqBody.title,
-            "shortDescription": reqBody.shortDescription,
-            "content": reqBody.content,
-            "blogId": reqBody.blogId,
-            "blogName": "",
+            "title": postBody.title,
+            "shortDescription": postBody.shortDescription,
+            "content": postBody.content,
+            "blogId": postBody.blogId,
+            "blogName": postBody.blogName ? postBody.blogName : "",
             "createdAt": new Date().toISOString(),
         }
         const insertResult = await postCollection.insertOne(newPost)
@@ -60,8 +70,7 @@ export const postsRepository = {
                 shortDescription: postBody.shortDescription,
                 content: postBody.content,
                 blogId: postBody.blogId,
-                blogName: !postBody.blogName ? "" : postBody.blogName
-
+                blogName: postBody.blogName ? postBody.blogName : ""
             }
         })
 
@@ -69,17 +78,17 @@ export const postsRepository = {
     },
 
     deletePost: async function (id: string) {
-
         const result = await postCollection.deleteOne({ id: id })
         return result.deletedCount === 1
-
     },
 
-    getDocumetnsCount: async function (searchNameTerm: string) {
-        const filter: any = {}
-        if (searchNameTerm) {
-            filter.title = { $regex: searchNameTerm, $option: 'i' }
-        }
+    getDocumetnsCount: async function (filter: any) {
+        // const filter: any = {}
+        // if (searchNameTerm) {
+        //     filter.blogName = { $regex: searchNameTerm, $options: 'i' }
+        // }
+        console.log("getDocumetnsCount")
+        console.log("getDocumetnsCount")
         return await postCollection.countDocuments(filter)
     }
 }

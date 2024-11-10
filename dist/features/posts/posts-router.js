@@ -15,6 +15,14 @@ const base_auth_middleware_1 = require("../../global-middlewares/base-auth-middl
 const post_validators_1 = require("./middlewares/post-validators");
 const post_service_1 = require("./services/post-service");
 exports.postRouter = (0, express_1.Router)({});
+// simple logger for this router's requests
+// all requests to this router will first hit this middleware
+exports.postRouter.use(function (req, res, next) {
+    console.log('postRouter Logger \n{--');
+    console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url);
+    console.log('--}');
+    next();
+});
 exports.postRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const foudPosts = yield post_service_1.postsService.findPosts(req.query);
     res.status(200).json(foudPosts);

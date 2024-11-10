@@ -10,9 +10,9 @@ export const blogsService = {
 
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
-        const sortBy = !queryParams.sortBy ? queryParams.sortBy : "createdAt"
-        const sortDirection = !queryParams.sortDirection ? queryParams.sortDirection : 'asc'
-        const searchNameTerm = !queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
+        const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
+        const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
+        const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
 
         const allBlogs = await blogsRepository.getAllBlogs(
             pageNumber,
@@ -22,18 +22,19 @@ export const blogsService = {
             searchNameTerm
         )
 
-        allBlogs.map((el) => {
+        const mappedBlogs = allBlogs.map((el) => {
             let { ["_id"]: _, ...mapped } = el
             return mapped
         })
+
         const totalCount = await blogsRepository.getDocumetnsCount(searchNameTerm)
 
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
             pageSize: pageSize,
-            totalCount,
-            items: allBlogs,
+            totalCount: totalCount,
+            items: mappedBlogs,
         }
     },
 
@@ -42,20 +43,43 @@ export const blogsService = {
         if (foundBlog == null) {
             return false
         }
-        let { ["_id"]: _, ...mapedBlog
-        } = foundBlog
+        let { ["_id"]: _, ...mapedBlog } = foundBlog
         return mapedBlog
     },
 
-    findBlogPosts: async function (blogId: string) {
-        const trsult = await postsService.findPostsOfBlog(blogId)
-        return trsult
+    findBlogPosts: async function (blogId: string, queryParams: any) {
+
+        const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
+        const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
+        const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
+        const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
+        const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
+
+        const foundPosts = await postsService.findPostsOfBlog(
+            blogId,
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+            searchNameTerm)
+
+        const _totalCount = await postsService.getDocumetnsCountBlog(blogId, searchNameTerm)
+
+        console.log("_totalCount " + _totalCount)
+
+        return {
+            pagesCount: Math.ceil(_totalCount / pageSize),
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount: _totalCount,
+            items: foundPosts,
+        }
+
     },
 
     createBlog: async function (blogBody: BlogInputModel) {
         const newBblogId = await blogsRepository.createBlog(blogBody);
-
-        const foundBlog = await blogsRepository.getBlogByID(newBblogId);
+        const foundBlog = await this.findBlogById(newBblogId);
         return foundBlog
     },
 
@@ -74,5 +98,9 @@ export const blogsService = {
         const isBlogDeleted = await blogsRepository.deleteBlog(id)
         return isBlogDeleted
     },
+
+    getDocumetnsCount: async function (searchNameTerm: string) {
+        return await blogsRepository.getDocumetnsCount(searchNameTerm)
+    }
 
 }

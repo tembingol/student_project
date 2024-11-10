@@ -28,7 +28,8 @@ exports.postsRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
             if (searchNameTerm) {
-                filter.title = { $regex: searchNameTerm, $option: 'i' };
+                //filter.title = { $regex: searchNameTerm, $options: 'i' }
+                filter[sortBy] = { $regex: searchNameTerm, $options: 'i' };
             }
             const _pageNumber = +pageNumber;
             const _pageSize = +pageSize;
@@ -36,14 +37,25 @@ exports.postsRepository = {
             const allPosts = yield mongodb_2.postCollection.find(filter)
                 .skip((_pageNumber - 1) * _pageSize)
                 .limit(_pageSize)
-                .sort({ [sortBy]: _sortDirection })
+                .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })
                 .toArray();
             return allPosts;
         });
     },
-    getAllPostsOfBlog: function (blogId) {
+    getAllPostsOfBlog: function (blogId, pageNumber, pageSize, sortBy, sortDirection, searchNameTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            const allPosts = yield mongodb_2.postCollection.find({ "blogId": blogId }).toArray();
+            const filter = {};
+            if (searchNameTerm) {
+                filter.title = { $regex: searchNameTerm, $options: 'i' };
+            }
+            const _pageNumber = +pageNumber;
+            const _pageSize = +pageSize;
+            const _sortDirection = sortDirection === 'asc' ? 1 : -1;
+            const allPosts = yield mongodb_2.postCollection.find({ "blogId": blogId })
+                .skip((_pageNumber - 1) * _pageSize)
+                .limit(_pageSize)
+                .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })
+                .toArray();
             return allPosts.map((el) => {
                 let { ["_id"]: _ } = el, mapped = __rest(el, ["_id"]);
                 return mapped;
@@ -56,17 +68,17 @@ exports.postsRepository = {
             return foundPost;
         });
     },
-    createPost: function (reqBody) {
+    createPost: function (postBody) {
         return __awaiter(this, void 0, void 0, function* () {
             const newPostObjectId = new mongodb_1.ObjectId();
             const newPost = {
                 "_id": newPostObjectId,
                 "id": newPostObjectId.toString(),
-                "title": reqBody.title,
-                "shortDescription": reqBody.shortDescription,
-                "content": reqBody.content,
-                "blogId": reqBody.blogId,
-                "blogName": "",
+                "title": postBody.title,
+                "shortDescription": postBody.shortDescription,
+                "content": postBody.content,
+                "blogId": postBody.blogId,
+                "blogName": postBody.blogName ? postBody.blogName : "",
                 "createdAt": new Date().toISOString(),
             };
             const insertResult = yield mongodb_2.postCollection.insertOne(newPost);
@@ -81,7 +93,7 @@ exports.postsRepository = {
                     shortDescription: postBody.shortDescription,
                     content: postBody.content,
                     blogId: postBody.blogId,
-                    blogName: !postBody.blogName ? "" : postBody.blogName
+                    blogName: postBody.blogName ? postBody.blogName : ""
                 }
             });
             return result.matchedCount === 1;
@@ -93,12 +105,14 @@ exports.postsRepository = {
             return result.deletedCount === 1;
         });
     },
-    getDocumetnsCount: function (searchNameTerm) {
+    getDocumetnsCount: function (filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            const filter = {};
-            if (searchNameTerm) {
-                filter.title = { $regex: searchNameTerm, $option: 'i' };
-            }
+            // const filter: any = {}
+            // if (searchNameTerm) {
+            //     filter.blogName = { $regex: searchNameTerm, $options: 'i' }
+            // }
+            console.log("getDocumetnsCount");
+            console.log("getDocumetnsCount");
             return yield mongodb_2.postCollection.countDocuments(filter);
         });
     }

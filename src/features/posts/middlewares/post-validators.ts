@@ -26,7 +26,6 @@ export const blogIdValidator = body('blogId')
     .isString().withMessage('not string')
     .trim().custom(async (blogId) => {
         const foundBlog = await blogsService.findBlogById(blogId)
-
         if (foundBlog == false) {
             throw new Error('no blog');
         }
@@ -40,19 +39,6 @@ async function myValodator(id: string) {
     }
     return false
 }
-
-// export const findPostValidator = (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-//     const post = postsRepository.getPostByID(req.params.id)
-//     if (!post) {
-
-//         res
-//             .status(404)
-//             .json({})
-//         return
-//     }
-
-//     next()
-// }
 
 export const postValidators = [
     baseAuthMiddleware,
