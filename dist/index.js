@@ -9,13 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const process_1 = require("process");
 const app_1 = require("./app");
 const mongodb_1 = require("./db/mongodb");
 const settings_1 = require("./settings");
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, mongodb_1.connectMongoDB)();
-    app_1.app.listen(settings_1.SETTINGS.PORT, () => {
-        console.log('...server started in port ' + settings_1.SETTINGS.PORT);
-    });
+    const mongoConneted = yield (0, mongodb_1.connectMongoDB)();
+    if (mongoConneted) {
+        app_1.app.listen(settings_1.SETTINGS.PORT, () => {
+            console.log('...server started in port ' + settings_1.SETTINGS.PORT);
+        });
+    }
+    else {
+        console.log('App not started... ');
+        (0, process_1.exit)();
+    }
 });
 startApp();

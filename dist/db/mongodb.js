@@ -23,10 +23,12 @@ exports.videoCollection = exports.db.collection(settings_1.SETTINGS.VIDEO_COLLEC
 const connectMongoDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield client.connect();
-        console.log('connected to db');
+        yield client.db().command({ ping: 1 });
+        console.log('connected to mongo');
         return true;
     }
     catch (e) {
+        console.log('can not connected to mongo');
         console.log(e);
         yield client.close();
         return false;

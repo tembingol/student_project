@@ -17,9 +17,11 @@ export const videoCollection: Collection<VideoViewModel> = db.collection<VideoVi
 export const connectMongoDB = async () => {
     try {
         await client.connect()
-        console.log('connected to db')
+        await client.db().command({ ping: 1 })
+        console.log('connected to mongo')
         return true
     } catch (e) {
+        console.log('can not connected to mongo')
         console.log(e)
         await client.close()
         return false
