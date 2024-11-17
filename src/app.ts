@@ -4,6 +4,7 @@ import { videosRouter } from './features/videos/videos-router'
 import { blogsRouter } from './features/blogs/blogs-router'
 import { postRouter } from './features/posts/posts-router'
 import { testingRouter } from './features/testing/testing-router'
+import { usersRouter } from './features/users/users-router'
 
 //import { getVideosController } from './videos/getVideosController'
 
@@ -15,7 +16,7 @@ app.get(SETTINGS.PATH.ROOT, (req, res) => {
   res.status(200).json({ version: '1.1' })
 })
 
-//app.use(SETTINGS.PATH.VIDEOS, videosRouter)
+app.use(SETTINGS.PATH.AUTH, usersRouter)
 app.use(SETTINGS.PATH.BLOGS, blogsRouter)
 app.use(SETTINGS.PATH.POSTS, postRouter)
 app.use(SETTINGS.PATH.TESTING, testingRouter)
