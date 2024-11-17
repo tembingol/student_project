@@ -9,20 +9,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authsRouter = void 0;
+exports.authRouter = void 0;
 const express_1 = require("express");
-exports.authsRouter = (0, express_1.Router)({});
+const auth_validators_1 = require("./middlewares/auth-validators");
+const users_query_repo_1 = require("../users/users-query-repo");
+exports.authRouter = (0, express_1.Router)({});
 // // simple logger for this router's requests
 // // all requests to this router will first hit this middleware
-// blogsRouter.use(function (req, res, next) {
-//     console.log('authsRouter Logger \n{--')
+// authRouter.use(function (req, res, next) {
+//     console.log('authRouter Logger \n{--')
 //     console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
 //     console.log('--}')
 //     next()
 // })
-exports.authsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200);
-}));
-exports.authsRouter.get('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200);
+exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // isEmail =  (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(req.body.loginOrEmail.trim())) 
+    let foundUser = yield users_query_repo_1.usersQueryRepository.getUserByLogin(req.body.loginOrEmail.trim());
+    if (foundUser == null) {
+        foundUser = yield users_query_repo_1.usersQueryRepository.getUserByEmail(req.body.loginOrEmail.trim());
+    }
+    if (foundUser == null) {
+        res.sendStatus(401);
+        return;
+    }
+    //const hash = bcrypt.hash(req.body.password) 
+    res.sendStatus(204);
 }));

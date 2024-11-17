@@ -14,7 +14,8 @@ export const SETTINGS = {
     USERS_COLLECTION_NAME: 'users',
     PATH: {
         ROOT: '/',
-        AUTH: '/users',
+        USERS: '/users',
+        AUTH: '/auth',
         VIDEOS: '/videos',
         BLOGS: '/blogs',
         POSTS: '/posts',
