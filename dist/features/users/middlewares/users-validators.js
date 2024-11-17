@@ -15,8 +15,8 @@ exports.userEmailValidator = (0, express_validator_1.body)('email')
     .isString().withMessage('not string')
     .trim().isEmail().withMessage('not email');
 exports.userRegistrationValidators = [
-    exports.userLoginValidator,
-    exports.userPasswordValidator,
+    //userLoginValidator,
+    //userPasswordValidator,
     exports.userEmailValidator,
     input_Check_Errors_Middleware_1.inputCheckErrorsMiddleware,
 ];

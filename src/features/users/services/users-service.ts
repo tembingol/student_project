@@ -9,7 +9,8 @@ export type userServiceResponse = {
     result: boolean,
     status: number,
     data: {},
-    errors: OutputErrorsType[] | string
+    // errors: OutputErrorsType[] | string,
+    errors: {}[] | string
 }
 
 export const usersService = {
@@ -24,6 +25,9 @@ export const usersService = {
         const searchEmailTerm = queryParams.searchEmailTerm ? queryParams.searchEmailTerm : ""
 
         const filter: any = {}
+        // if (searchLoginTerm && searchEmailTerm) {
+        //     filter.login = { $regex: searchLoginTerm, $options: 'i' }
+        // }
         if (searchLoginTerm) {
             filter.login = { $regex: searchLoginTerm, $options: 'i' }
         }
@@ -63,7 +67,31 @@ export const usersService = {
             result: false,
             status: 400,
             data: {},
-            errors: [{ errorsMessages: { message: "error", field: "email" } }]
+            errors: []
+        }
+
+        if (!user.login) {
+            response.errors = [...response.errors, { errorsMessages: { message: "login should be string", field: "login" } }]
+        } else if (user.login.trim().length < 3 || user.login.trim().length > 10) {
+            response.errors = [...response.errors, { errorsMessages: { message: "login should be more then 3 or 10", field: "login" } }]
+        } else if (/^[a-zA-Z0-9_-]*$/.test(user.login.trim()) == false) {
+            response.errors = [...response.errors, { errorsMessages: { message: "login should true", field: "login" } }]
+        }
+
+        if (!user.password) {
+            response.errors = [...response.errors, { errorsMessages: { message: "password should be string", field: "login" } }]
+        } else if (user.password.trim().length < 6 || user.password.trim().length > 20) {
+            response.errors = [...response.errors, { errorsMessages: { message: "password should be more then 6 or 20", field: "login" } }]
+        }
+
+        if (!user.email) {
+            response.errors = [...response.errors, { errorsMessages: { message: "email should be string", field: "login" } }]
+        } else if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(user.email.trim()) == false) {
+            response.errors = [...response.errors, { errorsMessages: { message: "email should true", field: "email" } }]
+        }
+
+        if (response.errors.length > 0) {
+            return response
         }
 
         const isEmailAvalible = await usersQueryRepository.getUserByEmail(user.email)
@@ -72,7 +100,21 @@ export const usersService = {
             response.result = false
             response.status = 400
             response.data = {}
-            response.errors = [{ errorsMessages: { message: "email is busy", field: "email" } }]
+            response.errors = [...response.errors, { errorsMessages: { message: "email should be unique", field: "email" } }]
+            return response
+        }
+
+        const isLoginAvalible = await usersQueryRepository.getUserByLogin(user.login)
+
+        if (isLoginAvalible !== null) {
+            response.result = false
+            response.status = 400
+            response.data = {}
+            response.errors = [...response.errors, { errorsMessages: { message: "login should be unique", field: "login" } }]
+            return response
+        }
+
+        if (response.errors.length > 0) {
             return response
         }
 
@@ -87,10 +129,11 @@ export const usersService = {
 
         const isCreated = await usersRepository.createUser(newUser)
 
-        if (isCreated) {
+        if (isCreated !== "") {
+            const createdUser = await usersQueryRepository.getUserById(isCreated)
             response.result = true
-            response.status = 204
-            response.data = isCreated
+            response.status = 201
+            response.data = createdUser == null ? {} : createdUser
         }
 
         return response
@@ -117,6 +160,5 @@ export const usersService = {
         return response
 
     },
-
 
 }

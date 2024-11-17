@@ -18,8 +18,8 @@ export const userEmailValidator = body('email')
 
 export const userRegistrationValidators = [
 
-    userLoginValidator,
-    userPasswordValidator,
+    //userLoginValidator,
+    //userPasswordValidator,
     userEmailValidator,
 
     inputCheckErrorsMiddleware,

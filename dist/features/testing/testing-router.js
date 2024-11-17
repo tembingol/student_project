@@ -17,6 +17,7 @@ exports.testingRouter.delete('/all-data', (req, res) => __awaiter(void 0, void 0
     yield mongodb_1.blogCollection.drop();
     yield mongodb_1.postCollection.drop();
     yield mongodb_1.videoCollection.drop();
+    yield mongodb_1.usersCollection.drop();
     res.sendStatus(204);
 }));
 // testingRouter.delete('/all-data', (req, res) => {

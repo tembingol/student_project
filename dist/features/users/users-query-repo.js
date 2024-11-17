@@ -12,12 +12,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersQueryRepository = void 0;
 const mongodb_1 = require("../../db/mongodb");
 exports.usersQueryRepository = {
-    getUserByLogin: function (loginOrEmail) {
+    getUserByLogin: function (login) {
         return __awaiter(this, void 0, void 0, function* () {
-            const filter = { loginOrEmail: loginOrEmail };
+            const filter = { login: login };
             const foundUser = yield mongodb_1.usersCollection.findOne(filter);
             if (foundUser) {
-                userEntityMapper(foundUser);
+                return userEntityMapper(foundUser);
+            }
+            return foundUser;
+        });
+    },
+    getUserById: function (id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = { id: id };
+            const foundUser = yield mongodb_1.usersCollection.findOne(filter);
+            if (foundUser) {
+                return userEntityMapper(foundUser);
             }
             return foundUser;
         });
@@ -27,7 +37,7 @@ exports.usersQueryRepository = {
             const filter = { email: email };
             const foundUser = yield mongodb_1.usersCollection.findOne(filter);
             if (foundUser) {
-                userEntityMapper(foundUser);
+                return userEntityMapper(foundUser);
             }
             return foundUser;
         });
@@ -37,10 +47,10 @@ exports.usersQueryRepository = {
             const _pageNumber = +pageNumber;
             const _pageSize = +pageSize;
             const _sortDirection = sortDirection === 'asc' ? 1 : -1;
-            // console.log("getAllBlogs_sortDirection  %s", _sortDirection)
-            // console.log("getAllBlogs_filter  %s", filter)
-            // console.log(filter)
-            // console.log("getAllBlogs_sortBy  %s", sortBy)
+            console.log("getAllUsers_sortDirection  %s", _sortDirection);
+            console.log("getAllUsers_filter  %s", filter);
+            console.log(filter);
+            console.log("getAllUsers_sortBy  %s", sortBy);
             const allUsers = yield mongodb_1.usersCollection.find(filter)
                 .skip((_pageNumber - 1) * _pageSize)
                 .limit(_pageSize)

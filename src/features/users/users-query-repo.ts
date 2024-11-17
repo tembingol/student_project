@@ -3,11 +3,20 @@ import { UserViewModel } from "../../input-output-types/users-moduls"
 
 export const usersQueryRepository = {
 
-    getUserByLogin: async function (loginOrEmail: string) {
-        const filter = { loginOrEmail: loginOrEmail }
+    getUserByLogin: async function (login: string) {
+        const filter = { login: login }
         const foundUser = await usersCollection.findOne(filter)
         if (foundUser) {
-            userEntityMapper(foundUser)
+            return userEntityMapper(foundUser)
+        }
+        return foundUser
+    },
+
+    getUserById: async function (id: string) {
+        const filter = { id: id }
+        const foundUser = await usersCollection.findOne(filter)
+        if (foundUser) {
+            return userEntityMapper(foundUser)
         }
         return foundUser
     },
@@ -16,7 +25,7 @@ export const usersQueryRepository = {
         const filter = { email: email }
         const foundUser = await usersCollection.findOne(filter)
         if (foundUser) {
-            userEntityMapper(foundUser)
+            return userEntityMapper(foundUser)
         }
         return foundUser
     },
@@ -27,10 +36,10 @@ export const usersQueryRepository = {
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
 
-        // console.log("getAllBlogs_sortDirection  %s", _sortDirection)
-        // console.log("getAllBlogs_filter  %s", filter)
-        // console.log(filter)
-        // console.log("getAllBlogs_sortBy  %s", sortBy)
+        console.log("getAllUsers_sortDirection  %s", _sortDirection)
+        console.log("getAllUsers_filter  %s", filter)
+        console.log(filter)
+        console.log("getAllUsers_sortBy  %s", sortBy)
 
         const allUsers = await usersCollection.find(filter)
             .skip((_pageNumber - 1) * _pageSize)
