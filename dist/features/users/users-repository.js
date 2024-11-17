@@ -13,11 +13,13 @@ exports.usersRepository = void 0;
 const mongodb_1 = require("mongodb");
 const mongodb_2 = require("../../db/mongodb");
 exports.usersRepository = {
-    createUser: function (user) {
+    createUser: function (user, usersCredentials) {
         return __awaiter(this, void 0, void 0, function* () {
             const newBObjectId = new mongodb_1.ObjectId();
             user._id = newBObjectId;
             user.id = newBObjectId.toString();
+            //toDo transaction
+            const insetrCred = mongodb_2.usersCredentialsCollection.insertOne(usersCredentials);
             const insertResult = yield mongodb_2.usersCollection.insertOne(user);
             return insertResult.insertedId.toString();
         });

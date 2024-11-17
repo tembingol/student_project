@@ -29,7 +29,14 @@ authRouter.post('/login', ...authValidators, async (req, res) => {
         return
     }
 
+    const userCredentials = await usersQueryRepository.getUserCredentials(foundUser.id)
 
-    //const hash = bcrypt.hash(req.body.password) 
+    const userHash = bcrypt.hashSync(req.body.password, userCredentials.salt)
+
+    if (userHash !== userCredentials.hash) {
+        res.sendStatus(401)
+        return
+    }
+
     res.sendStatus(204)
 })

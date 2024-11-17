@@ -8,11 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersService = void 0;
 const mongodb_1 = require("mongodb");
 const users_repository_1 = require("../users-repository");
 const users_query_repo_1 = require("../users-query-repo");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.usersService = {
     findUsers: function (queryParams) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -108,7 +112,14 @@ exports.usersService = {
                 createdAt: new Date(),
                 email: user.email,
             };
-            const isCreated = yield users_repository_1.usersRepository.createUser(newUser);
+            const salt = bcrypt_1.default.genSaltSync(10);
+            const hash = bcrypt_1.default.hashSync(user.password, salt);
+            const usersCredentials = {
+                userId: userId.toString(),
+                salt: salt,
+                hash: hash
+            };
+            const isCreated = yield users_repository_1.usersRepository.createUser(newUser, usersCredentials);
             if (isCreated !== "") {
                 const createdUser = yield users_query_repo_1.usersQueryRepository.getUserById(isCreated);
                 response.result = true;

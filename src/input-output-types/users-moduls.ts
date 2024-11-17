@@ -1,5 +1,11 @@
 import { ObjectId } from "mongodb"
 
+export type UserCredentialsModel = {
+    userId: string
+    salt: string,
+    hash: string
+}
+
 export type LoginInputModel = {
     loginOrEmail: string,
     password: string

@@ -1,28 +1,29 @@
-import { usersCollection } from "../../db/mongodb"
+import { usersCollection, usersCredentialsCollection } from "../../db/mongodb"
 import { UserViewModel } from "../../input-output-types/users-moduls"
 
 export const usersQueryRepository = {
 
-    getUserByLogin: async function (login: string) {
-        const filter = { login: login }
-        const foundUser = await usersCollection.findOne(filter)
-        if (foundUser) {
-            return userEntityMapper(foundUser)
-        }
+
+    getUserCredentials: async function (userId: string) {
+        const filter = { userId: userId }
+        const foundUser = await usersCredentialsCollection.findOne(filter)
         return foundUser
     },
 
-    getUserById: async function (id: string) {
-        const filter = { id: id }
+    getUserByLogin: async function (login: string) {
+        const filter = { login: login }
         const foundUser = await usersCollection.findOne(filter)
-        if (foundUser) {
-            return userEntityMapper(foundUser)
-        }
         return foundUser
     },
 
     getUserByEmail: async function (email: string) {
         const filter = { email: email }
+        const foundUser = await usersCollection.findOne(filter)
+        return foundUser
+    },
+
+    getUserById: async function (id: string) {
+        const filter = { id: id }
         const foundUser = await usersCollection.findOne(filter)
         if (foundUser) {
             return userEntityMapper(foundUser)
@@ -51,29 +52,16 @@ export const usersQueryRepository = {
     },
 
     getDocumetnsCount: async function (filter: {}) {
-
-        // console.log('getDocumetnsCount Logger \n{--')
-        // console.log('filter %s', filter)
-        // console.log(filter)
-        // console.log('--}')
-
         return await usersCollection.countDocuments(filter)
     }
 
 }
 
 function userEntityMapper(user: UserViewModel) {
-
     return {
         id: user.id,
         login: user.login,
         email: user.email,
         createdAt: user.createdAt,
     }
-
-    // const mappedArr = arrToMAp.map((el) => {
-    //     let { ["_id"]: _, ...mapped } = el
-    //     return mapped
-    // })
-    // return mappedArr
 }

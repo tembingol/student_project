@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb"
 import { OutputErrorsType } from "../../../input-output-types/otput-errors-model"
-import { UserInputModel, UserViewModel } from "../../../input-output-types/users-moduls"
+import { UserInputModel, UserCredentialsModel, UserViewModel } from "../../../input-output-types/users-moduls"
 import { usersRepository } from "../users-repository"
 import { usersQueryRepository } from "../users-query-repo"
 import bcrypt from "bcrypt"
@@ -127,7 +127,16 @@ export const usersService = {
             email: user.email,
         }
 
-        const isCreated = await usersRepository.createUser(newUser)
+        const salt = bcrypt.genSaltSync(10)
+        const hash = bcrypt.hashSync(user.password, salt)
+
+        const usersCredentials: UserCredentialsModel = {
+            userId: userId.toString(),
+            salt: salt,
+            hash: hash
+        }
+
+        const isCreated = await usersRepository.createUser(newUser, usersCredentials)
 
         if (isCreated !== "") {
             const createdUser = await usersQueryRepository.getUserById(isCreated)

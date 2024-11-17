@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectMongoDB = exports.usersCollection = exports.videoCollection = exports.postCollection = exports.blogCollection = exports.db = void 0;
+exports.connectMongoDB = exports.usersCredentialsCollection = exports.usersCollection = exports.videoCollection = exports.postCollection = exports.blogCollection = exports.db = void 0;
 const mongodb_1 = require("mongodb");
 const settings_1 = require("../settings");
 // получение доступа к бд
@@ -20,6 +20,7 @@ exports.blogCollection = exports.db.collection(settings_1.SETTINGS.BLOG_COLLECTI
 exports.postCollection = exports.db.collection(settings_1.SETTINGS.POST_COLLECTION_NAME);
 exports.videoCollection = exports.db.collection(settings_1.SETTINGS.VIDEO_COLLECTION_NAME);
 exports.usersCollection = exports.db.collection(settings_1.SETTINGS.USERS_COLLECTION_NAME);
+exports.usersCredentialsCollection = exports.db.collection(settings_1.SETTINGS.USERSCREDENTIALS_COLLECTION_NAME);
 // проверка подключения к бд
 const connectMongoDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {

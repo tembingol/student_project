@@ -12,29 +12,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersQueryRepository = void 0;
 const mongodb_1 = require("../../db/mongodb");
 exports.usersQueryRepository = {
+    getUserCredentials: function (userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = { userId: userId };
+            const foundUser = yield mongodb_1.usersCredentialsCollection.findOne(filter);
+            return foundUser;
+        });
+    },
     getUserByLogin: function (login) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = { login: login };
             const foundUser = yield mongodb_1.usersCollection.findOne(filter);
-            if (foundUser) {
-                return userEntityMapper(foundUser);
-            }
-            return foundUser;
-        });
-    },
-    getUserById: function (id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const filter = { id: id };
-            const foundUser = yield mongodb_1.usersCollection.findOne(filter);
-            if (foundUser) {
-                return userEntityMapper(foundUser);
-            }
             return foundUser;
         });
     },
     getUserByEmail: function (email) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = { email: email };
+            const foundUser = yield mongodb_1.usersCollection.findOne(filter);
+            return foundUser;
+        });
+    },
+    getUserById: function (id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = { id: id };
             const foundUser = yield mongodb_1.usersCollection.findOne(filter);
             if (foundUser) {
                 return userEntityMapper(foundUser);
@@ -61,10 +62,6 @@ exports.usersQueryRepository = {
     },
     getDocumetnsCount: function (filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            // console.log('getDocumetnsCount Logger \n{--')
-            // console.log('filter %s', filter)
-            // console.log(filter)
-            // console.log('--}')
             return yield mongodb_1.usersCollection.countDocuments(filter);
         });
     }
@@ -76,9 +73,4 @@ function userEntityMapper(user) {
         email: user.email,
         createdAt: user.createdAt,
     };
-    // const mappedArr = arrToMAp.map((el) => {
-    //     let { ["_id"]: _, ...mapped } = el
-    //     return mapped
-    // })
-    // return mappedArr
 }

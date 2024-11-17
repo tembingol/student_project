@@ -8,11 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
 const express_1 = require("express");
 const auth_validators_1 = require("./middlewares/auth-validators");
 const users_query_repo_1 = require("../users/users-query-repo");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.authRouter = (0, express_1.Router)({});
 // // simple logger for this router's requests
 // // all requests to this router will first hit this middleware
@@ -32,6 +36,11 @@ exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res
         res.sendStatus(401);
         return;
     }
-    //const hash = bcrypt.hash(req.body.password) 
+    const userCredentials = yield users_query_repo_1.usersQueryRepository.getUserCredentials(foundUser.id);
+    const userHash = bcrypt_1.default.hashSync(req.body.password, userCredentials.salt);
+    if (userHash !== userCredentials.hash) {
+        res.sendStatus(401);
+        return;
+    }
     res.sendStatus(204);
 }));

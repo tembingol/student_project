@@ -12,6 +12,7 @@ export const SETTINGS = {
     POST_COLLECTION_NAME: 'posts',
     VIDEO_COLLECTION_NAME: 'videos',
     USERS_COLLECTION_NAME: 'users',
+    USERSCREDENTIALS_COLLECTION_NAME: 'usersCredentials',
     PATH: {
         ROOT: '/',
         USERS: '/users',
