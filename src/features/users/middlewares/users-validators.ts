@@ -20,7 +20,7 @@ export const userRegistrationValidators = [
 
     //userLoginValidator,
     //userPasswordValidator,
-    userEmailValidator,
+    //userEmailValidator,
 
     inputCheckErrorsMiddleware,
 ]

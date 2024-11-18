@@ -17,6 +17,6 @@ exports.userEmailValidator = (0, express_validator_1.body)('email')
 exports.userRegistrationValidators = [
     //userLoginValidator,
     //userPasswordValidator,
-    exports.userEmailValidator,
+    //userEmailValidator,
     input_Check_Errors_Middleware_1.inputCheckErrorsMiddleware,
 ];

@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersService = void 0;
-const mongodb_1 = require("mongodb");
 const users_repository_1 = require("../users-repository");
 const users_query_repo_1 = require("../users-query-repo");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -26,16 +25,12 @@ exports.usersService = {
             const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc';
             const searchLoginTerm = queryParams.searchLoginTerm ? queryParams.searchLoginTerm : "";
             const searchEmailTerm = queryParams.searchEmailTerm ? queryParams.searchEmailTerm : "";
-            const filter = {};
-            // if (searchLoginTerm && searchEmailTerm) {
-            //     filter.login = { $regex: searchLoginTerm, $options: 'i' }
-            // }
-            if (searchLoginTerm) {
-                filter.login = { $regex: searchLoginTerm, $options: 'i' };
-            }
-            if (searchEmailTerm) {
-                filter.email = { $regex: searchEmailTerm, $options: 'i' };
-            }
+            const filter = {
+                $or: [
+                    { login: { $regex: searchLoginTerm, $options: 'i' } },
+                    { email: { $regex: searchEmailTerm, $options: 'i' } }
+                ]
+            };
             const allUsers = yield users_query_repo_1.usersQueryRepository.getAllUsers(pageNumber, pageSize, sortBy, sortDirection, filter);
             const totalCount = yield users_query_repo_1.usersQueryRepository.getDocumetnsCount(filter);
             const response = {
@@ -48,7 +43,7 @@ exports.usersService = {
                     totalCount: totalCount,
                     items: allUsers,
                 },
-                errors: []
+                errors: { errorsMessages: [] }
             };
             return response;
         });
@@ -59,30 +54,30 @@ exports.usersService = {
                 result: false,
                 status: 400,
                 data: {},
-                errors: []
+                errors: { errorsMessages: [] }
             };
             if (!user.login) {
-                response.errors = [...response.errors, { errorsMessages: { message: "login should be string", field: "login" } }];
+                response.errors.errorsMessages.push({ message: "login should be string", field: "login" });
             }
             else if (user.login.trim().length < 3 || user.login.trim().length > 10) {
-                response.errors = [...response.errors, { errorsMessages: { message: "login should be more then 3 or 10", field: "login" } }];
+                response.errors.errorsMessages.push({ message: "login should be more then 3 or 10", field: "login" });
             }
             else if (/^[a-zA-Z0-9_-]*$/.test(user.login.trim()) == false) {
-                response.errors = [...response.errors, { errorsMessages: { message: "login should true", field: "login" } }];
+                response.errors.errorsMessages.push({ message: "login is not valid", field: "login" });
             }
             if (!user.password) {
-                response.errors = [...response.errors, { errorsMessages: { message: "password should be string", field: "login" } }];
+                response.errors.errorsMessages.push({ message: "password should be string", field: "password" });
             }
             else if (user.password.trim().length < 6 || user.password.trim().length > 20) {
-                response.errors = [...response.errors, { errorsMessages: { message: "password should be more then 6 or 20", field: "login" } }];
+                response.errors.errorsMessages.push({ message: "password should be more then 6 or 20", field: "password" });
             }
             if (!user.email) {
-                response.errors = [...response.errors, { errorsMessages: { message: "email should be string", field: "login" } }];
+                response.errors.errorsMessages.push({ message: "email should be string", field: "email" });
             }
             else if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(user.email.trim()) == false) {
-                response.errors = [...response.errors, { errorsMessages: { message: "email should true", field: "email" } }];
+                response.errors.errorsMessages.push({ message: "not an email", field: "email" });
             }
-            if (response.errors.length > 0) {
+            if (response.errors.errorsMessages.length > 0) {
                 return response;
             }
             const isEmailAvalible = yield users_query_repo_1.usersQueryRepository.getUserByEmail(user.email);
@@ -90,7 +85,7 @@ exports.usersService = {
                 response.result = false;
                 response.status = 400;
                 response.data = {};
-                response.errors = [...response.errors, { errorsMessages: { message: "email should be unique", field: "email" } }];
+                response.errors.errorsMessages.push({ message: "email should be unique", field: "email" });
                 return response;
             }
             const isLoginAvalible = yield users_query_repo_1.usersQueryRepository.getUserByLogin(user.login);
@@ -98,16 +93,14 @@ exports.usersService = {
                 response.result = false;
                 response.status = 400;
                 response.data = {};
-                response.errors = [...response.errors, { errorsMessages: { message: "login should be unique", field: "login" } }];
+                response.errors.errorsMessages.push({ message: "login should be unique", field: "login" });
                 return response;
             }
-            if (response.errors.length > 0) {
+            if (response.errors.errorsMessages.length > 0) {
                 return response;
             }
-            const userId = new mongodb_1.ObjectId();
             const newUser = {
-                _id: userId,
-                id: userId.toString(),
+                id: "",
                 login: user.login,
                 createdAt: new Date(),
                 email: user.email,
@@ -115,7 +108,7 @@ exports.usersService = {
             const salt = bcrypt_1.default.genSaltSync(10);
             const hash = bcrypt_1.default.hashSync(user.password, salt);
             const usersCredentials = {
-                userId: userId.toString(),
+                userId: "",
                 salt: salt,
                 hash: hash
             };
@@ -135,13 +128,13 @@ exports.usersService = {
                 result: false,
                 status: 404,
                 data: {},
-                errors: "User not found"
+                errors: { errorsMessages: [] }
             };
             const isDeleted = yield users_repository_1.usersRepository.deleteUser(useriD);
             if (isDeleted) {
                 response.result = true;
                 response.status = 204;
-                response.errors = "";
+                response.errors.errorsMessages = [];
             }
             return response;
         });

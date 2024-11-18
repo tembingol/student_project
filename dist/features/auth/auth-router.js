@@ -37,6 +37,10 @@ exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res
         return;
     }
     const userCredentials = yield users_query_repo_1.usersQueryRepository.getUserCredentials(foundUser.id);
+    if (userCredentials == null) {
+        res.sendStatus(401);
+        return;
+    }
     const userHash = bcrypt_1.default.hashSync(req.body.password, userCredentials.salt);
     if (userHash !== userCredentials.hash) {
         res.sendStatus(401);

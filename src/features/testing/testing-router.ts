@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { blogCollection, postCollection, videoCollection, usersCollection } from "../../db/mongodb";
+import { blogCollection, postCollection, videoCollection, usersCollection, usersCredentialsCollection } from "../../db/mongodb";
 
 export const testingRouter = Router({})
 
@@ -8,6 +8,7 @@ testingRouter.delete('/all-data', async (req, res) => {
     await postCollection.drop()
     await videoCollection.drop()
     await usersCollection.drop()
+    await usersCredentialsCollection.drop()
 
     res.sendStatus(204)
 })

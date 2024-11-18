@@ -1,24 +1,32 @@
 import { usersCollection, usersCredentialsCollection } from "../../db/mongodb"
-import { UserViewModel } from "../../input-output-types/users-moduls"
+import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../input-output-types/users-moduls"
 
 export const usersQueryRepository = {
-
 
     getUserCredentials: async function (userId: string) {
         const filter = { userId: userId }
         const foundUser = await usersCredentialsCollection.findOne(filter)
+        if (foundUser) {
+            return userCredentialsMapper(foundUser)
+        }
         return foundUser
     },
 
     getUserByLogin: async function (login: string) {
         const filter = { login: login }
         const foundUser = await usersCollection.findOne(filter)
+        if (foundUser) {
+            return userEntityMapper(foundUser)
+        }
         return foundUser
     },
 
     getUserByEmail: async function (email: string) {
         const filter = { email: email }
         const foundUser = await usersCollection.findOne(filter)
+        if (foundUser) {
+            return userEntityMapper(foundUser)
+        }
         return foundUser
     },
 
@@ -37,11 +45,6 @@ export const usersQueryRepository = {
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
 
-        console.log("getAllUsers_sortDirection  %s", _sortDirection)
-        console.log("getAllUsers_filter  %s", filter)
-        console.log(filter)
-        console.log("getAllUsers_sortBy  %s", sortBy)
-
         const allUsers = await usersCollection.find(filter)
             .skip((_pageNumber - 1) * _pageSize)
             .limit(_pageSize)
@@ -54,14 +57,21 @@ export const usersQueryRepository = {
     getDocumetnsCount: async function (filter: {}) {
         return await usersCollection.countDocuments(filter)
     }
-
 }
 
-function userEntityMapper(user: UserViewModel) {
+function userEntityMapper(user: UserDataBaseModel): UserViewModel {
     return {
-        id: user.id,
+        id: user._id.toString(),
         login: user.login,
         email: user.email,
         createdAt: user.createdAt,
+    }
+}
+
+function userCredentialsMapper(userCredential: UserCredentialsModel): UserCredentialsModel {
+    return {
+        userId: userCredential.userId,
+        salt: userCredential.salt,
+        hash: userCredential.hash,
     }
 }

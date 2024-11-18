@@ -3,7 +3,7 @@ import { SETTINGS } from "../settings";
 import { BlogViewModel } from "../input-output-types/blogs-models";
 import { PostViewModel } from "../input-output-types/posts-models";
 import { VideoViewModel } from "../input-output-types/videos-models";
-import { UserredentialsModel, UserViewModel } from "../input-output-types/users-moduls";
+import { UserCredentialsModel, UserViewModel } from "../input-output-types/users-moduls";
 
 // получение доступа к бд
 const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL)
@@ -14,7 +14,7 @@ export const blogCollection: Collection<BlogViewModel> = db.collection<BlogViewM
 export const postCollection: Collection<PostViewModel> = db.collection<PostViewModel>(SETTINGS.POST_COLLECTION_NAME)
 export const videoCollection: Collection<VideoViewModel> = db.collection<VideoViewModel>(SETTINGS.VIDEO_COLLECTION_NAME)
 export const usersCollection: Collection<UserViewModel> = db.collection<UserViewModel>(SETTINGS.USERS_COLLECTION_NAME)
-export const usersCredentialsCollection: Collection<UserredentialsModel> = db.collection<UserredentialsModel>(SETTINGS.USERSCREDENTIALS_COLLECTION_NAME)
+export const usersCredentialsCollection: Collection<UserCredentialsModel> = db.collection<UserCredentialsModel>(SETTINGS.USERSCREDENTIALS_COLLECTION_NAME)
 
 
 // проверка подключения к бд

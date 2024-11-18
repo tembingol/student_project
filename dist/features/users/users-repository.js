@@ -15,12 +15,12 @@ const mongodb_2 = require("../../db/mongodb");
 exports.usersRepository = {
     createUser: function (user, usersCredentials) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newBObjectId = new mongodb_1.ObjectId();
-            user._id = newBObjectId;
-            user.id = newBObjectId.toString();
-            //toDo transaction
-            const insetrCred = mongodb_2.usersCredentialsCollection.insertOne(usersCredentials);
-            const insertResult = yield mongodb_2.usersCollection.insertOne(user);
+            const newObjectId = new mongodb_1.ObjectId();
+            const newUser = Object.assign(Object.assign({}, user), { _id: newObjectId, id: newObjectId.toString() });
+            //toDo transaction {
+            const insetrCredentials = mongodb_2.usersCredentialsCollection.insertOne(Object.assign(Object.assign({}, usersCredentials), { userId: newObjectId.toString() }));
+            const insertResult = yield mongodb_2.usersCollection.insertOne(newUser);
+            //toDo transaction }
             return insertResult.insertedId.toString();
         });
     },

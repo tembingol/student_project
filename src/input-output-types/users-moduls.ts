@@ -18,6 +18,13 @@ export type UserInputModel = {
 }
 
 export type UserViewModel = {
+    id: string
+    login: string
+    email: string
+    createdAt: Date
+}
+
+export type UserDataBaseModel = {
     _id: ObjectId
     id: string
     login: string

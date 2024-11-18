@@ -1,18 +1,27 @@
 import { ObjectId } from "mongodb"
 import { usersCollection, usersCredentialsCollection } from "../../db/mongodb"
-import { UserCredentialsModel, UserViewModel } from "../../input-output-types/users-moduls"
+import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../input-output-types/users-moduls"
 
 export const usersRepository = {
 
     createUser: async function (user: UserViewModel, usersCredentials: UserCredentialsModel) {
-        const newBObjectId = new ObjectId()
-        user._id = newBObjectId
-        user.id = newBObjectId.toString()
+        const newObjectId = new ObjectId()
 
-        //toDo transaction
-        const insetrCred = usersCredentialsCollection.insertOne(usersCredentials)
+        const newUser: UserDataBaseModel = {
+            ...user,
+            _id: newObjectId,
+            id: newObjectId.toString()
+        }
 
-        const insertResult = await usersCollection.insertOne(user)
+        //toDo transaction {
+        const insetrCredentials = usersCredentialsCollection.insertOne({
+            ...usersCredentials,
+            userId: newObjectId.toString()
+        })
+
+        const insertResult = await usersCollection.insertOne(newUser)
+        //toDo transaction }
+
         return insertResult.insertedId.toString()
     },
 
