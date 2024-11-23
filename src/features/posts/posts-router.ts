@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { baseAuthMiddleware } from "../../global-middlewares/base-auth-middleware";
 import { postValidators } from "./middlewares/post-validators";
-import { postsService } from "./services/post-service";
+import { postsService } from "./services/posts-service";
+import { postsQueryService } from "./services/posts-query-service";
 
 export const postRouter = Router({})
 
@@ -15,42 +16,41 @@ export const postRouter = Router({})
 // })
 
 postRouter.get('/', async (req, res) => {
-    const foudPosts = await postsService.findPosts(req.query)
-    res.status(200).json(foudPosts)
+    const serviceRes = await postsQueryService.findPosts(req.query)
+    res.status(serviceRes.status).json(serviceRes.data)
 })
 
 postRouter.get('/:id', async (req, res) => {
-    const fuondPost = await postsService.findPostById(req.params.id)
-    if (!fuondPost) {
-        res.sendStatus(404)
+    const serviceRes = await postsQueryService.findPostById(req.params.id)
+    if (!serviceRes.result) {
+        res.sendStatus(serviceRes.status)
         return
     }
-    res.status(200).json(fuondPost)
+
+    res.status(serviceRes.status).json(serviceRes.data)
 })
 
 postRouter.post('/', ...postValidators, async (req, res) => {
-    const newBblog = await postsService.createPost(req.body);
-    if (!newBblog) {
-        res.sendStatus(400)
-        return
-    }
-    res.status(201).json(newBblog)
+    const serviceRes = await postsService.createPost(req.body);
+    res.status(serviceRes.status).json(serviceRes.data)
 })
 
 postRouter.put('/:id', ...postValidators, async (req, res) => {
-    const isPostUpdated = await postsService.updatePost(req.params.id, req.body);
-    if (!isPostUpdated) {
-        res.sendStatus(404)
+    const serviceRes = await postsService.updatePost(req.params.id, req.body);
+    if (!serviceRes.result) {
+        res.sendStatus(serviceRes.status)
         return
     }
-    res.sendStatus(204)
+
+    res.status(serviceRes.status).json(serviceRes.data)
 })
 
 postRouter.delete('/:id', baseAuthMiddleware, async (req, res) => {
-    const isPostDeleted = await postsService.deletePost(req.params.id)
-    if (!isPostDeleted) {
-        res.sendStatus(404)
+    const serviceRes = await postsService.deletePost(req.params.id)
+    if (!serviceRes.result) {
+        res.sendStatus(serviceRes.status)
         return
     }
-    res.sendStatus(204)
+
+    res.status(serviceRes.status).json(serviceRes.data)
 })

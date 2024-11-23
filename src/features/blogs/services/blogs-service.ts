@@ -1,9 +1,9 @@
 import { BlogInputModel, BlogViewModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
-import { postsService } from "../../posts/services/post-service"
+import { postsService } from "../../posts/services/posts-service"
 import { blogsQueryRepository } from "../blogs-query-repository"
 import { blogsRepository } from "../blogs-repository"
-import { blogEntityMapper } from "./blogs-query-servise"
+import { blogEntityMapper } from "./blogs-query-service"
 
 export type blogsServicesResponse = {
     result: boolean,
@@ -11,6 +11,7 @@ export type blogsServicesResponse = {
     data: {},
     errors: { errorsMessages: {}[] }
 }
+
 export const blogsService = {
 
     createBlog: async function (blogBody: BlogInputModel) {

@@ -3,7 +3,7 @@ import { inputCheckErrorsMiddleware } from '../../../global-middlewares/input-Ch
 import { NextFunction, Request, Response } from 'express'
 import { baseAuthMiddleware } from '../../../global-middlewares/base-auth-middleware'
 import { blogsService } from '../../blogs/services/blogs-service'
-import { blogsQueryService } from '../../blogs/services/blogs-query-servise'
+import { blogsQueryService } from '../../blogs/services/blogs-query-service'
 // title: string // max 30
 // shortDescription: string // max 100
 // content: string // max 1000

@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsQueryService = void 0;
 exports.blogEntityMapper = blogEntityMapper;
-const post_service_1 = require("../../posts/services/post-service");
+const posts_service_1 = require("../../posts/services/posts-service");
 const blogs_query_repository_1 = require("../blogs-query-repository");
 exports.blogsQueryService = {
     findBlogs: function (queryParams) {
@@ -79,8 +79,8 @@ exports.blogsQueryService = {
             const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt";
             const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc';
             const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : "";
-            const foundPosts = yield post_service_1.postsService.findPostsOfBlog(blogId, pageNumber, pageSize, sortBy, sortDirection, searchNameTerm);
-            const _totalCount = yield post_service_1.postsService.getDocumetnsCountBlog(blogId, searchNameTerm);
+            const foundPosts = yield posts_service_1.postsService.findPostsOfBlog(blogId, pageNumber, pageSize, sortBy, sortDirection, searchNameTerm);
+            const _totalCount = yield posts_service_1.postsService.getDocumetnsCountBlog(blogId, searchNameTerm);
             console.log("_totalCount " + _totalCount);
             const result = {
                 result: true,

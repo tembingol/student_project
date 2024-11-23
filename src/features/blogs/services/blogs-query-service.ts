@@ -1,7 +1,6 @@
 import { BlogDataBaseModel, BlogViewModel } from "../../../input-output-types/blogs-models"
-import { postsService } from "../../posts/services/post-service"
+import { postsQueryService } from "../../posts/services/posts-query-service"
 import { blogsQueryRepository } from "../blogs-query-repository"
-import { blogsRepository } from "../blogs-repository"
 import { blogsServicesResponse } from "./blogs-service"
 
 export const blogsQueryService = {
@@ -83,7 +82,7 @@ export const blogsQueryService = {
         const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
         const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
 
-        const foundPosts = await postsService.findPostsOfBlog(
+        const foundPosts = await postsQueryService.findPostsOfBlog(
             blogId,
             pageNumber,
             pageSize,
@@ -91,9 +90,7 @@ export const blogsQueryService = {
             sortDirection,
             searchNameTerm)
 
-        const _totalCount = await postsService.getDocumetnsCountBlog(blogId, searchNameTerm)
-
-        console.log("_totalCount " + _totalCount)
+        const _totalCount = await postsQueryService.getDocumetnsCountBlog(blogId, searchNameTerm)
 
         const result: blogsServicesResponse = {
             result: true,
@@ -109,7 +106,6 @@ export const blogsQueryService = {
         }
 
         return result
-
     },
 
 }

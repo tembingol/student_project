@@ -4,7 +4,7 @@ import { blogValidators } from "./middlewares/blog-validators";
 import { blogsService } from "./services/blogs-service";
 import { contentValidator, shortDescriptionValidator, titleValidator } from "../posts/middlewares/post-validators";
 import { inputCheckErrorsMiddleware } from "../../global-middlewares/input-Check-Errors-Middleware";
-import { blogsQueryService } from "./services/blogs-query-servise";
+import { blogsQueryService } from "./services/blogs-query-service";
 
 export const blogsRouter = Router({})
 
@@ -56,17 +56,17 @@ blogsRouter.post('/:id/posts',
     inputCheckErrorsMiddleware, async (req, res) => {
 
         const blog = await blogsQueryService.findBlogById(req.params.id);
-        if (blog.result === false) {
+        if (!blog.result) {
             res.sendStatus(blog.status)
             return
         }
 
         const newBblogPost = await blogsService.createBlogPost(req.params.id, req.body);
-        if (!newBblogPost) {
-            res.sendStatus(400)
+        if (!newBblogPost.result) {
+            res.sendStatus(newBblogPost.status)
             return
         }
-        res.status(201).json(newBblogPost)
+        res.status(newBblogPost.status).json(newBblogPost.data)
     })
 
 blogsRouter.put('/:id', ...blogValidators, async (req, res) => {

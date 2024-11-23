@@ -13,7 +13,8 @@ exports.postRouter = void 0;
 const express_1 = require("express");
 const base_auth_middleware_1 = require("../../global-middlewares/base-auth-middleware");
 const post_validators_1 = require("./middlewares/post-validators");
-const post_service_1 = require("./services/post-service");
+const posts_service_1 = require("./services/posts-service");
+const posts_query_service_1 = require("./services/posts-query-service");
 exports.postRouter = (0, express_1.Router)({});
 // simple logger for this router's requests
 // all requests to this router will first hit this middleware
@@ -24,38 +25,34 @@ exports.postRouter = (0, express_1.Router)({});
 //     next()
 // })
 exports.postRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const foudPosts = yield post_service_1.postsService.findPosts(req.query);
-    res.status(200).json(foudPosts);
+    const serviceRes = yield posts_query_service_1.postsQueryService.findPosts(req.query);
+    res.status(serviceRes.status).json(serviceRes.data);
 }));
 exports.postRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const fuondPost = yield post_service_1.postsService.findPostById(req.params.id);
-    if (!fuondPost) {
-        res.sendStatus(404);
+    const serviceRes = yield posts_query_service_1.postsQueryService.findPostById(req.params.id);
+    if (!serviceRes.result) {
+        res.sendStatus(serviceRes.status);
         return;
     }
-    res.status(200).json(fuondPost);
+    res.status(serviceRes.status).json(serviceRes.data);
 }));
 exports.postRouter.post('/', ...post_validators_1.postValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newBblog = yield post_service_1.postsService.createPost(req.body);
-    if (!newBblog) {
-        res.sendStatus(400);
-        return;
-    }
-    res.status(201).json(newBblog);
+    const serviceRes = yield posts_service_1.postsService.createPost(req.body);
+    res.status(serviceRes.status).json(serviceRes.data);
 }));
 exports.postRouter.put('/:id', ...post_validators_1.postValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isPostUpdated = yield post_service_1.postsService.updatePost(req.params.id, req.body);
-    if (!isPostUpdated) {
-        res.sendStatus(404);
+    const serviceRes = yield posts_service_1.postsService.updatePost(req.params.id, req.body);
+    if (!serviceRes.result) {
+        res.sendStatus(serviceRes.status);
         return;
     }
-    res.sendStatus(204);
+    res.status(serviceRes.status).json(serviceRes.data);
 }));
 exports.postRouter.delete('/:id', base_auth_middleware_1.baseAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isPostDeleted = yield post_service_1.postsService.deletePost(req.params.id);
-    if (!isPostDeleted) {
-        res.sendStatus(404);
+    const serviceRes = yield posts_service_1.postsService.deletePost(req.params.id);
+    if (!serviceRes.result) {
+        res.sendStatus(serviceRes.status);
         return;
     }
-    res.sendStatus(204);
+    res.status(serviceRes.status).json(serviceRes.data);
 }));

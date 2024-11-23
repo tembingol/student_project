@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsService = void 0;
-const post_service_1 = require("../../posts/services/post-service");
+const posts_service_1 = require("../../posts/services/posts-service");
 const blogs_query_repository_1 = require("../blogs-query-repository");
 const blogs_repository_1 = require("../blogs-repository");
-const blogs_query_servise_1 = require("./blogs-query-servise");
+const blogs_query_service_1 = require("./blogs-query-service");
 exports.blogsService = {
     createBlog: function (blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -39,7 +39,7 @@ exports.blogsService = {
             if (foundCreatedBlog) {
                 response.result = true;
                 response.status = 201;
-                response.data = (0, blogs_query_servise_1.blogEntityMapper)(foundCreatedBlog);
+                response.data = (0, blogs_query_service_1.blogEntityMapper)(foundCreatedBlog);
             }
             return response;
         });
@@ -47,7 +47,7 @@ exports.blogsService = {
     createBlogPost: function (id, postBody) {
         return __awaiter(this, void 0, void 0, function* () {
             postBody.blogId = id;
-            const newPost = yield post_service_1.postsService.createPost(postBody);
+            const newPost = yield posts_service_1.postsService.createPost(postBody);
             return newPost;
         });
     },
