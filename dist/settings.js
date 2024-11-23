@@ -8,7 +8,7 @@ exports.SETTINGS = {
     PORT: process.env.PORT || 3003,
     ADMIN_AUTH: process.env.ADMIN_AUTH || 'admin:qwerty',
     MONGO_URL: process.env.MONGO_URL || 'mongodb://0.0.0.0:27017',
-    DB_NAME: process.env.DB_NAME || 'student_project',
+    DB_NAME: process.env.DB_NAME || 'test_project',
     BLOG_COLLECTION_NAME: 'blogs',
     POST_COLLECTION_NAME: 'posts',
     VIDEO_COLLECTION_NAME: 'videos',
