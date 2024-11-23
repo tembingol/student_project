@@ -13,7 +13,7 @@ exports.postValidators = exports.blogIdValidator = exports.contentValidator = ex
 const express_validator_1 = require("express-validator");
 const input_Check_Errors_Middleware_1 = require("../../../global-middlewares/input-Check-Errors-Middleware");
 const base_auth_middleware_1 = require("../../../global-middlewares/base-auth-middleware");
-const blogs_service_1 = require("../../blogs/services/blogs-service");
+const blogs_query_servise_1 = require("../../blogs/services/blogs-query-servise");
 // title: string // max 30
 // shortDescription: string // max 100
 // content: string // max 1000
@@ -35,16 +35,16 @@ exports.contentValidator = (0, express_validator_1.body)('content')
 exports.blogIdValidator = (0, express_validator_1.body)('blogId')
     .isString().withMessage('not string')
     .trim().custom((blogId) => __awaiter(void 0, void 0, void 0, function* () {
-    const foundBlog = yield blogs_service_1.blogsService.findBlogById(blogId);
-    if (foundBlog == false) {
+    const foundBlog = yield blogs_query_servise_1.blogsQueryService.findBlogById(blogId);
+    if (!foundBlog.result) {
         throw new Error('no blog');
     }
     return true;
 })).withMessage("no blog");
 function myValodator(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        const foundBlog = yield blogs_service_1.blogsService.findBlogById(id);
-        if (foundBlog == false) {
+        const foundBlog = yield blogs_query_servise_1.blogsQueryService.findBlogById(id);
+        if (!foundBlog.result) {
             return false;
         }
         return false;

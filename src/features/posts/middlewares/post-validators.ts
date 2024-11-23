@@ -3,6 +3,7 @@ import { inputCheckErrorsMiddleware } from '../../../global-middlewares/input-Ch
 import { NextFunction, Request, Response } from 'express'
 import { baseAuthMiddleware } from '../../../global-middlewares/base-auth-middleware'
 import { blogsService } from '../../blogs/services/blogs-service'
+import { blogsQueryService } from '../../blogs/services/blogs-query-servise'
 // title: string // max 30
 // shortDescription: string // max 100
 // content: string // max 1000
@@ -25,16 +26,16 @@ export const contentValidator = body('content')
 export const blogIdValidator = body('blogId')
     .isString().withMessage('not string')
     .trim().custom(async (blogId) => {
-        const foundBlog = await blogsService.findBlogById(blogId)
-        if (foundBlog == false) {
+        const foundBlog = await blogsQueryService.findBlogById(blogId)
+        if (!foundBlog.result) {
             throw new Error('no blog');
         }
         return true
     }).withMessage("no blog")
 
 async function myValodator(id: string) {
-    const foundBlog = await blogsService.findBlogById(id)
-    if (foundBlog == false) {
+    const foundBlog = await blogsQueryService.findBlogById(id)
+    if (!foundBlog.result) {
         return false
     }
     return false

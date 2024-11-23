@@ -2,8 +2,9 @@ import { UserInputModel, UserCredentialsModel, UserViewModel } from "../../../in
 import { usersRepository } from "../users-repository"
 import { usersQueryRepository } from "../users-query-repo"
 import bcrypt from "bcrypt"
+import { userEntityMapper, usersQueryService } from "./users-query-service"
 
-export type userServiceResponse = {
+export type userServicesResponse = {
     result: boolean,
     status: number,
     data: {},
@@ -12,47 +13,8 @@ export type userServiceResponse = {
 
 export const usersService = {
 
-    findUsers: async function (queryParams: any) {
-        const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
-        const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
-        const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
-        const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
-        const searchLoginTerm = queryParams.searchLoginTerm ? queryParams.searchLoginTerm : ""
-        const searchEmailTerm = queryParams.searchEmailTerm ? queryParams.searchEmailTerm : ""
-
-        const filter: any = {
-            $or: [
-                { login: { $regex: searchLoginTerm, $options: 'i' } },
-                { email: { $regex: searchEmailTerm, $options: 'i' } }]
-        }
-
-        const allUsers = await usersQueryRepository.getAllUsers(
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-            filter,
-        )
-
-        const totalCount = await usersQueryRepository.getDocumetnsCount(filter)
-
-        const response: userServiceResponse = {
-            result: true,
-            status: 200,
-            data: {
-                pagesCount: Math.ceil(totalCount / pageSize),
-                page: pageNumber,
-                pageSize: pageSize,
-                totalCount: totalCount,
-                items: allUsers,
-            },
-            errors: { errorsMessages: [] }
-        }
-        return response
-    },
-
     createUser: async function (user: UserInputModel) {
-        const response: userServiceResponse = {
+        const response: userServicesResponse = {
             result: false,
             status: 400,
             data: {},
@@ -83,7 +45,7 @@ export const usersService = {
             return response
         }
 
-        const isEmailAvalible = await usersQueryRepository.getUserByEmail(user.email)
+        const isEmailAvalible = await usersQueryService.getUserByEmail(user.email)
 
         if (isEmailAvalible !== null) {
             response.result = false
@@ -129,14 +91,14 @@ export const usersService = {
             const createdUser = await usersQueryRepository.getUserById(isCreated)
             response.result = true
             response.status = 201
-            response.data = createdUser == null ? {} : createdUser
+            response.data = createdUser == null ? {} : userEntityMapper(createdUser)
         }
 
         return response
     },
 
     deleteUser: async function (useriD: string) {
-        let response: userServiceResponse = {
+        let response: userServicesResponse = {
             result: false,
             status: 404,
             data: {},

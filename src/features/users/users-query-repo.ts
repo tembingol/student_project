@@ -1,41 +1,29 @@
 import { usersCollection, usersCredentialsCollection } from "../../db/mongodb"
-import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../input-output-types/users-moduls"
+import { userEntityMapper } from "./services/users-query-service"
 
 export const usersQueryRepository = {
 
     getUserCredentials: async function (userId: string) {
         const filter = { userId: userId }
         const foundUser = await usersCredentialsCollection.findOne(filter)
-        if (foundUser) {
-            return userCredentialsMapper(foundUser)
-        }
         return foundUser
     },
 
     getUserByLogin: async function (login: string) {
         const filter = { login: login }
         const foundUser = await usersCollection.findOne(filter)
-        if (foundUser) {
-            return userEntityMapper(foundUser)
-        }
         return foundUser
     },
 
     getUserByEmail: async function (email: string) {
         const filter = { email: email }
         const foundUser = await usersCollection.findOne(filter)
-        if (foundUser) {
-            return userEntityMapper(foundUser)
-        }
         return foundUser
     },
 
     getUserById: async function (id: string) {
         const filter = { id: id }
         const foundUser = await usersCollection.findOne(filter)
-        if (foundUser) {
-            return userEntityMapper(foundUser)
-        }
         return foundUser
     },
 
@@ -51,27 +39,10 @@ export const usersQueryRepository = {
             .sort({ [sortBy]: _sortDirection })
             .toArray()
 
-        return allUsers.map((el) => userEntityMapper(el))
+        return allUsers
     },
 
     getDocumetnsCount: async function (filter: {}) {
         return await usersCollection.countDocuments(filter)
-    }
-}
-
-function userEntityMapper(user: UserDataBaseModel): UserViewModel {
-    return {
-        id: user._id.toString(),
-        login: user.login,
-        email: user.email,
-        createdAt: user.createdAt,
-    }
-}
-
-function userCredentialsMapper(userCredential: UserCredentialsModel): UserCredentialsModel {
-    return {
-        userId: userCredential.userId,
-        salt: userCredential.salt,
-        hash: userCredential.hash,
     }
 }

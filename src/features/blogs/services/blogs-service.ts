@@ -1,86 +1,49 @@
-import { BlogInputModel } from "../../../input-output-types/blogs-models"
+import { BlogInputModel, BlogViewModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
 import { postsService } from "../../posts/services/post-service"
+import { blogsQueryRepository } from "../blogs-query-repository"
 import { blogsRepository } from "../blogs-repository"
+import { blogEntityMapper } from "./blogs-query-servise"
 
-
+export type blogsServicesResponse = {
+    result: boolean,
+    status: number,
+    data: {},
+    errors: { errorsMessages: {}[] }
+}
 export const blogsService = {
 
-    findBlogs: async function (queryParams: any) {
-
-        const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
-        const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
-        const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
-        const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
-        const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
-
-        const allBlogs = await blogsRepository.getAllBlogs(
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-            searchNameTerm
-        )
-
-        const mappedBlogs = allBlogs.map((el) => {
-            let { ["_id"]: _, ...mapped } = el
-            return mapped
-        })
-
-        const totalCount = await blogsRepository.getDocumetnsCount(searchNameTerm)
-
-        return {
-            pagesCount: Math.ceil(totalCount / pageSize),
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: totalCount,
-            items: mappedBlogs,
-        }
-    },
-
-    findBlogById: async function (id: string) {
-        const foundBlog = await blogsRepository.getBlogByID(id);
-        if (foundBlog == null) {
-            return false
-        }
-        let { ["_id"]: _, ...mapedBlog } = foundBlog
-        return mapedBlog
-    },
-
-    findBlogPosts: async function (blogId: string, queryParams: any) {
-
-        const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
-        const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
-        const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
-        const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
-        const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
-
-        const foundPosts = await postsService.findPostsOfBlog(
-            blogId,
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-            searchNameTerm)
-
-        const _totalCount = await postsService.getDocumetnsCountBlog(blogId, searchNameTerm)
-
-        console.log("_totalCount " + _totalCount)
-
-        return {
-            pagesCount: Math.ceil(_totalCount / pageSize),
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: _totalCount,
-            items: foundPosts,
-        }
-
-    },
-
     createBlog: async function (blogBody: BlogInputModel) {
-        const newBblogId = await blogsRepository.createBlog(blogBody);
-        const foundBlog = await this.findBlogById(newBblogId);
-        return foundBlog
+        const response: blogsServicesResponse = {
+            result: false,
+            status: 400,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+
+        const newBlog: BlogViewModel = {
+            "id": "",
+            "name": blogBody.name,
+            "description": blogBody.description,
+            "websiteUrl": blogBody.websiteUrl,
+            "createdAt": new Date().toISOString(),
+            "isMembership": false,
+        }
+
+        const newBblogId = await blogsRepository.createBlog(newBlog);
+        if (newBblogId === "") {
+            return response
+        }
+
+        const foundCreatedBlog = await blogsQueryRepository.getBlogByID({ id: newBblogId });
+
+        if (foundCreatedBlog) {
+            response.result = true
+            response.status = 201
+            response.data = blogEntityMapper(foundCreatedBlog)
+        }
+
+        return response
     },
 
     createBlogPost: async function (id: string, postBody: PostInputModel) {
@@ -90,17 +53,38 @@ export const blogsService = {
     },
 
     updateBlog: async function (id: string, blogBody: BlogInputModel) {
+        const response: blogsServicesResponse = {
+            result: false,
+            status: 404,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+
         const isBlogUpdated = await blogsRepository.updateBlog(id, blogBody);
-        return isBlogUpdated
+
+        if (isBlogUpdated) {
+            response.result = true
+            response.status = 204
+        }
+
+        return response
     },
 
     deleteBlog: async function (id: string) {
-        const isBlogDeleted = await blogsRepository.deleteBlog(id)
-        return isBlogDeleted
-    },
+        const response: blogsServicesResponse = {
+            result: false,
+            status: 404,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
 
-    getDocumetnsCount: async function (searchNameTerm: string) {
-        return await blogsRepository.getDocumetnsCount(searchNameTerm)
-    }
+        const isBlogDeleted = await blogsRepository.deleteBlog(id)
+        if (isBlogDeleted) {
+            response.result = true
+            response.status = 204
+        }
+
+        return response
+    },
 
 }

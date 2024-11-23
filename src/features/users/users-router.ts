@@ -2,6 +2,7 @@ import { Router } from "express"
 import { userRegistrationValidators } from "./middlewares/users-validators"
 import { usersService } from "./services/users-service"
 import { baseAuthMiddleware } from "../../global-middlewares/base-auth-middleware"
+import { usersQueryService } from "./services/users-query-service"
 
 export const usersRouter = Router({})
 
@@ -15,7 +16,7 @@ export const usersRouter = Router({})
 // })
 
 usersRouter.get('/', async (req, res) => {
-    const serviceRes = await usersService.findUsers(req.query)
+    const serviceRes = await usersQueryService.findUsers(req.query)
     res.status(serviceRes.status).json(serviceRes.data)
 })
 

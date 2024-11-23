@@ -16,38 +16,8 @@ exports.usersService = void 0;
 const users_repository_1 = require("../users-repository");
 const users_query_repo_1 = require("../users-query-repo");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const users_query_service_1 = require("./users-query-service");
 exports.usersService = {
-    findUsers: function (queryParams) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1;
-            const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10;
-            const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt";
-            const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc';
-            const searchLoginTerm = queryParams.searchLoginTerm ? queryParams.searchLoginTerm : "";
-            const searchEmailTerm = queryParams.searchEmailTerm ? queryParams.searchEmailTerm : "";
-            const filter = {
-                $or: [
-                    { login: { $regex: searchLoginTerm, $options: 'i' } },
-                    { email: { $regex: searchEmailTerm, $options: 'i' } }
-                ]
-            };
-            const allUsers = yield users_query_repo_1.usersQueryRepository.getAllUsers(pageNumber, pageSize, sortBy, sortDirection, filter);
-            const totalCount = yield users_query_repo_1.usersQueryRepository.getDocumetnsCount(filter);
-            const response = {
-                result: true,
-                status: 200,
-                data: {
-                    pagesCount: Math.ceil(totalCount / pageSize),
-                    page: pageNumber,
-                    pageSize: pageSize,
-                    totalCount: totalCount,
-                    items: allUsers,
-                },
-                errors: { errorsMessages: [] }
-            };
-            return response;
-        });
-    },
     createUser: function (user) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = {
@@ -80,7 +50,7 @@ exports.usersService = {
             if (response.errors.errorsMessages.length > 0) {
                 return response;
             }
-            const isEmailAvalible = yield users_query_repo_1.usersQueryRepository.getUserByEmail(user.email);
+            const isEmailAvalible = yield users_query_service_1.usersQueryService.getUserByEmail(user.email);
             if (isEmailAvalible !== null) {
                 response.result = false;
                 response.status = 400;
@@ -117,7 +87,7 @@ exports.usersService = {
                 const createdUser = yield users_query_repo_1.usersQueryRepository.getUserById(isCreated);
                 response.result = true;
                 response.status = 201;
-                response.data = createdUser == null ? {} : createdUser;
+                response.data = createdUser == null ? {} : (0, users_query_service_1.userEntityMapper)(createdUser);
             }
             return response;
         });

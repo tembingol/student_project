@@ -16,9 +16,6 @@ exports.usersQueryRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = { userId: userId };
             const foundUser = yield mongodb_1.usersCredentialsCollection.findOne(filter);
-            if (foundUser) {
-                return userCredentialsMapper(foundUser);
-            }
             return foundUser;
         });
     },
@@ -26,9 +23,6 @@ exports.usersQueryRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = { login: login };
             const foundUser = yield mongodb_1.usersCollection.findOne(filter);
-            if (foundUser) {
-                return userEntityMapper(foundUser);
-            }
             return foundUser;
         });
     },
@@ -36,9 +30,6 @@ exports.usersQueryRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = { email: email };
             const foundUser = yield mongodb_1.usersCollection.findOne(filter);
-            if (foundUser) {
-                return userEntityMapper(foundUser);
-            }
             return foundUser;
         });
     },
@@ -46,9 +37,6 @@ exports.usersQueryRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = { id: id };
             const foundUser = yield mongodb_1.usersCollection.findOne(filter);
-            if (foundUser) {
-                return userEntityMapper(foundUser);
-            }
             return foundUser;
         });
     },
@@ -62,7 +50,7 @@ exports.usersQueryRepository = {
                 .limit(_pageSize)
                 .sort({ [sortBy]: _sortDirection })
                 .toArray();
-            return allUsers.map((el) => userEntityMapper(el));
+            return allUsers;
         });
     },
     getDocumetnsCount: function (filter) {
@@ -71,18 +59,3 @@ exports.usersQueryRepository = {
         });
     }
 };
-function userEntityMapper(user) {
-    return {
-        id: user._id.toString(),
-        login: user.login,
-        email: user.email,
-        createdAt: user.createdAt,
-    };
-}
-function userCredentialsMapper(userCredential) {
-    return {
-        userId: userCredential.userId,
-        salt: userCredential.salt,
-        hash: userCredential.hash,
-    };
-}

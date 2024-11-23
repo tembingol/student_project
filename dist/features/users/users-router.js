@@ -14,6 +14,7 @@ const express_1 = require("express");
 const users_validators_1 = require("./middlewares/users-validators");
 const users_service_1 = require("./services/users-service");
 const base_auth_middleware_1 = require("../../global-middlewares/base-auth-middleware");
+const users_query_service_1 = require("./services/users-query-service");
 exports.usersRouter = (0, express_1.Router)({});
 // // simple logger for this router's requests
 // // all requests to this router will first hit this middleware
@@ -24,7 +25,7 @@ exports.usersRouter = (0, express_1.Router)({});
 //     next()
 // })
 exports.usersRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const serviceRes = yield users_service_1.usersService.findUsers(req.query);
+    const serviceRes = yield users_query_service_1.usersQueryService.findUsers(req.query);
     res.status(serviceRes.status).json(serviceRes.data);
 }));
 exports.usersRouter.post('/', base_auth_middleware_1.baseAuthMiddleware, ...users_validators_1.userRegistrationValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
