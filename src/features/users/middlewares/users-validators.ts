@@ -17,10 +17,8 @@ export const userEmailValidator = body('email')
     .trim().isEmail().withMessage('not email')
 
 export const userRegistrationValidators = [
-
     //userLoginValidator,
     //userPasswordValidator,
     //userEmailValidator,
-
     inputCheckErrorsMiddleware,
 ]

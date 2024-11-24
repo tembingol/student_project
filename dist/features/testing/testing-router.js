@@ -21,9 +21,3 @@ exports.testingRouter.delete('/all-data', (req, res) => __awaiter(void 0, void 0
     yield mongodb_1.usersCredentialsCollection.drop();
     res.sendStatus(204);
 }));
-// testingRouter.delete('/all-data', (req, res) => {
-//     db.videos = []
-//     db.blogs = []
-//     db.posts = []
-//     res.sendStatus(204)
-// })

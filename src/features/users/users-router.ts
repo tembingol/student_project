@@ -32,7 +32,6 @@ usersRouter.post('/', baseAuthMiddleware, ...userRegistrationValidators, async (
 })
 
 usersRouter.delete('/:id', baseAuthMiddleware, async (req, res) => {
-
     const serviceRes = await usersService.deleteUser(req.params.id)
     if (serviceRes.result) {
         res.status(serviceRes.status).json(serviceRes.data)

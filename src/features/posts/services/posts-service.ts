@@ -21,13 +21,13 @@ export const postsService = {
         }
 
         const newPost: PostViewModel = {
-            "id": "",
-            "title": postBody.title,
-            "shortDescription": postBody.shortDescription,
-            "content": postBody.content,
-            "blogId": postBody.blogId,
-            "blogName": postBody.blogName ? postBody.blogName : "",
-            "createdAt": new Date().toISOString(),
+            id: "",
+            title: postBody.title,
+            shortDescription: postBody.shortDescription,
+            content: postBody.content,
+            blogId: postBody.blogId,
+            blogName: postBody.blogName ? postBody.blogName : "",
+            createdAt: new Date().toISOString(),
         }
 
         const newPostId = await postsRepository.createPost(newPost);

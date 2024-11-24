@@ -24,12 +24,12 @@ exports.blogsService = {
                 errors: { errorsMessages: [] }
             };
             const newBlog = {
-                "id": "",
-                "name": blogBody.name,
-                "description": blogBody.description,
-                "websiteUrl": blogBody.websiteUrl,
-                "createdAt": new Date().toISOString(),
-                "isMembership": false,
+                id: "",
+                name: blogBody.name,
+                description: blogBody.description,
+                websiteUrl: blogBody.websiteUrl,
+                createdAt: new Date().toISOString(),
+                isMembership: false,
             };
             const newBblogId = yield blogs_repository_1.blogsRepository.createBlog(newBlog);
             if (newBblogId === "") {

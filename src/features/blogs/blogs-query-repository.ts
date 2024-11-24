@@ -3,7 +3,6 @@ import { blogCollection } from "../../db/mongodb"
 export const blogsQueryRepository = {
 
     getAllBlogs: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
-
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
@@ -23,7 +22,6 @@ export const blogsQueryRepository = {
     },
 
     getDocumetnsCount: async function (filter: {}) {
-
         const retult = await blogCollection.countDocuments(filter)
         return retult
     },

@@ -14,10 +14,6 @@ const express_validator_1 = require("express-validator");
 const input_Check_Errors_Middleware_1 = require("../../../global-middlewares/input-Check-Errors-Middleware");
 const base_auth_middleware_1 = require("../../../global-middlewares/base-auth-middleware");
 const blogs_query_service_1 = require("../../blogs/services/blogs-query-service");
-// title: string // max 30
-// shortDescription: string // max 100
-// content: string // max 1000
-// blogId: string // valid
 exports.blogNameValidator = (0, express_validator_1.body)('blogName')
     .isString().withMessage('not string');
 exports.titleValidator = (0, express_validator_1.body)('title')

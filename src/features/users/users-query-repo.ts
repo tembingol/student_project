@@ -28,7 +28,6 @@ export const usersQueryRepository = {
     },
 
     getAllUsers: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
-
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1

@@ -16,8 +16,6 @@ export const authRouter = Router({})
 
 authRouter.post('/login', ...authValidators, async (req, res) => {
 
-    // isEmail =  (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(req.body.loginOrEmail.trim())) 
-
     let foundUser = await usersQueryRepository.getUserByLogin(req.body.loginOrEmail.trim())
 
     if (foundUser == null) {

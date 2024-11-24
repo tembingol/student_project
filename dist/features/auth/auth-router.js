@@ -27,7 +27,6 @@ exports.authRouter = (0, express_1.Router)({});
 //     next()
 // })
 exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // isEmail =  (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(req.body.loginOrEmail.trim())) 
     let foundUser = yield users_query_repo_1.usersQueryRepository.getUserByLogin(req.body.loginOrEmail.trim());
     if (foundUser == null) {
         foundUser = yield users_query_repo_1.usersQueryRepository.getUserByEmail(req.body.loginOrEmail.trim());

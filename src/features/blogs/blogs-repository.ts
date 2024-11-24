@@ -5,7 +5,6 @@ import { BlogDataBaseModel, BlogInputModel, BlogViewModel } from "../../input-ou
 export const blogsRepository = {
 
     createBlog: async function (blog: BlogViewModel) {
-
         const newObjectId = new ObjectId()
         const newBlog: BlogDataBaseModel = {
             ...blog,
@@ -14,6 +13,7 @@ export const blogsRepository = {
         }
 
         const insertResult = await blogCollection.insertOne(newBlog)
+
         return insertResult.insertedId.toString()
     },
 
@@ -33,6 +33,5 @@ export const blogsRepository = {
         const result = await blogCollection.deleteOne({ id: id })
         return result.deletedCount === 1
     },
-
 
 }

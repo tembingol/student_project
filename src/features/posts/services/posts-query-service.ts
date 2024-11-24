@@ -7,7 +7,6 @@ import { postsServicesResponse } from "./posts-service"
 export const postsQueryService = {
 
     findPosts: async function (queryParams: any) {
-
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
@@ -52,6 +51,7 @@ export const postsQueryService = {
         if (searchNameTerm) {
             filter.name = { $regex: searchNameTerm, $options: 'i' }
         }
+
         return await postsQueryRepository.getDocumetnsCount(filter)
     },
 
@@ -61,6 +61,7 @@ export const postsQueryService = {
         if (searchNameTerm) {
             filter.title = { $regex: searchNameTerm, $options: 'i' }
         }
+
         return await postsQueryRepository.getDocumetnsCount(filter)
     },
 
@@ -98,6 +99,7 @@ export const postsQueryService = {
             .toArray()
 
         const mappedPosts = allPosts.map((el) => postEntityMapper(el))
+
         return mappedPosts
     },
 

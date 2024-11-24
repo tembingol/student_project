@@ -23,12 +23,12 @@ export const blogsService = {
         }
 
         const newBlog: BlogViewModel = {
-            "id": "",
-            "name": blogBody.name,
-            "description": blogBody.description,
-            "websiteUrl": blogBody.websiteUrl,
-            "createdAt": new Date().toISOString(),
-            "isMembership": false,
+            id: "",
+            name: blogBody.name,
+            description: blogBody.description,
+            websiteUrl: blogBody.websiteUrl,
+            createdAt: new Date().toISOString(),
+            isMembership: false,
         }
 
         const newBblogId = await blogsRepository.createBlog(newBlog);
@@ -50,6 +50,7 @@ export const blogsService = {
     createBlogPost: async function (id: string, postBody: PostInputModel) {
         postBody.blogId = id
         const newPost = await postsService.createPost(postBody)
+
         return newPost
     },
 

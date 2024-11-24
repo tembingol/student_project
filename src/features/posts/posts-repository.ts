@@ -4,7 +4,6 @@ import { PostDataBaseModel, PostInputModel, PostViewModel } from "../../input-ou
 
 export const postsRepository = {
 
-
     createPost: async function (post: PostViewModel) {
         const newObjectId = new ObjectId()
         const newPost: PostDataBaseModel = {
@@ -35,6 +34,5 @@ export const postsRepository = {
         const result = await postCollection.deleteOne({ id: id })
         return result.deletedCount === 1
     },
-
 
 }

@@ -41,6 +41,7 @@ export const blogsQueryService = {
             },
             errors: { errorsMessages: [] }
         }
+
         return result
     },
 
@@ -71,11 +72,11 @@ export const blogsQueryService = {
             filter.name = { $regex: searchNameTerm, $options: 'i' }
         }
         const result = await blogsQueryRepository.getDocumetnsCount(filter)
+
         return result
     },
 
     findPostsOfBlog: async function (blogId: string, queryParams: any) {
-
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"

@@ -2,12 +2,8 @@ import { body } from 'express-validator'
 import { inputCheckErrorsMiddleware } from '../../../global-middlewares/input-Check-Errors-Middleware'
 import { NextFunction, Request, Response } from 'express'
 import { baseAuthMiddleware } from '../../../global-middlewares/base-auth-middleware'
-import { blogsService } from '../../blogs/services/blogs-service'
 import { blogsQueryService } from '../../blogs/services/blogs-query-service'
-// title: string // max 30
-// shortDescription: string // max 100
-// content: string // max 1000
-// blogId: string // valid
+
 
 export const blogNameValidator = body('blogName')
     .isString().withMessage('not string')
