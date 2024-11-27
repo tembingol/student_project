@@ -6,6 +6,7 @@ import { postRouter } from './features/posts/posts-router'
 import { testingRouter } from './features/testing/testing-router'
 import { usersRouter } from './features/users/users-router'
 import { authRouter } from './features/auth/auth-router'
+import { commentsRouter } from './features/comments/comments-router'
 
 //import { getVideosController } from './videos/getVideosController'
 
@@ -21,4 +22,5 @@ app.use(SETTINGS.PATH.USERS, usersRouter)
 app.use(SETTINGS.PATH.AUTH, authRouter)
 app.use(SETTINGS.PATH.BLOGS, blogsRouter)
 app.use(SETTINGS.PATH.POSTS, postRouter)
+app.use(SETTINGS.PATH.COMMENTS, commentsRouter)
 app.use(SETTINGS.PATH.TESTING, testingRouter)

@@ -12,6 +12,7 @@ export const SETTINGS = {
     POST_COLLECTION_NAME: 'posts',
     VIDEO_COLLECTION_NAME: 'videos',
     USERS_COLLECTION_NAME: 'users',
+    COMMENTS_COLLECTION_NAME: "comments",
     USERSCREDENTIALS_COLLECTION_NAME: 'usersCredentials',
     JWT_SECRET: process.env.JWT_SECRET || 'testproject',
     PATH: {
@@ -19,6 +20,7 @@ export const SETTINGS = {
         USERS: '/users',
         AUTH: '/auth',
         VIDEOS: '/videos',
+        COMMENTS: '/comments',
         BLOGS: '/blogs',
         POSTS: '/posts',
         TESTING: '/testing',

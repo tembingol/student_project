@@ -11,6 +11,7 @@ const posts_router_1 = require("./features/posts/posts-router");
 const testing_router_1 = require("./features/testing/testing-router");
 const users_router_1 = require("./features/users/users-router");
 const auth_router_1 = require("./features/auth/auth-router");
+const comments_router_1 = require("./features/comments/comments-router");
 //import { getVideosController } from './videos/getVideosController'
 exports.app = (0, express_1.default)(); // создать приложение
 exports.app.use(express_1.default.json()); // создание свойств-объектов body и query во всех реквестах
@@ -22,4 +23,5 @@ exports.app.use(settings_1.SETTINGS.PATH.USERS, users_router_1.usersRouter);
 exports.app.use(settings_1.SETTINGS.PATH.AUTH, auth_router_1.authRouter);
 exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postRouter);
+exports.app.use(settings_1.SETTINGS.PATH.COMMENTS, comments_router_1.commentsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.TESTING, testing_router_1.testingRouter);
