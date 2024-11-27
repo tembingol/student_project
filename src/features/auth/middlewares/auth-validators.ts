@@ -1,4 +1,4 @@
-import { body } from 'express-validator'
+import { body, header } from 'express-validator'
 import { inputCheckErrorsMiddleware } from '../../../global-middlewares/input-Check-Errors-Middleware'
 import { NextFunction, Request, Response } from 'express'
 
@@ -14,3 +14,8 @@ export const authValidators = [
 
     inputCheckErrorsMiddleware,
 ]
+
+
+
+export const authHeaderValidator = header('Authorization'.toLowerCase())
+    .isString().withMessage('not string')

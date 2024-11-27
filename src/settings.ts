@@ -13,6 +13,7 @@ export const SETTINGS = {
     VIDEO_COLLECTION_NAME: 'videos',
     USERS_COLLECTION_NAME: 'users',
     USERSCREDENTIALS_COLLECTION_NAME: 'usersCredentials',
+    JWT_SECRET: process.env.JWT_SECRET || 'testproject',
     PATH: {
         ROOT: '/',
         USERS: '/users',

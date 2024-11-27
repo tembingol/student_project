@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authValidators = exports.passwordValidator = exports.loginOrEmailValidator = void 0;
+exports.authHeaderValidator = exports.authValidators = exports.passwordValidator = exports.loginOrEmailValidator = void 0;
 const express_validator_1 = require("express-validator");
 const input_Check_Errors_Middleware_1 = require("../../../global-middlewares/input-Check-Errors-Middleware");
 exports.loginOrEmailValidator = (0, express_validator_1.body)('loginOrEmail')
@@ -12,3 +12,5 @@ exports.authValidators = [
     exports.passwordValidator,
     input_Check_Errors_Middleware_1.inputCheckErrorsMiddleware,
 ];
+exports.authHeaderValidator = (0, express_validator_1.header)('Authorization'.toLowerCase())
+    .isString().withMessage('not string');

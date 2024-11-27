@@ -8,15 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
 const express_1 = require("express");
 const auth_validators_1 = require("./middlewares/auth-validators");
-const users_query_repo_1 = require("../users/users-query-repo");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const JWT_service_1 = require("../../application-services/JWT-service");
+const auth_service_1 = require("./services/auth-service");
 exports.authRouter = (0, express_1.Router)({});
 // // simple logger for this router's requests
 // // all requests to this router will first hit this middleware
@@ -27,23 +24,27 @@ exports.authRouter = (0, express_1.Router)({});
 //     next()
 // })
 exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let foundUser = yield users_query_repo_1.usersQueryRepository.getUserByLogin(req.body.loginOrEmail.trim());
-    if (foundUser == null) {
-        foundUser = yield users_query_repo_1.usersQueryRepository.getUserByEmail(req.body.loginOrEmail.trim());
-    }
-    if (foundUser == null) {
+    const result = yield auth_service_1.authService.checkUserCredintails(req.body);
+    if (result === null) {
         res.sendStatus(401);
         return;
     }
-    const userCredentials = yield users_query_repo_1.usersQueryRepository.getUserCredentials(foundUser.id);
-    if (userCredentials == null) {
+    const userToken = yield JWT_service_1.jwtService.createJWT(result);
+    res.status(201).send(userToken);
+}));
+exports.authRouter.get('/login/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const authorization = req.headers['Authorization'.toLowerCase()];
+    // console.log("authorization " + authorization)
+    if (typeof authorization == "undefined") {
         res.sendStatus(401);
         return;
     }
-    const userHash = bcrypt_1.default.hashSync(req.body.password, userCredentials.salt);
-    if (userHash !== userCredentials.hash) {
+    const token = authorization.slice(7);
+    const foundUser = yield auth_service_1.authService.getUserByToken(token.toString());
+    if (foundUser === null) {
         res.sendStatus(401);
         return;
     }
-    res.sendStatus(204);
+    res.status(201).send(foundUser);
+    return;
 }));

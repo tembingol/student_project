@@ -1,7 +1,9 @@
 import { Router } from "express"
-import { authValidators } from "./middlewares/auth-validators"
+import { authHeaderValidator, authValidators } from "./middlewares/auth-validators"
 import { usersQueryRepository } from "../users/users-query-repo"
 import bcrypt from "bcrypt"
+import { jwtService } from "../../application-services/JWT-service"
+import { authService } from "./services/auth-service"
 
 export const authRouter = Router({})
 
@@ -16,30 +18,40 @@ export const authRouter = Router({})
 
 authRouter.post('/login', ...authValidators, async (req, res) => {
 
-    let foundUser = await usersQueryRepository.getUserByLogin(req.body.loginOrEmail.trim())
+    const result = await authService.checkUserCredintails(req.body)
 
-    if (foundUser == null) {
-        foundUser = await usersQueryRepository.getUserByEmail(req.body.loginOrEmail.trim())
-    }
-
-    if (foundUser == null) {
+    if (result === null) {
         res.sendStatus(401)
         return
     }
 
-    const userCredentials = await usersQueryRepository.getUserCredentials(foundUser.id)
+    const userToken = await jwtService.createJWT(result)
 
-    if (userCredentials == null) {
+    res.status(201).send(userToken)
+})
+
+authRouter.get('/login/me', async (req, res) => {
+
+    const authorization = req.headers['Authorization'.toLowerCase()]
+
+    // console.log("authorization " + authorization)
+
+    if (typeof authorization == "undefined") {
         res.sendStatus(401)
         return
     }
 
-    const userHash = bcrypt.hashSync(req.body.password, userCredentials.salt)
+    const token = authorization.slice(7)
 
-    if (userHash !== userCredentials!.hash) {
+    const foundUser = await authService.getUserByToken(token.toString())
+
+    if (foundUser === null) {
         res.sendStatus(401)
         return
     }
 
-    res.sendStatus(204)
+    res.status(201).send(foundUser)
+
+    return
+
 })
