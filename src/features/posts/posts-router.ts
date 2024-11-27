@@ -3,6 +3,8 @@ import { baseAuthMiddleware } from "../../global-middlewares/base-auth-middlewar
 import { postValidators } from "./middlewares/post-validators";
 import { postsService } from "./services/posts-service";
 import { postsQueryService } from "./services/posts-query-service";
+import { commentsQueryService } from "../comments/services/comments-query-service";
+import { commentsService } from "../comments/services/comments-service";
 
 export const postRouter = Router({})
 
@@ -28,6 +30,40 @@ postRouter.get('/:id', async (req, res) => {
     }
 
     res.status(serviceRes.status).json(serviceRes.data)
+})
+
+postRouter.get('/:id/comments', async (req, res) => {
+
+    const foundPost = await postsQueryService.findPostById(req.params.id);
+    if (!foundPost.result) {
+        res.sendStatus(foundPost.status)
+        return
+    }
+
+    const foundCommentsOfPost = await commentsQueryService.findCommentsOfPost(req.params.id, req.query);
+    res.status(foundCommentsOfPost.status).json(foundCommentsOfPost.data)
+})
+
+postRouter.post('/:id/comments', async (req, res) => {
+
+    const foundPost = await postsQueryService.findPostById(req.params.id);
+    if (!foundPost.result) {
+        res.sendStatus(foundPost.status)
+        return
+    }
+
+    const commentatorInfo = {
+        userId: "userId",
+        userLogin: "string",
+    }
+
+    const newComment = await commentsService.addCommentToPost(req.params.id, req.body, commentatorInfo);
+
+    if (!newComment.result) {
+        res.sendStatus(newComment.status)
+        return
+    }
+    res.status(newComment.status).json(newComment.data)
 })
 
 postRouter.post('/', ...postValidators, async (req, res) => {

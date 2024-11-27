@@ -24,6 +24,45 @@ export const commentsQueryService = {
         return result
     },
 
+    findCommentsOfPost: async function (postId: string, queryParams: any) {
+        const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
+        const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
+        const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
+        const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
+        const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
+
+        const foundComments = await commentsQueryRepository.getCommentsOfPost(
+            postId,
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+            searchNameTerm)
+
+        // const filter: any = {}
+        // filter.PostId = PostId
+        // if (searchNameTerm) {
+        //     filter.title = { $regex: searchNameTerm, $options: 'i' }
+        // }
+
+        const _totalCount = await commentsQueryRepository.getDocumetnsCountOfPost({ postId: postId })
+
+        const result: commentsServicesResponse = {
+            result: true,
+            status: 200,
+            data: {
+                pagesCount: Math.ceil(_totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: _totalCount,
+                items: foundComments,
+            },
+            errors: { errorsMessages: [] }
+        }
+
+        return result
+    },
+
 }
 
 export function commentEntityMapper(comment: CommentDataBaseModel,): CommentViewModel {

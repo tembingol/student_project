@@ -2,7 +2,7 @@ import { CommentInputModel, CommentViewModel } from "../../../input-output-types
 import { postsQueryService } from "../../posts/services/posts-query-service"
 import { commentsQueryRepository } from "../comments-query-repository"
 import { commentsRepository } from "../comments-repository"
-import { commentEntityMapper, commentsQueryService } from "./comments-query-service"
+import { commentEntityMapper } from "./comments-query-service"
 
 export type commentsServicesResponse = {
     result: boolean,
@@ -12,7 +12,7 @@ export type commentsServicesResponse = {
 }
 export const commentsService = {
 
-    addCommentToPost: async function (postId: string, comment: {}, commentatorInfo: {}) {
+    addCommentToPost: async function (postId: string, comment: any, commentatorInfo: any) {
         const response: commentsServicesResponse = {
             result: false,
             status: 404,
@@ -28,10 +28,10 @@ export const commentsService = {
 
         const newCooment: CommentViewModel = {
             id: "",
-            content: "",
+            content: comment.content,
             commentatorInfo: {
-                userId: "commentatorInfo.userId",
-                userLogin: "commentatorInfo.userLogin",
+                userId: commentatorInfo.userId,
+                userLogin: commentatorInfo.userLogin,
             },
             createdAt: new Date().toISOString()
         }
