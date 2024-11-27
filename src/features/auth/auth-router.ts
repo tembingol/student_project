@@ -27,7 +27,7 @@ authRouter.post('/login', ...authValidators, async (req, res) => {
 
     const userToken = await jwtService.createJWT(result)
 
-    res.status(201).send(userToken)
+    res.status(200).send(userToken)
 })
 
 authRouter.get('/login/me', async (req, res) => {

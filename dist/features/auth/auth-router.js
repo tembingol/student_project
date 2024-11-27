@@ -30,7 +30,7 @@ exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res
         return;
     }
     const userToken = yield JWT_service_1.jwtService.createJWT(result);
-    res.status(201).send(userToken);
+    res.status(200).send(userToken);
 }));
 exports.authRouter.get('/login/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const authorization = req.headers['Authorization'.toLowerCase()];
