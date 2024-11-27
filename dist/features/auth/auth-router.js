@@ -34,7 +34,6 @@ exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res
 }));
 exports.authRouter.get('/login/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const authorization = req.headers['Authorization'.toLowerCase()];
-    // console.log("authorization " + authorization)
     if (typeof authorization == "undefined") {
         res.sendStatus(401);
         return;

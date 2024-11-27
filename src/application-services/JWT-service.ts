@@ -6,19 +6,19 @@ const jwt = Jwt;
 export const jwtService = {
 
     async createJWT(user: UserViewModel) {
-        const token = await jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, { expiresIn: '10m' })
+        const token = await jwt.sign({ userId: user.id, userLogin: user.login }, SETTINGS.JWT_SECRET, { expiresIn: '10m' })
         return {
             accessToken: token
         }
     },
 
-    async getUserIdFromToken(token: string): Promise<string> {
+    async getUserIdFromToken(token: string) {
         try {
             const result: any = await jwt.verify(token, SETTINGS.JWT_SECRET)
-            return result.userId
+            return { userId: result.userId, userLogin: result.userLogin }
         } catch (err) {
             //console.log(err)
-            return ""
+            return null
         }
     },
 

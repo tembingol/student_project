@@ -33,12 +33,17 @@ export const authService = {
 
     async getUserByToken(userToken: string) {
 
-        let userId = await jwtService.getUserIdFromToken(userToken)
+        let foundUserFronToken = await jwtService.getUserIdFromToken(userToken)
 
-        const foundUser = await usersQueryService.getUserById(userId)
+        if (!foundUserFronToken) {
+            return null
+        }
+        const foundUser = await usersQueryService.getUserById(foundUserFronToken.userId)
+
         if (foundUser) {
             return userMapper(foundUser)
         }
+
         return foundUser
     }
 }

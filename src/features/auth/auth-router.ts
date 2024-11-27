@@ -34,8 +34,6 @@ authRouter.get('/login/me', async (req, res) => {
 
     const authorization = req.headers['Authorization'.toLowerCase()]
 
-    // console.log("authorization " + authorization)
-
     if (typeof authorization == "undefined") {
         res.sendStatus(401)
         return
