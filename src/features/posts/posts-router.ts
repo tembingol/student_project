@@ -5,6 +5,8 @@ import { postsService } from "./services/posts-service";
 import { postsQueryService } from "./services/posts-query-service";
 import { commentsQueryService } from "../comments/services/comments-query-service";
 import { commentsService } from "../comments/services/comments-service";
+import { commentValidators } from "../comments/middlewares/comments-validators";
+import { jwtService } from "../../application-services/JWT-service";
 
 export const postRouter = Router({})
 
@@ -46,6 +48,33 @@ postRouter.get('/:id/comments', async (req, res) => {
 
 postRouter.post('/:id/comments', async (req, res) => {
 
+    const authorization = req.headers['Authorization'.toLowerCase()]
+
+    if (typeof authorization == "undefined") {
+        res.sendStatus(401)
+        return
+    }
+
+    const userToken = authorization.slice(7)
+
+    let foundUser = await jwtService.getUserIdFromToken(userToken.toString())
+
+    if (foundUser === null) {
+        res.sendStatus(401)
+        return
+    }
+
+    const content = req.body.content
+    if (!content) {
+        res.status(400).send({ errorsMessages: [{ message: 'more then 300 or less 20', field: 'content' }] })
+        return
+    }
+
+    if (content.length < 20 || content.length > 300) {
+        res.status(400).send({ errorsMessages: [{ message: 'more then 300 or less 20', field: 'content' }] })
+        return
+    }
+
     const foundPost = await postsQueryService.findPostById(req.params.id);
     if (!foundPost.result) {
         res.sendStatus(foundPost.status)
@@ -53,8 +82,8 @@ postRouter.post('/:id/comments', async (req, res) => {
     }
 
     const commentatorInfo = {
-        userId: "userId",
-        userLogin: "string",
+        userId: foundUser.userId,
+        userLogin: foundUser.userLogin,
     }
 
     const newComment = await commentsService.addCommentToPost(req.params.id, req.body, commentatorInfo);

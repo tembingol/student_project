@@ -54,12 +54,25 @@ export const commentsService = {
 
     },
 
-    updateComment: async function (id: string, commentBody: CommentInputModel) {
+    updateComment: async function (id: string, commentBody: CommentInputModel, user: any) {
         const response: commentsServicesResponse = {
             result: false,
             status: 404,
             data: {},
             errors: { errorsMessages: [] }
+        }
+
+        const filter = {
+            commentatorInfo: { userId: user.userId, userLogin: user.userLogin }
+        }
+
+        const foundcomment = await commentsQueryRepository.getCommentByID(filter)
+
+        if (!foundcomment) {
+            response.result = true
+            response.status = 403
+            response.data = {}
+            return response
         }
 
         const isCommentUpdated = await commentsRepository.updateComment(id, commentBody);
@@ -72,12 +85,25 @@ export const commentsService = {
         return response
     },
 
-    deleteComment: async function (id: string) {
+    deleteComment: async function (id: string, user: any) {
         const response: commentsServicesResponse = {
             result: false,
             status: 404,
             data: {},
             errors: { errorsMessages: [] }
+        }
+
+        const filter = {
+            commentatorInfo: { userId: user.userId, userLogin: user.userLogin }
+        }
+
+        const foundcomment = await commentsQueryRepository.getCommentByID(filter)
+
+        if (!foundcomment) {
+            response.result = true
+            response.status = 403
+            response.data = {}
+            return response
         }
 
         const isBlogDeleted = await commentsRepository.deleteComment(id)
