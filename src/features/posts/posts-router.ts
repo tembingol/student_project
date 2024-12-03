@@ -6,7 +6,7 @@ import { postsQueryService } from "./services/posts-query-service";
 import { commentsQueryService } from "../comments/services/comments-query-service";
 import { commentsService } from "../comments/services/comments-service";
 import { commentValidators } from "../comments/middlewares/comments-validators";
-import { jwtService } from "../../application-services/JWT-service";
+import { authMiddleware } from "../../global-middlewares/auth-middleware";
 
 export const postRouter = Router({})
 
@@ -46,34 +46,9 @@ postRouter.get('/:id/comments', async (req, res) => {
     res.status(foundCommentsOfPost.status).json(foundCommentsOfPost.data)
 })
 
-postRouter.post('/:id/comments', async (req, res) => {
-
-    const authorization = req.headers['Authorization'.toLowerCase()]
-
-    if (typeof authorization == "undefined") {
-        res.sendStatus(401)
-        return
-    }
-
-    const userToken = authorization.slice(7)
-
-    let foundUser = await jwtService.getUserIdFromToken(userToken.toString())
-
-    if (foundUser === null) {
-        res.sendStatus(401)
-        return
-    }
+postRouter.post('/:id/comments', authMiddleware, ...commentValidators, async (req, res) => {
 
     const content = req.body.content
-    if (!content) {
-        res.status(400).send({ errorsMessages: [{ message: 'more then 300 or less 20', field: 'content' }] })
-        return
-    }
-
-    if (content.length < 20 || content.length > 300) {
-        res.status(400).send({ errorsMessages: [{ message: 'more then 300 or less 20', field: 'content' }] })
-        return
-    }
 
     const foundPost = await postsQueryService.findPostById(req.params.id);
     if (!foundPost.result) {
@@ -81,18 +56,15 @@ postRouter.post('/:id/comments', async (req, res) => {
         return
     }
 
-    const commentatorInfo = {
-        userId: foundUser.userId,
-        userLogin: foundUser.userLogin,
-    }
+    const loginedUser = req.context!.currentUser
 
-    const newComment = await commentsService.addCommentToPost(req.params.id, req.body, commentatorInfo);
+    const newCommentResult = await commentsService.addCommentToPost(req.params.id, content, loginedUser);
 
-    if (!newComment.result) {
-        res.sendStatus(newComment.status)
+    if (!newCommentResult.result) {
+        res.sendStatus(newCommentResult.status)
         return
     }
-    res.status(newComment.status).json(newComment.data)
+    res.status(newCommentResult.status).json(newCommentResult.data)
 })
 
 postRouter.post('/', ...postValidators, async (req, res) => {

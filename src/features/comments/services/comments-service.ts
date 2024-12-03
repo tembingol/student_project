@@ -12,7 +12,7 @@ export type commentsServicesResponse = {
 }
 export const commentsService = {
 
-    addCommentToPost: async function (postId: string, comment: any, commentatorInfo: any) {
+    addCommentToPost: async function (postId: string, content: any, commentatorInfo: any) {
         const response: commentsServicesResponse = {
             result: false,
             status: 404,
@@ -28,7 +28,7 @@ export const commentsService = {
 
         const newCooment: CommentViewModel = {
             id: "",
-            content: comment.content,
+            content: content,
             commentatorInfo: {
                 userId: commentatorInfo.userId,
                 userLogin: commentatorInfo.userLogin,

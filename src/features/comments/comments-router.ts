@@ -2,7 +2,7 @@ import { Router } from "express"
 import { commentsQueryService } from "./services/comments-query-service"
 import { commentsService } from "./services/comments-service"
 import { commentValidators } from "./middlewares/comments-validators"
-import { jwtService } from "../../application-services/JWT-service"
+import { authMiddleware } from "../../global-middlewares/auth-middleware"
 
 export const commentsRouter = Router({})
 
@@ -25,35 +25,11 @@ commentsRouter.get('/:id', async (req, res) => {
     res.status(serviceRes.status).json(serviceRes.data)
 })
 
-commentsRouter.put('/:id', async (req, res) => {
-    const authorization = req.headers['Authorization'.toLowerCase()]
+commentsRouter.put('/:id', authMiddleware, ...commentValidators, async (req, res) => {
 
-    if (typeof authorization == "undefined") {
-        res.sendStatus(401)
-        return
-    }
+    const loginedUser = req.context!.currentUser
 
-    const userToken = authorization.slice(7)
-
-    let foundUser = await jwtService.getUserIdFromToken(userToken.toString())
-
-    if (foundUser === null) {
-        res.sendStatus(401)
-        return
-    }
-
-    const content = req.body.content
-    if (!content) {
-        res.status(400).send({ errorsMessages: [{ message: 'more then 300 or less 20', field: 'content' }] })
-        return
-    }
-
-    if (content.length < 20 || content.length > 300) {
-        res.status(400).send({ errorsMessages: [{ message: 'more then 300 or less 20', field: 'content' }] })
-        return
-    }
-
-    const serviceRes = await commentsService.updateComment(req.params.id, req.body, foundUser)
+    const serviceRes = await commentsService.updateComment(req.params.id, req.body, loginedUser)
     if (!serviceRes.result) {
         res.sendStatus(serviceRes.status)
         return
@@ -62,25 +38,11 @@ commentsRouter.put('/:id', async (req, res) => {
     res.status(serviceRes.status).json(serviceRes.data)
 })
 
-commentsRouter.delete('/:id', async (req, res) => {
+commentsRouter.delete('/:id', authMiddleware, async (req, res) => {
 
-    const authorization = req.headers['Authorization'.toLowerCase()]
+    const loginedUser = req.context!.currentUser
 
-    if (typeof authorization == "undefined") {
-        res.sendStatus(401)
-        return
-    }
-
-    const userToken = authorization.slice(7)
-
-    let foundUser = await jwtService.getUserIdFromToken(userToken.toString())
-
-    if (foundUser === null) {
-        res.sendStatus(401)
-        return
-    }
-
-    const serviceRes = await commentsService.deleteComment(req.params.id, foundUser)
+    const serviceRes = await commentsService.deleteComment(req.params.id, loginedUser)
     if (!serviceRes.result) {
         res.sendStatus(serviceRes.status)
         return
