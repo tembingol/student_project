@@ -1,6 +1,6 @@
+import { ServicesResponse } from "../../../input-output-types/services-models"
 import { UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
 import { usersQueryRepository } from "../users-query-repo"
-import { userServicesResponse } from "./users-service"
 
 export const usersQueryService = {
 
@@ -30,7 +30,7 @@ export const usersQueryService = {
 
         const totalCount = await usersQueryRepository.getDocumetnsCount(filter)
 
-        const result: userServicesResponse = {
+        const result: ServicesResponse = {
             result: true,
             status: 200,
             data: {

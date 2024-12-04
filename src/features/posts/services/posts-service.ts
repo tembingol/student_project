@@ -1,19 +1,15 @@
 import { PostInputModel, PostViewModel } from "../../../input-output-types/posts-models"
+import { ServicesResponse } from "../../../input-output-types/services-models"
 import { postsQueryRepository } from "../posts-query-repository"
 import { postsRepository } from "../posts-repository"
 import { postEntityMapper } from "./posts-query-service"
 
-export type postsServicesResponse = {
-    result: boolean,
-    status: number,
-    data: {},
-    errors: { errorsMessages: {}[] }
-}
+
 
 export const postsService = {
 
     createPost: async function (postBody: PostInputModel) {
-        const response: postsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 400,
             data: {},
@@ -47,7 +43,7 @@ export const postsService = {
     },
 
     updatePost: async function (id: string, postBody: PostInputModel) {
-        const response: postsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},
@@ -65,7 +61,7 @@ export const postsService = {
     },
 
     deletePost: async function (id: string) {
-        const response: postsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},

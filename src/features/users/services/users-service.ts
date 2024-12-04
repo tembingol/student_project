@@ -3,18 +3,13 @@ import { usersRepository } from "../users-repository"
 import { usersQueryRepository } from "../users-query-repo"
 import bcrypt from "bcrypt"
 import { userEntityMapper, usersQueryService } from "./users-query-service"
+import { ServicesResponse } from "../../../input-output-types/services-models"
 
-export type userServicesResponse = {
-    result: boolean,
-    status: number,
-    data: {},
-    errors: { errorsMessages: {}[] }
-}
 
 export const usersService = {
 
     createUser: async function (user: UserInputModel) {
-        const response: userServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 400,
             data: {},
@@ -98,7 +93,7 @@ export const usersService = {
     },
 
     deleteUser: async function (useriD: string) {
-        let response: userServicesResponse = {
+        let response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},

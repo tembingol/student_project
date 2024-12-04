@@ -1,11 +1,12 @@
-import { CommentatorInfo, CommentDataBaseModel, CommentViewModel } from "../../../input-output-types/comments-models"
+import { CommentDataBaseModel, CommentViewModel } from "../../../input-output-types/comments-models"
+import { ServicesResponse } from "../../../input-output-types/services-models"
 import { commentsQueryRepository } from "../comments-query-repository"
-import { commentsServicesResponse } from "./comments-service"
+
 
 export const commentsQueryService = {
 
     findCommentById: async function (id: string) {
-        const result: commentsServicesResponse = {
+        const result: ServicesResponse = {
             result: false,
             status: 404,
             data: {},
@@ -47,7 +48,7 @@ export const commentsQueryService = {
 
         const _totalCount = await commentsQueryRepository.getDocumetnsCountOfPost({ postId: postId })
 
-        const result: commentsServicesResponse = {
+        const result: ServicesResponse = {
             result: true,
             status: 200,
             data: {

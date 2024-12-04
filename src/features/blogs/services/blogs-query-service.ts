@@ -1,7 +1,7 @@
 import { BlogDataBaseModel, BlogViewModel } from "../../../input-output-types/blogs-models"
+import { ServicesResponse } from "../../../input-output-types/services-models"
 import { postsQueryService } from "../../posts/services/posts-query-service"
 import { blogsQueryRepository } from "../blogs-query-repository"
-import { blogsServicesResponse } from "./blogs-service"
 
 export const blogsQueryService = {
 
@@ -29,7 +29,7 @@ export const blogsQueryService = {
 
         const totalCount = await blogsQueryRepository.getDocumetnsCount(filter)
 
-        const result: blogsServicesResponse = {
+        const result: ServicesResponse = {
             result: true,
             status: 200,
             data: {
@@ -46,7 +46,7 @@ export const blogsQueryService = {
     },
 
     findBlogById: async function (id: string) {
-        const result: blogsServicesResponse = {
+        const result: ServicesResponse = {
             result: false,
             status: 404,
             data: {},
@@ -93,7 +93,7 @@ export const blogsQueryService = {
 
         const _totalCount = await postsQueryService.getDocumetnsCountBlog(blogId, searchNameTerm)
 
-        const result: blogsServicesResponse = {
+        const result: ServicesResponse = {
             result: true,
             status: 200,
             data: {

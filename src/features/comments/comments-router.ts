@@ -2,7 +2,7 @@ import { Router } from "express"
 import { commentsQueryService } from "./services/comments-query-service"
 import { commentsService } from "./services/comments-service"
 import { commentValidators } from "./middlewares/comments-validators"
-import { authMiddleware } from "../../global-middlewares/auth-middleware"
+import { authMiddleware } from "../../global-middlewares/jwt-auth-middleware"
 
 export const commentsRouter = Router({})
 

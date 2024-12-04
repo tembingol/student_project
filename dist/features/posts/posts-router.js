@@ -18,7 +18,7 @@ const posts_query_service_1 = require("./services/posts-query-service");
 const comments_query_service_1 = require("../comments/services/comments-query-service");
 const comments_service_1 = require("../comments/services/comments-service");
 const comments_validators_1 = require("../comments/middlewares/comments-validators");
-const auth_middleware_1 = require("../../global-middlewares/auth-middleware");
+const jwt_auth_middleware_1 = require("../../global-middlewares/jwt-auth-middleware");
 exports.postRouter = (0, express_1.Router)({});
 // simple logger for this router's requests
 // all requests to this router will first hit this middleware
@@ -49,7 +49,7 @@ exports.postRouter.get('/:id/comments', (req, res) => __awaiter(void 0, void 0, 
     const foundCommentsOfPost = yield comments_query_service_1.commentsQueryService.findCommentsOfPost(req.params.id, req.query);
     res.status(foundCommentsOfPost.status).json(foundCommentsOfPost.data);
 }));
-exports.postRouter.post('/:id/comments', auth_middleware_1.authMiddleware, ...comments_validators_1.commentValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postRouter.post('/:id/comments', jwt_auth_middleware_1.authMiddleware, ...comments_validators_1.commentValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const content = req.body.content;
     const foundPost = yield posts_query_service_1.postsQueryService.findPostById(req.params.id);
     if (!foundPost.result) {

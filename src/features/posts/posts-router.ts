@@ -6,7 +6,7 @@ import { postsQueryService } from "./services/posts-query-service";
 import { commentsQueryService } from "../comments/services/comments-query-service";
 import { commentsService } from "../comments/services/comments-service";
 import { commentValidators } from "../comments/middlewares/comments-validators";
-import { authMiddleware } from "../../global-middlewares/auth-middleware";
+import { authMiddleware } from "../../global-middlewares/jwt-auth-middleware";
 
 export const postRouter = Router({})
 

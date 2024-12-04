@@ -1,8 +1,7 @@
 import { postCollection } from "../../../db/mongodb"
 import { PostDataBaseModel, PostViewModel } from "../../../input-output-types/posts-models"
+import { ServicesResponse } from "../../../input-output-types/services-models"
 import { postsQueryRepository } from "../posts-query-repository"
-import { postsRepository } from "../posts-repository"
-import { postsServicesResponse } from "./posts-service"
 
 export const postsQueryService = {
 
@@ -30,7 +29,7 @@ export const postsQueryService = {
 
         const totalCount = await postsQueryService.getDocumetnsCount(searchNameTerm)
 
-        const result: postsServicesResponse = {
+        const result: ServicesResponse = {
             result: true,
             status: 200,
             data: {
@@ -66,7 +65,7 @@ export const postsQueryService = {
     },
 
     findPostById: async function (id: string) {
-        const result: postsServicesResponse = {
+        const result: ServicesResponse = {
             result: false,
             status: 404,
             data: {},

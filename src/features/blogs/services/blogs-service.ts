@@ -1,21 +1,16 @@
 import { BlogInputModel, BlogViewModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
+import { ServicesResponse } from "../../../input-output-types/services-models"
 import { postsService } from "../../posts/services/posts-service"
 import { blogsQueryRepository } from "../blogs-query-repository"
 import { blogsRepository } from "../blogs-repository"
 import { blogEntityMapper } from "./blogs-query-service"
 
-export type blogsServicesResponse = {
-    result: boolean,
-    status: number,
-    data: {},
-    errors: { errorsMessages: {}[] }
-}
 
 export const blogsService = {
 
     createBlog: async function (blogBody: BlogInputModel) {
-        const response: blogsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 400,
             data: {},
@@ -55,7 +50,7 @@ export const blogsService = {
     },
 
     updateBlog: async function (id: string, blogBody: BlogInputModel) {
-        const response: blogsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},
@@ -73,7 +68,7 @@ export const blogsService = {
     },
 
     deleteBlog: async function (id: string) {
-        const response: blogsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},

@@ -1,19 +1,15 @@
 import { CommentInputModel, CommentViewModel } from "../../../input-output-types/comments-models"
+import { ServicesResponse } from "../../../input-output-types/services-models"
 import { postsQueryService } from "../../posts/services/posts-query-service"
 import { commentsQueryRepository } from "../comments-query-repository"
 import { commentsRepository } from "../comments-repository"
 import { commentEntityMapper } from "./comments-query-service"
 
-export type commentsServicesResponse = {
-    result: boolean,
-    status: number,
-    data: {},
-    errors: { errorsMessages: {}[] }
-}
+
 export const commentsService = {
 
     addCommentToPost: async function (postId: string, content: any, commentatorInfo: any) {
-        const response: commentsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},
@@ -55,7 +51,7 @@ export const commentsService = {
     },
 
     updateComment: async function (id: string, commentBody: CommentInputModel, user: any) {
-        const response: commentsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},
@@ -86,7 +82,7 @@ export const commentsService = {
     },
 
     deleteComment: async function (id: string, user: any) {
-        const response: commentsServicesResponse = {
+        const response: ServicesResponse = {
             result: false,
             status: 404,
             data: {},
