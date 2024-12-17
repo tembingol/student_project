@@ -23,7 +23,34 @@ exports.authRouter = (0, express_1.Router)({});
 //     console.log('--}')
 //     next()
 // })
-exports.authRouter.post('/login', ...auth_validators_1.authValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/registration', ...auth_validators_1.authRegistrationValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield auth_service_1.authService.registerNewUser(req.body);
+    if (result === null) {
+        res.sendStatus(401);
+        return;
+    }
+    //const userToken = await jwtService.createJWT(result)
+    res.status(200).send(result);
+}));
+exports.authRouter.post('/registration-confirmation', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield auth_service_1.authService.checkUserCredintails(req.body);
+    if (result === null) {
+        res.sendStatus(401);
+        return;
+    }
+    const userToken = yield JWT_service_1.jwtService.createJWT(result);
+    res.status(200).send(userToken);
+}));
+exports.authRouter.post('/registration-email-resending', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield auth_service_1.authService.checkUserCredintails(req.body);
+    if (result === null) {
+        res.sendStatus(401);
+        return;
+    }
+    const userToken = yield JWT_service_1.jwtService.createJWT(result);
+    res.status(200).send(userToken);
+}));
+exports.authRouter.post('/login', ...auth_validators_1.authLoginValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.authService.checkUserCredintails(req.body);
     if (result === null) {
         res.sendStatus(401);

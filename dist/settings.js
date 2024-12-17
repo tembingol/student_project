@@ -16,6 +16,8 @@ exports.SETTINGS = {
     COMMENTS_COLLECTION_NAME: "comments",
     USERSCREDENTIALS_COLLECTION_NAME: 'usersCredentials',
     JWT_SECRET: process.env.JWT_SECRET || 'testproject',
+    EMAILMANAGERLOGIN: process.env.EMAILMANAGERLOGIN || 'login',
+    EMAILMANAGERPASSWORD: process.env.EMAILMANAGERPASSWORD || 'password',
     PATH: {
         ROOT: '/',
         USERS: '/users',

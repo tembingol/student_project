@@ -1,13 +1,23 @@
 import { body, header } from 'express-validator'
 import { inputCheckErrorsMiddleware } from '../../../global-middlewares/input-Check-Errors-Middleware'
-import { NextFunction, Request, Response } from 'express'
 
 export const loginOrEmailValidator = body('loginOrEmail')
     .isString().withMessage('not string')
 export const passwordValidator = body('password')
     .isString().withMessage('not string')
 
-export const authValidators = [
+export const registrationLoinValidator = body('login')
+    .isString().withMessage('not string')
+    .isLength({ min: 3, max: 10 }).withMessage('more then 10 or less than 3')
+export const egistrationPasswordValidator = body('password')
+    .isString().withMessage('not string')
+    .trim()
+    .isLength({ min: 6, max: 20 }).withMessage('more then 20 or less than 6')
+export const legistrationEmailValidator = body('email')
+    .isString().withMessage('not string')
+    .isEmail().withMessage('not valid email')
+
+export const authLoginValidators = [
 
     loginOrEmailValidator,
     passwordValidator,
@@ -15,6 +25,14 @@ export const authValidators = [
     inputCheckErrorsMiddleware,
 ]
 
+export const authRegistrationValidators = [
+
+    registrationLoinValidator,
+    egistrationPasswordValidator,
+    legistrationEmailValidator,
+
+    inputCheckErrorsMiddleware,
+]
 
 
 export const authHeaderValidator = header('Authorization'.toLowerCase())

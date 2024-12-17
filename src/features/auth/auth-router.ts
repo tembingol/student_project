@@ -1,7 +1,5 @@
 import { Router } from "express"
-import { authHeaderValidator, authValidators } from "./middlewares/auth-validators"
-import { usersQueryRepository } from "../users/users-query-repo"
-import bcrypt from "bcrypt"
+import { authRegistrationValidators, authLoginValidators } from "./middlewares/auth-validators"
 import { jwtService } from "../../application-services/JWT-service"
 import { authService } from "./services/auth-service"
 
@@ -16,7 +14,49 @@ export const authRouter = Router({})
 //     next()
 // })
 
-authRouter.post('/login', ...authValidators, async (req, res) => {
+authRouter.post('/registration', ...authRegistrationValidators, async (req, res) => {
+
+    const result = await authService.registerNewUser(req.body)
+
+    if (result === null) {
+        res.sendStatus(401)
+        return
+    }
+
+    //const userToken = await jwtService.createJWT(result)
+
+    res.status(200).send(result)
+})
+
+authRouter.post('/registration-confirmation', async (req, res) => {
+
+    const result = await authService.checkUserCredintails(req.body)
+
+    if (result === null) {
+        res.sendStatus(401)
+        return
+    }
+
+    const userToken = await jwtService.createJWT(result)
+
+    res.status(200).send(userToken)
+})
+
+authRouter.post('/registration-email-resending', async (req, res) => {
+
+    const result = await authService.checkUserCredintails(req.body)
+
+    if (result === null) {
+        res.sendStatus(401)
+        return
+    }
+
+    const userToken = await jwtService.createJWT(result)
+
+    res.status(200).send(userToken)
+})
+
+authRouter.post('/login', ...authLoginValidators, async (req, res) => {
 
     const result = await authService.checkUserCredintails(req.body)
 
