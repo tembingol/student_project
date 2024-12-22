@@ -16,44 +16,32 @@ export const authRouter = Router({})
 
 authRouter.post('/registration', ...authRegistrationValidators, async (req, res) => {
 
-    const result = await authService.registerNewUser(req.body)
-
-    if (result === null) {
-        res.sendStatus(401)
+    const serviceRes = await authService.registerNewUser(req.body)
+    if (serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data)
         return
     }
-
-    //const userToken = await jwtService.createJWT(result)
-
-    res.status(200).send(result)
+    res.status(serviceRes.status).json(serviceRes.errors)
 })
 
 authRouter.post('/registration-confirmation', async (req, res) => {
 
-    const result = await authService.checkUserCredintails(req.body)
-
-    if (result === null) {
-        res.sendStatus(401)
+    const serviceRes = await authService.confirmEmail(req.body)
+    if (serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data)
         return
     }
-
-    const userToken = await jwtService.createJWT(result)
-
-    res.status(200).send(userToken)
+    res.status(serviceRes.status).json(serviceRes.errors)
 })
 
 authRouter.post('/registration-email-resending', async (req, res) => {
 
-    const result = await authService.checkUserCredintails(req.body)
-
-    if (result === null) {
-        res.sendStatus(401)
+    const serviceRes = await authService.resendRegistrationEmail(req.body)
+    if (serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data)
         return
     }
-
-    const userToken = await jwtService.createJWT(result)
-
-    res.status(200).send(userToken)
+    res.status(serviceRes.status).json(serviceRes.errors)
 })
 
 authRouter.post('/login', ...authLoginValidators, async (req, res) => {

@@ -30,4 +30,18 @@ exports.usersRepository = {
             return result.deletedCount === 1;
         });
     },
+    updateConfirmation: function (useriD) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = { _id: new mongodb_1.ObjectId(useriD) };
+            const result = yield mongodb_2.usersCollection.updateOne(filter, { $set: { 'emailConfirmation.isConfirmed': true } });
+            return result.modifiedCount === 1;
+        });
+    },
+    updateConfirmationCode: function (useriD, confirmationCode) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = { _id: new mongodb_1.ObjectId(useriD) };
+            const result = yield mongodb_2.usersCollection.updateOne(filter, { $set: { 'emailConfirmation.confirmationCode': confirmationCode } });
+            return result.modifiedCount === 1;
+        });
+    },
 };

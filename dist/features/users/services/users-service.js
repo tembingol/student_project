@@ -17,6 +17,7 @@ const users_repository_1 = require("../users-repository");
 const users_query_repo_1 = require("../users-query-repo");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_query_service_1 = require("./users-query-service");
+const mongodb_1 = require("mongodb");
 exports.usersService = {
     createUser: function (user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -74,6 +75,17 @@ exports.usersService = {
                 login: user.login,
                 createdAt: new Date(),
                 email: user.email,
+                emailConfirmation: {
+                    confirmationCode: 'string',
+                    expirationDate: new Date(),
+                    isConfirmed: false
+                },
+                phoneConfirmation: {
+                    confirmationCode: 'string',
+                    expirationDate: new Date(),
+                    isConfirmed: false
+                },
+                _id: new mongodb_1.ObjectId
             };
             const salt = bcrypt_1.default.genSaltSync(10);
             const hash = bcrypt_1.default.hashSync(user.password, salt);
@@ -109,4 +121,31 @@ exports.usersService = {
             return response;
         });
     },
+    getUserByConfirmationCode: function (confirmCode) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let response = {
+                result: false,
+                status: 400,
+                data: {},
+                errors: { errorsMessages: [] }
+            };
+            const foundUser = yield users_query_repo_1.usersQueryRepository.getUserByConfirmationCode(confirmCode);
+            if (foundUser === null) {
+                response.errors.errorsMessages.push({ message: "confirmation code is wrong", field: "code" });
+                return response;
+            }
+            if (foundUser.emailConfirmation.expirationDate < new Date()) {
+                response.errors.errorsMessages.push({ message: "confirmation code is exparied", field: "code" });
+                return response;
+            }
+            if (foundUser.emailConfirmation.isConfirmed) {
+                response.errors.errorsMessages.push({ message: "user already is confirmed", field: "code" });
+                return response;
+            }
+            response.result = true;
+            response.status = 204;
+            response.data = Object.assign({}, foundUser);
+            return response;
+        });
+    }
 };

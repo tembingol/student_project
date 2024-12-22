@@ -1,9 +1,10 @@
-import { UserInputModel, UserCredentialsModel, UserViewModel } from "../../../input-output-types/users-moduls"
+import { UserInputModel, UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
 import { usersRepository } from "../users-repository"
 import { usersQueryRepository } from "../users-query-repo"
 import bcrypt from "bcrypt"
 import { userEntityMapper, usersQueryService } from "./users-query-service"
 import { ServicesResponse } from "../../../input-output-types/services-models"
+import { ObjectId } from "mongodb"
 
 
 export const usersService = {
@@ -64,11 +65,22 @@ export const usersService = {
             return response
         }
 
-        const newUser: UserViewModel = {
+        const newUser: UserDataBaseModel = {
             id: "",
             login: user.login,
             createdAt: new Date(),
             email: user.email,
+            emailConfirmation: {
+                confirmationCode: 'string',
+                expirationDate: new Date(),
+                isConfirmed: false
+            },
+            phoneConfirmation: {
+                confirmationCode: 'string',
+                expirationDate: new Date(),
+                isConfirmed: false
+            },
+            _id: new ObjectId
         }
 
         const salt = bcrypt.genSaltSync(10)
@@ -110,5 +122,35 @@ export const usersService = {
 
         return response
     },
+
+    getUserByConfirmationCode: async function (confirmCode: string) {
+        let response: ServicesResponse = {
+            result: false,
+            status: 400,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+        const foundUser = await usersQueryRepository.getUserByConfirmationCode(confirmCode)
+
+        if (foundUser === null) {
+            response.errors.errorsMessages.push({ message: "confirmation code is wrong", field: "code" })
+            return response
+        }
+
+        if (foundUser.emailConfirmation.expirationDate < new Date()) {
+            response.errors.errorsMessages.push({ message: "confirmation code is exparied", field: "code" })
+            return response
+        }
+
+        if (foundUser.emailConfirmation.isConfirmed) {
+            response.errors.errorsMessages.push({ message: "user already is confirmed", field: "code" })
+            return response
+        }
+
+        response.result = true
+        response.status = 204
+        response.data = { ...foundUser }
+        return response
+    }
 
 }

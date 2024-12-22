@@ -40,6 +40,13 @@ exports.usersQueryRepository = {
             return foundUser;
         });
     },
+    getUserByConfirmationCode: function (code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = { 'emailConfirmation.confirmationCode': code };
+            const foundUser = yield mongodb_1.usersCollection.findOne(filter);
+            return foundUser;
+        });
+    },
     getAllUsers: function (pageNumber, pageSize, sortBy, sortDirection, filter) {
         return __awaiter(this, void 0, void 0, function* () {
             const _pageNumber = +pageNumber;

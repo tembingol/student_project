@@ -27,6 +27,12 @@ export const usersQueryRepository = {
         return foundUser
     },
 
+    getUserByConfirmationCode: async function (code: string) {
+        const filter = { 'emailConfirmation.confirmationCode': code }
+        const foundUser = await usersCollection.findOne(filter)
+        return foundUser
+    },
+
     getAllUsers: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize

@@ -36,14 +36,16 @@ export const emailManager = {
         return false
     },
 
-    async sendRegistrationCode(receiversArray: string[], confirmationCode: string) {
+    async sendRegistrationConfirmation(receiversArray: string[], confirmationCode: string) {
 
+        const confirmLink = `https://8fdc6ffba3c499c27ea034bdbffe323d.serveo.net/confirm-email?code=${confirmationCode}`
+        const emailText = `<h1>Thank for your registration</h1> <p>To finish registration please follow the link below:<a href=${confirmLink}>complete registration</a></p>`
         const mailOptions: MailOptions = {
             from: '"service app" <stud2025@vk.com>', // sender address
             to: receiversArray.join(','),// list of receivers,
             subject: 'Hello! this is registration',// Subject line,
-            text: 'registration code = ' + confirmationCode,// plain text body
-            html: "<b>registration " + confirmationCode + "</b>",// html body,
+            text: emailText,// plain text body
+            html: "<b>" + emailText + "</b>",// html body,
         };
 
         const result = await this.sendEmail(mailOptions)
@@ -53,7 +55,7 @@ export const emailManager = {
         return result
     },
 
-    async sendRegistrationConfirmation(receiversArray: string[]) {
+    async resendRegistrationConfirmation(receiversArray: string[]) {
 
         const mailOptions: MailOptions = {
             from: '"service app" <stud2025@vk.com>', // sender address

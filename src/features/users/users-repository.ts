@@ -4,7 +4,7 @@ import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../in
 
 export const usersRepository = {
 
-    createUser: async function (user: UserViewModel, usersCredentials: UserCredentialsModel) {
+    createUser: async function (user: UserDataBaseModel, usersCredentials: UserCredentialsModel) {
         const newObjectId = new ObjectId()
 
         const newUser: UserDataBaseModel = {
@@ -30,4 +30,15 @@ export const usersRepository = {
         return result.deletedCount === 1
     },
 
+    updateConfirmation: async function (useriD: string) {
+        const filter = { _id: new ObjectId(useriD) }
+        const result = await usersCollection.updateOne(filter, { $set: { 'emailConfirmation.isConfirmed': true } })
+        return result.modifiedCount === 1
+    },
+
+    updateConfirmationCode: async function (useriD: string, confirmationCode: string) {
+        const filter = { _id: new ObjectId(useriD) }
+        const result = await usersCollection.updateOne(filter, { $set: { 'emailConfirmation.confirmationCode': confirmationCode } })
+        return result.modifiedCount === 1
+    },
 }

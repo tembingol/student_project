@@ -24,31 +24,28 @@ exports.authRouter = (0, express_1.Router)({});
 //     next()
 // })
 exports.authRouter.post('/registration', ...auth_validators_1.authRegistrationValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield auth_service_1.authService.registerNewUser(req.body);
-    if (result === null) {
-        res.sendStatus(401);
+    const serviceRes = yield auth_service_1.authService.registerNewUser(req.body);
+    if (serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data);
         return;
     }
-    //const userToken = await jwtService.createJWT(result)
-    res.status(200).send(result);
+    res.status(serviceRes.status).json(serviceRes.errors);
 }));
 exports.authRouter.post('/registration-confirmation', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield auth_service_1.authService.checkUserCredintails(req.body);
-    if (result === null) {
-        res.sendStatus(401);
+    const serviceRes = yield auth_service_1.authService.confirmEmail(req.body);
+    if (serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data);
         return;
     }
-    const userToken = yield JWT_service_1.jwtService.createJWT(result);
-    res.status(200).send(userToken);
+    res.status(serviceRes.status).json(serviceRes.errors);
 }));
 exports.authRouter.post('/registration-email-resending', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield auth_service_1.authService.checkUserCredintails(req.body);
-    if (result === null) {
-        res.sendStatus(401);
+    const serviceRes = yield auth_service_1.authService.resendRegistrationEmail(req.body);
+    if (serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data);
         return;
     }
-    const userToken = yield JWT_service_1.jwtService.createJWT(result);
-    res.status(200).send(userToken);
+    res.status(serviceRes.status).json(serviceRes.errors);
 }));
 exports.authRouter.post('/login', ...auth_validators_1.authLoginValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.authService.checkUserCredintails(req.body);
