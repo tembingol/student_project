@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersQueryService = void 0;
 exports.userEntityMapper = userEntityMapper;
 exports.userCredentialsMapper = userCredentialsMapper;
+const types_1 = require("../../../input-output-types/types");
 const users_query_repo_1 = require("../users-query-repo");
 exports.usersQueryService = {
     findUsers: function (queryParams) {
@@ -53,6 +54,24 @@ exports.usersQueryService = {
                 return userEntityMapper(foundUser);
             }
             return foundUser;
+        });
+    },
+    getUserByEmailServicesResponse: function (email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = {
+                result: false,
+                status: types_1.HTTP_STATUS_CODE.BadRequest,
+                data: {},
+                errors: { errorsMessages: [] }
+            };
+            const foundUser = yield users_query_repo_1.usersQueryRepository.getUserByEmail(email);
+            if (foundUser === null) {
+                return response;
+            }
+            response.result = true;
+            response.status = types_1.HTTP_STATUS_CODE.OK;
+            response.data = userEntityMapper(foundUser);
+            return response;
         });
     },
     getUserByLogin: function (login) {

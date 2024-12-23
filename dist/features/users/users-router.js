@@ -29,7 +29,7 @@ exports.usersRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, fun
     res.status(serviceRes.status).json(serviceRes.data);
 }));
 exports.usersRouter.post('/', base_auth_middleware_1.baseAuthMiddleware, ...users_validators_1.userRegistrationValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const serviceRes = yield users_service_1.usersService.createUser(req.body);
+    const serviceRes = yield users_service_1.usersService.createUser(req.body, true);
     if (serviceRes.result) {
         res.status(serviceRes.status).json(serviceRes.data);
         return;

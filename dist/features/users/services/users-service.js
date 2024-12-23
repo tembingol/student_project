@@ -13,17 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersService = void 0;
+const types_1 = require("../../../input-output-types/types");
 const users_repository_1 = require("../users-repository");
 const users_query_repo_1 = require("../users-query-repo");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_query_service_1 = require("./users-query-service");
-const mongodb_1 = require("mongodb");
 exports.usersService = {
-    createUser: function (user) {
-        return __awaiter(this, void 0, void 0, function* () {
+    createUser: function (user_1) {
+        return __awaiter(this, arguments, void 0, function* (user, isConfirmed = false) {
             const response = {
                 result: false,
-                status: 400,
+                status: types_1.HTTP_STATUS_CODE.BadRequest,
                 data: {},
                 errors: { errorsMessages: [] }
             };
@@ -53,17 +53,11 @@ exports.usersService = {
             }
             const isEmailAvalible = yield users_query_service_1.usersQueryService.getUserByEmail(user.email);
             if (isEmailAvalible !== null) {
-                response.result = false;
-                response.status = 400;
-                response.data = {};
                 response.errors.errorsMessages.push({ message: "email should be unique", field: "email" });
                 return response;
             }
             const isLoginAvalible = yield users_query_repo_1.usersQueryRepository.getUserByLogin(user.login);
             if (isLoginAvalible !== null) {
-                response.result = false;
-                response.status = 400;
-                response.data = {};
                 response.errors.errorsMessages.push({ message: "login should be unique", field: "login" });
                 return response;
             }
@@ -71,21 +65,19 @@ exports.usersService = {
                 return response;
             }
             const newUser = {
-                id: "",
                 login: user.login,
                 createdAt: new Date(),
                 email: user.email,
                 emailConfirmation: {
                     confirmationCode: 'string',
                     expirationDate: new Date(),
-                    isConfirmed: false
+                    isConfirmed: isConfirmed
                 },
                 phoneConfirmation: {
                     confirmationCode: 'string',
                     expirationDate: new Date(),
                     isConfirmed: false
                 },
-                _id: new mongodb_1.ObjectId
             };
             const salt = bcrypt_1.default.genSaltSync(10);
             const hash = bcrypt_1.default.hashSync(user.password, salt);
@@ -95,37 +87,36 @@ exports.usersService = {
                 hash: hash
             };
             const isCreated = yield users_repository_1.usersRepository.createUser(newUser, usersCredentials);
-            if (isCreated !== "") {
-                const createdUser = yield users_query_repo_1.usersQueryRepository.getUserById(isCreated);
+            const createdUser = yield users_query_repo_1.usersQueryRepository.getUserById(isCreated);
+            if (createdUser !== null) {
                 response.result = true;
                 response.status = 201;
-                response.data = createdUser == null ? {} : (0, users_query_service_1.userEntityMapper)(createdUser);
+                response.data = (0, users_query_service_1.userEntityMapper)(createdUser);
             }
             return response;
         });
     },
     deleteUser: function (useriD) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = {
+            const response = {
                 result: false,
-                status: 404,
+                status: types_1.HTTP_STATUS_CODE.NotFound,
                 data: {},
                 errors: { errorsMessages: [] }
             };
             const isDeleted = yield users_repository_1.usersRepository.deleteUser(useriD);
             if (isDeleted) {
                 response.result = true;
-                response.status = 204;
-                response.errors.errorsMessages = [];
+                response.status = types_1.HTTP_STATUS_CODE.NoContent;
             }
             return response;
         });
     },
     getUserByConfirmationCode: function (confirmCode) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = {
+            const response = {
                 result: false,
-                status: 400,
+                status: types_1.HTTP_STATUS_CODE.BadRequest,
                 data: {},
                 errors: { errorsMessages: [] }
             };
@@ -143,8 +134,8 @@ exports.usersService = {
                 return response;
             }
             response.result = true;
-            response.status = 204;
-            response.data = Object.assign({}, foundUser);
+            response.status = types_1.HTTP_STATUS_CODE.NoContent;
+            response.data = (0, users_query_service_1.userEntityMapper)(foundUser);
             return response;
         });
     }

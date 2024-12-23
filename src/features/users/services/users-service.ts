@@ -1,18 +1,18 @@
 import { UserInputModel, UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
+import { ServicesResponse, HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { usersRepository } from "../users-repository"
 import { usersQueryRepository } from "../users-query-repo"
 import bcrypt from "bcrypt"
 import { userEntityMapper, usersQueryService } from "./users-query-service"
-import { ServicesResponse } from "../../../input-output-types/services-models"
-import { ObjectId } from "mongodb"
+
 
 
 export const usersService = {
 
-    createUser: async function (user: UserInputModel) {
-        const response: ServicesResponse = {
+    createUser: async function (user: UserInputModel, isConfirmed: boolean = false) {
+        const response: ServicesResponse<UserViewModel | {}> = {
             result: false,
-            status: 400,
+            status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -44,9 +44,6 @@ export const usersService = {
         const isEmailAvalible = await usersQueryService.getUserByEmail(user.email)
 
         if (isEmailAvalible !== null) {
-            response.result = false
-            response.status = 400
-            response.data = {}
             response.errors.errorsMessages.push({ message: "email should be unique", field: "email" })
             return response
         }
@@ -54,9 +51,6 @@ export const usersService = {
         const isLoginAvalible = await usersQueryRepository.getUserByLogin(user.login)
 
         if (isLoginAvalible !== null) {
-            response.result = false
-            response.status = 400
-            response.data = {}
             response.errors.errorsMessages.push({ message: "login should be unique", field: "login" })
             return response
         }
@@ -66,21 +60,19 @@ export const usersService = {
         }
 
         const newUser: UserDataBaseModel = {
-            id: "",
             login: user.login,
             createdAt: new Date(),
             email: user.email,
             emailConfirmation: {
                 confirmationCode: 'string',
                 expirationDate: new Date(),
-                isConfirmed: false
+                isConfirmed: isConfirmed
             },
             phoneConfirmation: {
                 confirmationCode: 'string',
                 expirationDate: new Date(),
                 isConfirmed: false
             },
-            _id: new ObjectId
         }
 
         const salt = bcrypt.genSaltSync(10)
@@ -94,20 +86,21 @@ export const usersService = {
 
         const isCreated = await usersRepository.createUser(newUser, usersCredentials)
 
-        if (isCreated !== "") {
-            const createdUser = await usersQueryRepository.getUserById(isCreated)
+        const createdUser = await usersQueryRepository.getUserById(isCreated)
+
+        if (createdUser !== null) {
             response.result = true
             response.status = 201
-            response.data = createdUser == null ? {} : userEntityMapper(createdUser)
+            response.data = userEntityMapper(createdUser)
         }
 
         return response
     },
 
     deleteUser: async function (useriD: string) {
-        let response: ServicesResponse = {
+        const response: ServicesResponse<UserViewModel | {}> = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -116,17 +109,16 @@ export const usersService = {
 
         if (isDeleted) {
             response.result = true
-            response.status = 204
-            response.errors.errorsMessages = []
+            response.status = HTTP_STATUS_CODE.NoContent
         }
 
         return response
     },
 
     getUserByConfirmationCode: async function (confirmCode: string) {
-        let response: ServicesResponse = {
+        const response: ServicesResponse<UserViewModel | {}> = {
             result: false,
-            status: 400,
+            status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -148,8 +140,9 @@ export const usersService = {
         }
 
         response.result = true
-        response.status = 204
-        response.data = { ...foundUser }
+        response.status = HTTP_STATUS_CODE.NoContent
+        response.data = userEntityMapper(foundUser)
+
         return response
     }
 

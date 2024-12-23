@@ -1,4 +1,4 @@
-import { ObjectId, UUID } from "mongodb"
+
 import { jwtService } from "../../../application-services/JWT-service"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { LoginInputModel, UserCredentialsModel, UserDataBaseModel, UserInputModel, UserViewModel } from "../../../input-output-types/users-moduls"
@@ -15,10 +15,10 @@ import { usersService } from "../../users/services/users-service"
 export const authService = {
 
     async checkUserCredintails(loginData: LoginInputModel) {
-        let foundUser = await usersQueryRepository.getUserByLogin(loginData.loginOrEmail.trim())
+        let foundUser = await usersQueryService.getUserByLogin(loginData.loginOrEmail.trim())
 
         if (foundUser == null) {
-            foundUser = await usersQueryRepository.getUserByEmail(loginData.loginOrEmail.trim())
+            foundUser = await usersQueryService.getUserByEmail(loginData.loginOrEmail.trim())
         }
 
         if (foundUser === null) {
@@ -75,8 +75,8 @@ export const authService = {
             return DBUser
         }
 
-        const userData = DBUser.data as UserDataBaseModel
-        let userId = userData._id.toString()
+        const userData = DBUser.data as UserViewModel
+        let userId = userData.id
 
         const confirmResult = await usersRepository.updateConfirmation(userId)
 
@@ -174,8 +174,7 @@ export const authService = {
 
         const confirmationCode = uuidv4()
 
-        const newDBUser = {
-            id: "",
+        const newDBUser: UserDataBaseModel = {
             login: user.login,
             createdAt: new Date(),
             email: user.email,
@@ -189,7 +188,6 @@ export const authService = {
                 expirationDate: add(new Date(), { minutes: 1 }),
                 isConfirmed: false
             },
-            _id: new ObjectId
         }
 
         const salt = bcrypt.genSaltSync(10)
@@ -215,7 +213,6 @@ export const authService = {
         response.result = true
         response.status = 204
         return response
-
     }
 }
 

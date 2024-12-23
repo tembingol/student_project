@@ -21,7 +21,7 @@ usersRouter.get('/', async (req, res) => {
 })
 
 usersRouter.post('/', baseAuthMiddleware, ...userRegistrationValidators, async (req, res) => {
-    const serviceRes = await usersService.createUser(req.body)
+    const serviceRes = await usersService.createUser(req.body, true)
 
     if (serviceRes.result) {
         res.status(serviceRes.status).json(serviceRes.data)

@@ -25,8 +25,7 @@ export type UserViewModel = {
 }
 
 export type UserDataBaseModel = {
-    _id: ObjectId
-    id: string
+    _id?: ObjectId
     login: string
     email: string
     createdAt: Date

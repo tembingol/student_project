@@ -16,7 +16,7 @@ exports.usersRepository = {
     createUser: function (user, usersCredentials) {
         return __awaiter(this, void 0, void 0, function* () {
             const newObjectId = new mongodb_1.ObjectId();
-            const newUser = Object.assign(Object.assign({}, user), { _id: newObjectId, id: newObjectId.toString() });
+            const newUser = Object.assign(Object.assign({}, user), { _id: newObjectId });
             //toDo transaction {
             const insetrCredentials = mongodb_2.usersCredentialsCollection.insertOne(Object.assign(Object.assign({}, usersCredentials), { userId: newObjectId.toString() }));
             const insertResult = yield mongodb_2.usersCollection.insertOne(newUser);

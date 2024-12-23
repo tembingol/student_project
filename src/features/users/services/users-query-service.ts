@@ -1,4 +1,4 @@
-import { ServicesResponse } from "../../../input-output-types/services-models"
+import { ServicesResponse, PaginationResponseType, HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
 import { usersQueryRepository } from "../users-query-repo"
 
@@ -30,7 +30,7 @@ export const usersQueryService = {
 
         const totalCount = await usersQueryRepository.getDocumetnsCount(filter)
 
-        const result: ServicesResponse = {
+        const result: ServicesResponse<PaginationResponseType<UserViewModel>> = {
             result: true,
             status: 200,
             data: {
@@ -51,6 +51,27 @@ export const usersQueryService = {
             return userEntityMapper(foundUser)
         }
         return foundUser
+    },
+
+    getUserByEmailServicesResponse: async function (email: string) {
+        const response: ServicesResponse<UserViewModel | {}> = {
+            result: false,
+            status: HTTP_STATUS_CODE.BadRequest,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+
+        const foundUser = await usersQueryRepository.getUserByEmail(email)
+
+        if (foundUser === null) {
+            return response
+        }
+
+        response.result = true
+        response.status = HTTP_STATUS_CODE.OK
+        response.data = userEntityMapper(foundUser)
+
+        return response
     },
 
     getUserByLogin: async function (login: string) {
@@ -81,7 +102,7 @@ export const usersQueryService = {
 
 export function userEntityMapper(user: UserDataBaseModel): UserViewModel {
     return {
-        id: user._id.toString(),
+        id: user._id!.toString(),
         login: user.login,
         email: user.email,
         createdAt: user.createdAt,

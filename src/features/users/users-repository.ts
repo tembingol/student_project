@@ -10,7 +10,6 @@ export const usersRepository = {
         const newUser: UserDataBaseModel = {
             ...user,
             _id: newObjectId,
-            id: newObjectId.toString()
         }
 
         //toDo transaction {
