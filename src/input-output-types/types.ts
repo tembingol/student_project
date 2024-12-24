@@ -9,7 +9,7 @@ export type PaginationResponseType<T> = {
     items: T[]
 }
 
-export type ServicesResponse<T> = {
+export type ServicesResponseNew<T> = {
     result: boolean,
     status: HTTP_STATUS_CODE,
     data: T,
@@ -44,7 +44,7 @@ export enum HTTP_STATUS_CODE {
 }
 
 //example user
-const responTest: ServicesResponse<UserViewModel> = {
+const responTest: ServicesResponseNew<UserViewModel> = {
     result: false,
     status: HTTP_STATUS_CODE.OK,
     data: {
@@ -59,7 +59,7 @@ const responTest: ServicesResponse<UserViewModel> = {
 }
 
 //example blog
-const responTestError: ServicesResponse<BlogViewModel | {}> = {
+const responTestError: ServicesResponseNew<BlogViewModel | {}> = {
     result: false,
     status: HTTP_STATUS_CODE.BadRequest,
     data: {},

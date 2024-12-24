@@ -1,6 +1,7 @@
 
 import nodemailer from 'nodemailer'
 import { SETTINGS } from '../settings';
+import { error } from 'console';
 
 export type MailOptions = {
     from: string
@@ -27,9 +28,9 @@ export const emailManager = {
                 },
             });
 
-            const info = await transporter.sendMail(mailOptions);
+            transporter.sendMail(mailOptions).catch((error) => console.log(error));
 
-            return info
+            return true
         } catch (err) {
             console.log(err)
         }
@@ -48,9 +49,7 @@ export const emailManager = {
             html: "<b>" + emailText + "</b>",// html body,
         };
 
-        const result = await this.sendEmail(mailOptions)
-
-        console.log(result)
+        const result = this.sendEmail(mailOptions)
 
         return result
     },
@@ -66,8 +65,6 @@ export const emailManager = {
         };
 
         const result = this.sendEmail(mailOptions)
-
-        console.log(result)
 
         return result
     }

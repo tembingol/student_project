@@ -1,5 +1,5 @@
 import { UserInputModel, UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
-import { ServicesResponse, HTTP_STATUS_CODE } from "../../../input-output-types/types"
+import { ServicesResponseNew, HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { usersRepository } from "../users-repository"
 import { usersQueryRepository } from "../users-query-repo"
 import bcrypt from "bcrypt"
@@ -10,7 +10,7 @@ import { userEntityMapper, usersQueryService } from "./users-query-service"
 export const usersService = {
 
     createUser: async function (user: UserInputModel, isConfirmed: boolean = false) {
-        const response: ServicesResponse<UserViewModel | {}> = {
+        const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
             data: {},
@@ -98,7 +98,7 @@ export const usersService = {
     },
 
     deleteUser: async function (useriD: string) {
-        const response: ServicesResponse<UserViewModel | {}> = {
+        const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
             data: {},
@@ -116,7 +116,7 @@ export const usersService = {
     },
 
     getUserByConfirmationCode: async function (confirmCode: string) {
-        const response: ServicesResponse<UserViewModel | {}> = {
+        const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
             data: {},

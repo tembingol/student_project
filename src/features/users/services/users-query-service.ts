@@ -1,4 +1,4 @@
-import { ServicesResponse, PaginationResponseType, HTTP_STATUS_CODE } from "../../../input-output-types/types"
+import { ServicesResponseNew, PaginationResponseType, HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
 import { usersQueryRepository } from "../users-query-repo"
 
@@ -30,7 +30,7 @@ export const usersQueryService = {
 
         const totalCount = await usersQueryRepository.getDocumetnsCount(filter)
 
-        const result: ServicesResponse<PaginationResponseType<UserViewModel>> = {
+        const result: ServicesResponseNew<PaginationResponseType<UserViewModel>> = {
             result: true,
             status: 200,
             data: {
@@ -54,7 +54,7 @@ export const usersQueryService = {
     },
 
     getUserByEmailServicesResponse: async function (email: string) {
-        const response: ServicesResponse<UserViewModel | {}> = {
+        const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
             data: {},
