@@ -1,5 +1,5 @@
+import { ObjectId } from "mongodb"
 import { usersCollection, usersCredentialsCollection } from "../../db/mongodb"
-import { userEntityMapper } from "./services/users-query-service"
 
 export const usersQueryRepository = {
 
@@ -22,7 +22,7 @@ export const usersQueryRepository = {
     },
 
     getUserById: async function (id: string) {
-        const filter = { id: id }
+        const filter = { _id: new ObjectId(id) }
         const foundUser = await usersCollection.findOne(filter)
         return foundUser
     },

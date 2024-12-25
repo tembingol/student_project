@@ -48,13 +48,13 @@ exports.authRouter.post('/registration-email-resending', (req, res) => __awaiter
     res.status(serviceRes.status).json(serviceRes.errors);
 }));
 exports.authRouter.post('/login', ...auth_validators_1.authLoginValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield auth_service_1.authService.checkUserCredintails(req.body);
-    if (result === null) {
+    const foundUser = yield auth_service_1.authService.checkUserCredintails(req.body);
+    if (foundUser === null) {
         res.sendStatus(401);
         return;
     }
-    const userToken = yield JWT_service_1.jwtService.createJWT(result);
-    res.status(200).send(userToken);
+    const userToken = yield JWT_service_1.jwtService.createJWT(foundUser);
+    res.status(200).send({ accessToken: userToken });
 }));
 exports.authRouter.get('/login/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const authorization = req.headers['Authorization'.toLowerCase()];

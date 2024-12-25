@@ -1,23 +1,22 @@
 import { CommentDataBaseModel, CommentViewModel } from "../../../input-output-types/comments-models"
-import { ServicesResponse } from "../../../input-output-types/services-models"
+import { ServicesResponseNew, HTTP_STATUS_CODE, PaginationResponseType } from "../../../input-output-types/types"
 import { commentsQueryRepository } from "../comments-query-repository"
 
 
 export const commentsQueryService = {
 
     findCommentById: async function (id: string) {
-        const result: ServicesResponse = {
+        const result: ServicesResponseNew<CommentViewModel | {}> = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
-            errors: { errorsMessages: ["Not found"] }
+            errors: { errorsMessages: [] }
         }
-        const filter = { id: id }
-        const foundComment = await commentsQueryRepository.getCommentByID(filter);
+        const foundComment = await commentsQueryRepository.getCommentByID(id);
 
         if (foundComment) {
             result.result = true
-            result.status = 200
+            result.status = HTTP_STATUS_CODE.OK
             result.data = commentEntityMapper(foundComment)
             result.errors = { errorsMessages: [] }
         }
@@ -40,17 +39,11 @@ export const commentsQueryService = {
             sortDirection,
             searchNameTerm)
 
-        // const filter: any = {}
-        // filter.PostId = PostId
-        // if (searchNameTerm) {
-        //     filter.title = { $regex: searchNameTerm, $options: 'i' }
-        // }
-
         const _totalCount = await commentsQueryRepository.getDocumetnsCountOfPost({ postId: postId })
 
-        const result: ServicesResponse = {
+        const result: ServicesResponseNew<PaginationResponseType<CommentViewModel>> = {
             result: true,
-            status: 200,
+            status: HTTP_STATUS_CODE.OK,
             data: {
                 pagesCount: Math.ceil(_totalCount / pageSize),
                 page: pageNumber,
@@ -68,7 +61,7 @@ export const commentsQueryService = {
 
 export function commentEntityMapper(comment: CommentDataBaseModel,): CommentViewModel {
     return {
-        id: comment._id.toString(),
+        id: comment._id!.toString(),
         content: comment.content,
         commentatorInfo: comment.commentatorInfo,
         createdAt: comment.createdAt,

@@ -14,27 +14,23 @@ export type MailOptions = {
 export const emailManager = {
 
     async sendEmail(mailOptions: {}) {
-        try {
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.mail.ru',
-                port: 465,
-                secure: true,
-                auth: {
-                    user: SETTINGS.EMAILMANAGERLOGIN,
-                    pass: SETTINGS.EMAILMANAGERPASSWORD,
-                },
-                tls: {
-                    rejectUnauthorized: false,
-                },
-            });
 
-            transporter.sendMail(mailOptions).catch((error) => console.log(error));
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.mail.ru',
+            port: 465,
+            secure: true,
+            auth: {
+                user: SETTINGS.EMAILMANAGERLOGIN,
+                pass: SETTINGS.EMAILMANAGERPASSWORD,
+            },
+            tls: {
+                rejectUnauthorized: false,
+            },
+        });
 
-            return true
-        } catch (err) {
-            console.log(err)
-        }
-        return false
+        transporter.sendMail(mailOptions).catch((error) => console.log(error));
+
+        return true
     },
 
     async sendRegistrationConfirmation(receiversArray: string[], confirmationCode: string) {

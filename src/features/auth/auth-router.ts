@@ -46,16 +46,16 @@ authRouter.post('/registration-email-resending', async (req, res) => {
 
 authRouter.post('/login', ...authLoginValidators, async (req, res) => {
 
-    const result = await authService.checkUserCredintails(req.body)
+    const foundUser = await authService.checkUserCredintails(req.body)
 
-    if (result === null) {
+    if (foundUser === null) {
         res.sendStatus(401)
         return
     }
 
-    const userToken = await jwtService.createJWT(result)
+    const userToken = await jwtService.createJWT(foundUser)
 
-    res.status(200).send(userToken)
+    res.status(200).send({ accessToken: userToken })
 })
 
 authRouter.get('/login/me', async (req, res) => {

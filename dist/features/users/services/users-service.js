@@ -86,8 +86,8 @@ exports.usersService = {
                 salt: salt,
                 hash: hash
             };
-            const isCreated = yield users_repository_1.usersRepository.createUser(newUser, usersCredentials);
-            const createdUser = yield users_query_repo_1.usersQueryRepository.getUserById(isCreated);
+            const newUserId = yield users_repository_1.usersRepository.createUser(newUser, usersCredentials);
+            const createdUser = yield users_query_repo_1.usersQueryRepository.getUserById(newUserId);
             if (createdUser !== null) {
                 response.result = true;
                 response.status = 201;

@@ -84,9 +84,9 @@ export const usersService = {
             hash: hash
         }
 
-        const isCreated = await usersRepository.createUser(newUser, usersCredentials)
+        const newUserId = await usersRepository.createUser(newUser, usersCredentials)
 
-        const createdUser = await usersQueryRepository.getUserById(isCreated)
+        const createdUser = await usersQueryRepository.getUserById(newUserId)
 
         if (createdUser !== null) {
             response.result = true

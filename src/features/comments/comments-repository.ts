@@ -6,11 +6,9 @@ import { ObjectId } from "mongodb"
 export const commentsRepository = {
 
     createComment: async function (postId: string, comment: CommentViewModel) {
-        const newObjectId = new ObjectId()
         const newComment: CommentDataBaseModel = {
             ...comment,
-            _id: newObjectId,
-            id: newObjectId.toString(),
+            _id: new ObjectId(),
             postId: postId
         }
 
@@ -19,18 +17,17 @@ export const commentsRepository = {
         return insertResult.insertedId.toString()
     },
 
-    updateComment: async function (id: string, commentBody: CommentInputModel) {
-        const result = await commentsCollection.updateOne({ id: id }, {
-            $set: {
-                content: commentBody.content,
-            }
-        })
+    updateComment: async function (id: string, action: {}) {
+        const filter = { _id: new ObjectId(id) }
+        const result = await commentsCollection.updateOne(filter, action)
 
         return result.matchedCount === 1
     },
 
     deleteComment: async function (id: string) {
-        const result = await commentsCollection.deleteOne({ id: id })
+        const filter = { _id: new ObjectId(id) }
+        const result = await commentsCollection.deleteOne(filter)
+
         return result.deletedCount === 1
     },
 

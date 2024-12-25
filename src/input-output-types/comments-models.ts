@@ -17,8 +17,7 @@ export type CommentViewModel = {
 }
 
 export type CommentDataBaseModel = {
-    _id: ObjectId
-    id: string
+    _id?: ObjectId
     postId: string
     content: string
     commentatorInfo: CommentatorInfo

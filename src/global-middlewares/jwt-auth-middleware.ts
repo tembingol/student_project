@@ -17,8 +17,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         res.sendStatus(401)
         return
     }
-    debugger
-    console.log(foundUser)
+
     req.context = { currentUser: foundUser }
 
     next()

@@ -1,6 +1,7 @@
 import { postCollection } from "../../../db/mongodb"
 import { PostDataBaseModel, PostViewModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
+import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { postsQueryRepository } from "../posts-query-repository"
 
 export const postsQueryService = {
@@ -31,7 +32,7 @@ export const postsQueryService = {
 
         const result: ServicesResponse = {
             result: true,
-            status: 200,
+            status: HTTP_STATUS_CODE.OK,
             data: {
                 pagesCount: Math.ceil(totalCount / pageSize),
                 page: pageNumber,
@@ -67,19 +68,19 @@ export const postsQueryService = {
     findPostById: async function (id: string) {
         const result: ServicesResponse = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
-            errors: { errorsMessages: ["Not found"] }
+            errors: { errorsMessages: [] }
         }
 
         const filter = { id: id }
 
         const foundPost = await postsQueryRepository.getPostByID(filter)
-        if (foundPost) {
+
+        if (foundPost !== null) {
             result.result = true
-            result.status = 200
+            result.status = HTTP_STATUS_CODE.OK
             result.data = postEntityMapper(foundPost)
-            result.errors = { errorsMessages: [] }
         }
 
         return result

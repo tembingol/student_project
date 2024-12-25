@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb"
 import { usersCollection, usersCredentialsCollection } from "../../db/mongodb"
-import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../input-output-types/users-moduls"
+import { UserCredentialsModel, UserDataBaseModel } from "../../input-output-types/users-moduls"
 
 export const usersRepository = {
 
