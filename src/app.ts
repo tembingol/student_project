@@ -7,11 +7,11 @@ import { testingRouter } from './features/testing/testing-router'
 import { usersRouter } from './features/users/users-router'
 import { authRouter } from './features/auth/auth-router'
 import { commentsRouter } from './features/comments/comments-router'
-
-//import { getVideosController } from './videos/getVideosController'
+import cookieParser from 'cookie-parser'
 
 export const app = express() // создать приложение
 app.use(express.json()) // создание свойств-объектов body и query во всех реквестах
+app.use(cookieParser())
 
 app.get(SETTINGS.PATH.ROOT, (req, res) => {
   // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита

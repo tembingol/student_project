@@ -84,10 +84,11 @@ export const usersQueryService = {
 
     getUserById: async function (id: string) {
         const foundUser = await usersQueryRepository.getUserById(id)
-        if (foundUser) {
-            return userEntityMapper(foundUser)
+        if (foundUser === null) {
+            return foundUser
         }
-        return foundUser
+        return userEntityMapper(foundUser)
+
     },
 
     getUserCredentials: async function (userId: string) {

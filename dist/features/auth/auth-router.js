@@ -14,6 +14,7 @@ const express_1 = require("express");
 const auth_validators_1 = require("./middlewares/auth-validators");
 const JWT_service_1 = require("../../application-services/JWT-service");
 const auth_service_1 = require("./services/auth-service");
+const types_1 = require("../../input-output-types/types");
 exports.authRouter = (0, express_1.Router)({});
 // // simple logger for this router's requests
 // // all requests to this router will first hit this middleware
@@ -53,21 +54,67 @@ exports.authRouter.post('/login', ...auth_validators_1.authLoginValidators, (req
         res.sendStatus(401);
         return;
     }
-    const userToken = yield JWT_service_1.jwtService.createJWT(foundUser);
-    res.status(200).send({ accessToken: userToken });
+    const accessToken = yield JWT_service_1.jwtService.createAccsessJWT(foundUser);
+    const refreshToken = yield JWT_service_1.jwtService.createRefreshJWT(foundUser);
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, });
+    res.status(200).send({ accessToken: accessToken });
+}));
+exports.authRouter.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken === undefined) {
+        res.sendStatus(types_1.HTTP_STATUS_CODE.Unauthorized);
+        return;
+    }
+    const serviceRes = yield auth_service_1.authService.logoutUser(refreshToken);
+    if (!serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data);
+        return;
+    }
+    res.sendStatus(types_1.HTTP_STATUS_CODE.NoContent);
+}));
+exports.authRouter.post('/refresh-token', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken === undefined) {
+        res.sendStatus(types_1.HTTP_STATUS_CODE.Unauthorized);
+        return;
+    }
+    const serviceRes = yield auth_service_1.authService.refreshToken(refreshToken);
+    if (!serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.data);
+        return;
+    }
+    const foundUser = serviceRes.data;
+    const accessToken = yield JWT_service_1.jwtService.createAccsessJWT(foundUser);
+    const newRefreshToken = yield JWT_service_1.jwtService.createRefreshJWT(foundUser);
+    res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true, });
+    res.status(types_1.HTTP_STATUS_CODE.OK).send({ accessToken: accessToken });
 }));
 exports.authRouter.get('/login/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const authorization = req.headers['Authorization'.toLowerCase()];
-    if (typeof authorization == "undefined") {
-        res.sendStatus(401);
+    if (authorization == undefined) {
+        res.sendStatus(types_1.HTTP_STATUS_CODE.Unauthorized);
         return;
     }
-    const token = authorization.slice(7);
-    const foundUser = yield auth_service_1.authService.getUserByToken(token.toString());
+    const accessToken = authorization.slice(7);
+    const foundUser = yield auth_service_1.authService.getUserByToken(accessToken.toString());
     if (foundUser === null) {
-        res.sendStatus(401);
+        res.sendStatus(types_1.HTTP_STATUS_CODE.Unauthorized);
         return;
     }
-    res.status(201).send(foundUser);
-    return;
+    console.log(foundUser);
+    res.status(types_1.HTTP_STATUS_CODE.OK).send(foundUser);
+}));
+exports.authRouter.get('/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const authorization = req.headers['Authorization'.toLowerCase()];
+    if (authorization == undefined) {
+        res.sendStatus(types_1.HTTP_STATUS_CODE.Unauthorized);
+        return;
+    }
+    const accessToken = authorization.slice(7);
+    const foundUser = yield auth_service_1.authService.getUserByToken(accessToken.toString());
+    if (foundUser === null) {
+        res.sendStatus(types_1.HTTP_STATUS_CODE.Unauthorized);
+        return;
+    }
+    res.status(types_1.HTTP_STATUS_CODE.OK).send(foundUser);
 }));

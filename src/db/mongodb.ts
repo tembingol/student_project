@@ -5,6 +5,7 @@ import { PostDataBaseModel } from "../input-output-types/posts-models";
 import { VideoViewModel } from "../input-output-types/videos-models";
 import { UserCredentialsModel, UserDataBaseModel } from "../input-output-types/users-moduls";
 import { CommentDataBaseModel } from "../input-output-types/comments-models";
+import { ExpiredTokensModel } from "../input-output-types/expired-tokens-models";
 
 // получение доступа к бд
 const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL)
@@ -17,6 +18,7 @@ export const videoCollection: Collection<VideoViewModel> = db.collection<VideoVi
 export const usersCollection: Collection<UserDataBaseModel> = db.collection<UserDataBaseModel>(SETTINGS.USERS_COLLECTION_NAME)
 export const usersCredentialsCollection: Collection<UserCredentialsModel> = db.collection<UserCredentialsModel>(SETTINGS.USERSCREDENTIALS_COLLECTION_NAME)
 export const commentsCollection: Collection<CommentDataBaseModel> = db.collection<CommentDataBaseModel>(SETTINGS.COMMENTS_COLLECTION_NAME)
+export const expiredTokensCollection: Collection<ExpiredTokensModel> = db.collection<ExpiredTokensModel>(SETTINGS.EXPIREDTOKENS_COLLECTION_NAME)
 
 // проверка подключения к бд
 export const connectMongoDB = async () => {

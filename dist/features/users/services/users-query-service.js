@@ -86,10 +86,10 @@ exports.usersQueryService = {
     getUserById: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundUser = yield users_query_repo_1.usersQueryRepository.getUserById(id);
-            if (foundUser) {
-                return userEntityMapper(foundUser);
+            if (foundUser === null) {
+                return foundUser;
             }
-            return foundUser;
+            return userEntityMapper(foundUser);
         });
     },
     getUserCredentials: function (userId) {

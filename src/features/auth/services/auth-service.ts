@@ -10,6 +10,9 @@ import { add, format, compareAsc } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
 import { usersRepository } from "../../users/users-repository"
 import { usersService } from "../../users/services/users-service"
+import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
+import { ExpiredTokensModel } from "../../../input-output-types/expired-tokens-models"
+import { Console } from "console"
 
 
 export const authService = {
@@ -42,18 +45,19 @@ export const authService = {
 
     async getUserByToken(userToken: string) {
 
-        let foundUserFronToken = await jwtService.getUserIdFromToken(userToken)
+        let foundUserFromToken = await jwtService.getUserIdFromToken(userToken)
 
-        if (!foundUserFronToken) {
+        if (foundUserFromToken === null) {
             return null
         }
-        const foundUser = await usersQueryService.getUserById(foundUserFronToken.userId)
 
-        if (foundUser) {
-            return userMapper(foundUser)
+        const foundUser = await usersQueryService.getUserByLogin(foundUserFromToken.userLogin)
+
+        if (foundUser === null) {
+            return null
         }
 
-        return foundUser
+        return userMapper(foundUser)
     },
 
     async confirmEmail(reqBody: any) {
@@ -213,7 +217,75 @@ export const authService = {
         response.result = true
         response.status = 204
         return response
+    },
+
+    async logoutUser(token: string) {
+        const response: ServicesResponse = {
+            result: false,
+            status: HTTP_STATUS_CODE.Unauthorized,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+
+        const isExpired = await jwtService.isTokenExpired(token)
+
+        if (isExpired) {
+            return response
+        }
+
+        const isTokenBlocked = await jwtService.isTokenBlocked(token)
+
+        if (isTokenBlocked) {
+            return response
+        }
+
+        const foundUser = await authService.getUserByToken(token)
+
+        if (foundUser === null) {
+            return response
+        }
+
+        const result = await jwtService.createExpiredToken(token)
+
+        response.result = true
+        response.status = HTTP_STATUS_CODE.NoContent
+        return response
+    },
+
+    async refreshToken(refreshToken: string) {
+        const response: ServicesResponse = {
+            result: false,
+            status: HTTP_STATUS_CODE.Unauthorized,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+
+        const isExpired = await jwtService.isTokenExpired(refreshToken)
+
+        if (isExpired) {
+            return response
+        }
+
+        const isTokenBlocked = await jwtService.isTokenBlocked(refreshToken)
+
+        if (isTokenBlocked) {
+            return response
+        }
+
+        const foundUser = await authService.getUserByToken(refreshToken)
+
+        if (foundUser === null) {
+            return response
+        }
+
+        response.data = foundUser
+        const result = await jwtService.createExpiredToken(refreshToken)
+
+        response.result = true
+        response.status = 204
+        return response
     }
+
 }
 
 function userMapper(user: UserViewModel) {

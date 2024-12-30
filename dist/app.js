@@ -12,9 +12,10 @@ const testing_router_1 = require("./features/testing/testing-router");
 const users_router_1 = require("./features/users/users-router");
 const auth_router_1 = require("./features/auth/auth-router");
 const comments_router_1 = require("./features/comments/comments-router");
-//import { getVideosController } from './videos/getVideosController'
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 exports.app = (0, express_1.default)(); // создать приложение
 exports.app.use(express_1.default.json()); // создание свойств-объектов body и query во всех реквестах
+exports.app.use((0, cookie_parser_1.default)());
 exports.app.get(settings_1.SETTINGS.PATH.ROOT, (req, res) => {
     // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
     res.status(200).json({ version: '1.1' });
