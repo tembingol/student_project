@@ -8,23 +8,37 @@ import { CommentDataBaseModel } from "../input-output-types/comments-models";
 import { ExpiredTokensModel } from "../input-output-types/expired-tokens-models";
 
 // получение доступа к бд
-const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL)
-export const db = client.db(SETTINGS.DB_NAME);
+// const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL)
+// export const db = client.db(SETTINGS.DB_NAME);
+export let client: MongoClient
+export let db: any
 
 // получение доступа к коллекциям
-export const blogCollection: Collection<BlogDataBaseModel> = db.collection<BlogDataBaseModel>(SETTINGS.BLOG_COLLECTION_NAME)
-export const postCollection: Collection<PostDataBaseModel> = db.collection<PostDataBaseModel>(SETTINGS.POST_COLLECTION_NAME)
-export const videoCollection: Collection<VideoViewModel> = db.collection<VideoViewModel>(SETTINGS.VIDEO_COLLECTION_NAME)
-export const usersCollection: Collection<UserDataBaseModel> = db.collection<UserDataBaseModel>(SETTINGS.USERS_COLLECTION_NAME)
-export const usersCredentialsCollection: Collection<UserCredentialsModel> = db.collection<UserCredentialsModel>(SETTINGS.USERSCREDENTIALS_COLLECTION_NAME)
-export const commentsCollection: Collection<CommentDataBaseModel> = db.collection<CommentDataBaseModel>(SETTINGS.COMMENTS_COLLECTION_NAME)
-export const expiredTokensCollection: Collection<ExpiredTokensModel> = db.collection<ExpiredTokensModel>(SETTINGS.EXPIREDTOKENS_COLLECTION_NAME)
+export let blogCollection: Collection<BlogDataBaseModel>
+export let postCollection: Collection<PostDataBaseModel>
+export let videoCollection: Collection<VideoViewModel>
+export let usersCollection: Collection<UserDataBaseModel>
+export let usersCredentialsCollection: Collection<UserCredentialsModel>
+export let commentsCollection: Collection<CommentDataBaseModel>
+export let expiredTokensCollection: Collection<ExpiredTokensModel>
 
 // проверка подключения к бд
-export const connectMongoDB = async () => {
+export const connectMongoDB = async (MONGO_URL: string) => {
     try {
+        // получение доступа к бд
+        client = new MongoClient(MONGO_URL)
+        db = await client.db(SETTINGS.DB_NAME);
         await client.connect()
         await client.db().command({ ping: 1 })
+        // получение доступа к коллекциям
+        blogCollection = db.collection(SETTINGS.BLOG_COLLECTION_NAME)
+        postCollection = db.collection(SETTINGS.POST_COLLECTION_NAME)
+        videoCollection = db.collection(SETTINGS.VIDEO_COLLECTION_NAME)
+        usersCollection = db.collection(SETTINGS.USERS_COLLECTION_NAME)
+        usersCredentialsCollection = db.collection(SETTINGS.USERSCREDENTIALS_COLLECTION_NAME)
+        commentsCollection = db.collection(SETTINGS.COMMENTS_COLLECTION_NAME)
+        expiredTokensCollection = db.collection(SETTINGS.EXPIREDTOKENS_COLLECTION_NAME)
+        // все ок
         console.log('connected to mongo')
         return true
     } catch (e) {

@@ -20,14 +20,6 @@ const comments_service_1 = require("../comments/services/comments-service");
 const comments_validators_1 = require("../comments/middlewares/comments-validators");
 const jwt_auth_middleware_1 = require("../../global-middlewares/jwt-auth-middleware");
 exports.postRouter = (0, express_1.Router)({});
-// simple logger for this router's requests
-// all requests to this router will first hit this middleware
-// postRouter.use(function (req, res, next) {
-//     console.log('postRouter Logger \n{--')
-//     console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
-//     console.log('--}')
-//     next()
-// })
 exports.postRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const serviceRes = yield posts_query_service_1.postsQueryService.findPosts(req.query);
     res.status(serviceRes.status).json(serviceRes.data);

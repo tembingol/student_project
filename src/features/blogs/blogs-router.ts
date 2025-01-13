@@ -8,15 +8,6 @@ import { blogsQueryService } from "./services/blogs-query-service";
 
 export const blogsRouter = Router({})
 
-// // simple logger for this router's requests
-// // all requests to this router will first hit this middleware
-// blogsRouter.use(function (req, res, next) {
-//     console.log('blogsRouter Logger \n{--')
-//     console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
-//     console.log('--}')
-//     next()
-// })
-
 blogsRouter.get('/', async (req, res) => {
     const serviceRes = await blogsQueryService.findBlogs(req.query)
     res.status(serviceRes.status).json(serviceRes.data)

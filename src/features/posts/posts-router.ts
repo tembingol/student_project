@@ -10,15 +10,6 @@ import { authMiddleware } from "../../global-middlewares/jwt-auth-middleware";
 
 export const postRouter = Router({})
 
-// simple logger for this router's requests
-// all requests to this router will first hit this middleware
-// postRouter.use(function (req, res, next) {
-//     console.log('postRouter Logger \n{--')
-//     console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
-//     console.log('--}')
-//     next()
-// })
-
 postRouter.get('/', async (req, res) => {
     const serviceRes = await postsQueryService.findPosts(req.query)
     res.status(serviceRes.status).json(serviceRes.data)

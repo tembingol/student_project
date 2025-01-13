@@ -21,6 +21,7 @@ export const SETTINGS = {
     EXPIREDTOKENS_COLLECTION_NAME: 'expiredTokens',
 
     JWT_SECRET: process.env.JWT_SECRET || 'testproject',
+    SESSION_SECRET: process.env.SESSION_SECRET || 'testproject',
     ACCESSTOKEN_TTL: process.env.ACCESSTOKEN_TTL || 10,
     REFRESHTOKEN_TTL: process.env.REFRESHTOKEN_TTL || 20,
 

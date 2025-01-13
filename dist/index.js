@@ -14,7 +14,7 @@ const app_1 = require("./app");
 const mongodb_1 = require("./db/mongodb");
 const settings_1 = require("./settings");
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
-    const mongoConneted = yield (0, mongodb_1.connectMongoDB)();
+    const mongoConneted = yield (0, mongodb_1.connectMongoDB)(settings_1.SETTINGS.MONGO_URL);
     if (mongoConneted) {
         app_1.app.listen(settings_1.SETTINGS.PORT, () => {
             console.log('...server started in port ' + settings_1.SETTINGS.PORT);

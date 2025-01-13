@@ -5,7 +5,7 @@ import { SETTINGS } from './settings'
 
 const startApp = async () => {
 
-    const mongoConneted = await connectMongoDB()
+    const mongoConneted = await connectMongoDB(SETTINGS.MONGO_URL)
     if (mongoConneted) {
         app.listen(SETTINGS.PORT, () => {
             console.log('...server started in port ' + SETTINGS.PORT)

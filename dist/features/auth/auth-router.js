@@ -16,14 +16,6 @@ const JWT_service_1 = require("../../application-services/JWT-service");
 const auth_service_1 = require("./services/auth-service");
 const types_1 = require("../../input-output-types/types");
 exports.authRouter = (0, express_1.Router)({});
-// // simple logger for this router's requests
-// // all requests to this router will first hit this middleware
-// authRouter.use(function (req, res, next) {
-//     console.log('authRouter Logger \n{--')
-//     console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
-//     console.log('--}')
-//     next()
-// })
 exports.authRouter.post('/registration', ...auth_validators_1.authRegistrationValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const serviceRes = yield auth_service_1.authService.registerNewUser(req.body);
     if (serviceRes.result) {

@@ -18,14 +18,6 @@ const post_validators_1 = require("../posts/middlewares/post-validators");
 const input_Check_Errors_Middleware_1 = require("../../global-middlewares/input-Check-Errors-Middleware");
 const blogs_query_service_1 = require("./services/blogs-query-service");
 exports.blogsRouter = (0, express_1.Router)({});
-// // simple logger for this router's requests
-// // all requests to this router will first hit this middleware
-// blogsRouter.use(function (req, res, next) {
-//     console.log('blogsRouter Logger \n{--')
-//     console.log('%s ,%s ,%s', req.method, req.body, req.baseUrl + req.url)
-//     console.log('--}')
-//     next()
-// })
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const serviceRes = yield blogs_query_service_1.blogsQueryService.findBlogs(req.query);
     res.status(serviceRes.status).json(serviceRes.data);
