@@ -1,63 +1,47 @@
 import { UserViewModel } from "../input-output-types/users-moduls";
 import Jwt from "jsonwebtoken";
 import { SETTINGS } from "../settings";
-import { ExpiredTokensModel } from "../input-output-types/expired-tokens-models";
-import { expiredTokensRepository } from "./JWT-repository";
 const jwt = Jwt;
 
 export const jwtService = {
 
     async createAccsessJWT(user: UserViewModel) {
-        const accessToken_JWT = await jwt.sign({ userId: user.id, userLogin: user.login }, SETTINGS.JWT_SECRET, { expiresIn: 10 })
-        return accessToken_JWT
+        const accessToken = await jwt.sign({ userId: user.id, userLogin: user.login }, SETTINGS.JWT_SECRET, { expiresIn: SETTINGS.ACCESSTOKEN_TTL })
+        return accessToken
     },
 
-    async createRefreshJWT(user: UserViewModel) {
-        const refreshToken_JWT = await jwt.sign({ userId: user.id, userLogin: user.login }, SETTINGS.JWT_SECRET, { expiresIn: 20 })
-        return refreshToken_JWT
+    async createRefreshJWT(user: UserViewModel, deviceID: string) {
+        const refreshToken = await jwt.sign({ userId: user.id, userLogin: user.login, deviceId: deviceID }, SETTINGS.JWT_SECRET, { expiresIn: SETTINGS.REFRESHTOKEN_TTL })
+        return refreshToken
     },
 
-    async getUserIdFromToken(token: string) {
-        try {
-            const result = await jwt.verify(token, SETTINGS.JWT_SECRET)
-            if (typeof result === "string") {
-                return null
-            }
-            return { userId: result.userId, userLogin: result.userLogin }
-        } catch (err) {
-            //console.log(err)
+    async tokenVerify(token: string) {
+        if (token === '') {
             return null
         }
-    },
-
-    async isTokenExpired(token: string) {
         try {
-            const result = await jwt.verify(token, SETTINGS.JWT_SECRET)
-            return false
+            const decoded = await jwt.verify(token, SETTINGS.JWT_SECRET)
+            return typeof decoded === 'object' ? { ...decoded } : null;
         } catch (err) {
-            return true
+            console.log('JWT is not valid ', token)
         }
+        return null
     },
 
-    async isTokenBlocked(token: string) {
-        const result = await expiredTokensRepository.findExpiredToken(token)
-        if (result === null) {
-            return false
+    async getUserFromToken(token: string) {
+        try {
+            const playLoad = await jwt.verify(token, SETTINGS.JWT_SECRET)
+            return typeof playLoad === 'object' ? { userId: playLoad.userId, userLogin: playLoad.userLogin } : null;
+        } catch (err) {
+            console.log('JWT is not valid ', token)
         }
-        return true
+        return null
     },
 
-    async createExpiredToken(token: string) {
+    async decodeToken(token: string) {
+        const decoded = await jwt.decode(token);
 
-        const expiredToken: ExpiredTokensModel = {
-            token: token,
-            expiredAt: new Date(),
-            status: 1
-        }
-
-        const result = await expiredTokensRepository.createExpiredToken(expiredToken)
-        return result
+        return { ...decoded as any }
     },
-
 
 }

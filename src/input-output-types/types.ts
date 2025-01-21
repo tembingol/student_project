@@ -41,8 +41,9 @@ export enum HTTP_STATUS_CODE {
     Unauthorized = 401,
     Forbidden = 403,
     NotFound = 404,
+    TooManyRequests = 429,
 }
-
+/*
 //example user
 const responTest: ServicesResponseNew<UserViewModel> = {
     result: false,
@@ -73,4 +74,26 @@ const responTestError: ServicesResponseNew<BlogViewModel | {}> = {
             field: "string"
         }]
     }
+}
+*/
+export type RequestContextType = {
+    currentUser: {
+        userId: string
+        userLogin: string
+    },
+    userDeviceInfo: UserDeviceInfoType
+}
+
+export type UserDeviceInfoType = {
+    deviceId: string
+    deviceName: string
+    deviceIp: string
+}
+
+export type TokenPlayLoadType = {
+    iat: number,
+    exp: number,
+    userId: string,
+    userLogin: string,
+    deviceId: string
 }

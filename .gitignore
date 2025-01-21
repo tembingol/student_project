@@ -5,3 +5,4 @@ __tests__
 dist
 .vscode
 jest.config.*
+src/features/template

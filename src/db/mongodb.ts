@@ -6,6 +6,7 @@ import { VideoViewModel } from "../input-output-types/videos-models";
 import { UserCredentialsModel, UserDataBaseModel } from "../input-output-types/users-moduls";
 import { CommentDataBaseModel } from "../input-output-types/comments-models";
 import { ExpiredTokensModel } from "../input-output-types/expired-tokens-models";
+import { IncomingRequestsModel, SessionDataBaseModel } from "../input-output-types/sessions-models";
 
 // получение доступа к бд
 // const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL)
@@ -21,6 +22,8 @@ export let usersCollection: Collection<UserDataBaseModel>
 export let usersCredentialsCollection: Collection<UserCredentialsModel>
 export let commentsCollection: Collection<CommentDataBaseModel>
 export let expiredTokensCollection: Collection<ExpiredTokensModel>
+export let sessionssCollection: Collection<SessionDataBaseModel>
+export let incomingRequestsCollection: Collection<IncomingRequestsModel>
 
 // проверка подключения к бд
 export const connectMongoDB = async (MONGO_URL: string) => {
@@ -38,6 +41,9 @@ export const connectMongoDB = async (MONGO_URL: string) => {
         usersCredentialsCollection = db.collection(SETTINGS.USERSCREDENTIALS_COLLECTION_NAME)
         commentsCollection = db.collection(SETTINGS.COMMENTS_COLLECTION_NAME)
         expiredTokensCollection = db.collection(SETTINGS.EXPIREDTOKENS_COLLECTION_NAME)
+        sessionssCollection = db.collection(SETTINGS.SESSIONS_COLLECTION_NAME)
+        incomingRequestsCollection = db.collection(SETTINGS.INCOMINGREQUESTS_COLLECTION_NAME)
+
         // все ок
         console.log('connected to mongo')
         return true

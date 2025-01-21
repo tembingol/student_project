@@ -18,10 +18,12 @@ exports.SETTINGS = {
     COMMENTS_COLLECTION_NAME: "comments",
     USERSCREDENTIALS_COLLECTION_NAME: 'usersCredentials',
     EXPIREDTOKENS_COLLECTION_NAME: 'expiredTokens',
+    SESSIONS_COLLECTION_NAME: 'sessions',
+    INCOMINGREQUESTS_COLLECTION_NAME: 'incomingRequests',
     JWT_SECRET: process.env.JWT_SECRET || 'testproject',
     SESSION_SECRET: process.env.SESSION_SECRET || 'testproject',
-    ACCESSTOKEN_TTL: process.env.ACCESSTOKEN_TTL || 10,
-    REFRESHTOKEN_TTL: process.env.REFRESHTOKEN_TTL || 20,
+    ACCESSTOKEN_TTL: process.env.ACCESSTOKEN_TTL || '10m',
+    REFRESHTOKEN_TTL: process.env.REFRESHTOKEN_TTL || '20m',
     PATH: {
         ROOT: '/',
         USERS: '/users',
@@ -30,6 +32,7 @@ exports.SETTINGS = {
         COMMENTS: '/comments',
         BLOGS: '/blogs',
         POSTS: '/posts',
+        SECURITY: '/security',
         TESTING: '/testing',
     },
 };

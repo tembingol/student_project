@@ -37,18 +37,8 @@ exports.blogIdValidator = (0, express_validator_1.body)('blogId')
     }
     return true;
 })).withMessage("no blog");
-function myValodator(id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const foundBlog = yield blogs_query_service_1.blogsQueryService.findBlogById(id);
-        if (!foundBlog.result) {
-            return false;
-        }
-        return false;
-    });
-}
 exports.postValidators = [
     base_auth_middleware_1.baseAuthMiddleware,
-    //blogNameValidator,
     exports.blogIdValidator,
     exports.titleValidator,
     exports.shortDescriptionValidator,

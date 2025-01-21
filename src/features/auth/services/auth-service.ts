@@ -10,9 +10,10 @@ import { add, format, compareAsc } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
 import { usersRepository } from "../../users/users-repository"
 import { usersService } from "../../users/services/users-service"
-import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { ExpiredTokensModel } from "../../../input-output-types/expired-tokens-models"
-import { Console } from "console"
+import { HTTP_STATUS_CODE, ServicesResponseNew, TokenPlayLoadType, UserDeviceInfoType } from "../../../input-output-types/types"
+import { sessionService } from "../../../application-services/sessions-service"
+import { sessionsRepository } from "../../../application-services/sessions-repository"
+import { SessionResponseMetadataModel } from "../../../input-output-types/sessions-models"
 
 
 export const authService = {
@@ -45,7 +46,7 @@ export const authService = {
 
     async getUserByToken(userToken: string) {
 
-        let foundUserFromToken = await jwtService.getUserIdFromToken(userToken)
+        let foundUserFromToken = await jwtService.tokenVerify(userToken)
 
         if (foundUserFromToken === null) {
             return null
@@ -61,7 +62,7 @@ export const authService = {
     },
 
     async confirmEmail(reqBody: any) {
-        const response: ServicesResponse = {
+        const response: ServicesResponseNew<{}> = {
             result: false,
             status: 400,
             data: {},
@@ -93,7 +94,7 @@ export const authService = {
     },
 
     async resendRegistrationEmail(reqBody: any) {
-        const response: ServicesResponse = {
+        const response: ServicesResponseNew<{}> = {
             result: false,
             status: 400,
             data: {},
@@ -135,7 +136,7 @@ export const authService = {
         const isEmailSended = await emailManager.sendRegistrationConfirmation([reqBody.email], confirmationCode)
 
         if (isEmailSended === false) {
-            response.errors.errorsMessages.push({ message: "email sending error" })
+            response.errors.errorsMessages.push({ message: "email sending error", field: "email" })
         }
 
         response.result = true
@@ -220,69 +221,129 @@ export const authService = {
     },
 
     async logoutUser(token: string) {
-        const response: ServicesResponse = {
+
+        const response: ServicesResponseNew<{}> = {
             result: false,
             status: HTTP_STATUS_CODE.Unauthorized,
             data: {},
             errors: { errorsMessages: [] }
         }
 
-        const isExpired = await jwtService.isTokenExpired(token)
+        const playLoad = await jwtService.tokenVerify(token)
 
-        if (isExpired) {
+        const userSession = await sessionService.getCurrentSession(playLoad as TokenPlayLoadType)
+        if (userSession === null) {
             return response
         }
 
-        const isTokenBlocked = await jwtService.isTokenBlocked(token)
+        const isSessionDeleted = await sessionsRepository.deleteSession(userSession.id)
 
-        if (isTokenBlocked) {
+        if (!isSessionDeleted) {
             return response
         }
-
-        const foundUser = await authService.getUserByToken(token)
-
-        if (foundUser === null) {
-            return response
-        }
-
-        const result = await jwtService.createExpiredToken(token)
 
         response.result = true
         response.status = HTTP_STATUS_CODE.NoContent
         return response
     },
 
-    async refreshToken(refreshToken: string) {
-        const response: ServicesResponse = {
+    async loginUser(foundUser: UserViewModel, userDeviceInfo: UserDeviceInfoType) {
+        const response: ServicesResponseNew<SessionResponseMetadataModel> = {
             result: false,
             status: HTTP_STATUS_CODE.Unauthorized,
-            data: {},
+            data: {
+                deviceId: '',
+                accessToken: '',
+                refreshToken: ''
+            },
             errors: { errorsMessages: [] }
         }
 
-        const isExpired = await jwtService.isTokenExpired(refreshToken)
+        const deviceID = userDeviceInfo.deviceId
+        const accessToken = await jwtService.createAccsessJWT(foundUser)
+        const refreshToken = await jwtService.createRefreshJWT(foundUser, deviceID)
 
-        if (isExpired) {
+        const isSessionAdded = await sessionService.addSession(foundUser, refreshToken, userDeviceInfo)
+        if (isSessionAdded === "") {
             return response
         }
 
-        const isTokenBlocked = await jwtService.isTokenBlocked(refreshToken)
-
-        if (isTokenBlocked) {
-            return response
+        response.data = {
+            deviceId: userDeviceInfo.deviceId,
+            accessToken: accessToken,
+            refreshToken: refreshToken
         }
 
-        const foundUser = await authService.getUserByToken(refreshToken)
+        response.result = true
+        response.status = HTTP_STATUS_CODE.NoContent
+
+        return response
+    },
+
+    async refreshTokenVerify(refreshToken: string) {
+
+        const playLoad = await jwtService.tokenVerify(refreshToken)
+
+        if (!playLoad || playLoad.userId === undefined) {
+            return false
+        }
+
+        const currentSession = await sessionService.getCurrentSession(playLoad as TokenPlayLoadType)
+
+        if (!currentSession) {
+            return false
+        }
+
+        return true
+
+    },
+
+    async refreshTokens(refreshToken: string, userDeviceInfo: UserDeviceInfoType) {
+
+        const response: ServicesResponseNew<SessionResponseMetadataModel> = {
+            result: false,
+            status: HTTP_STATUS_CODE.Unauthorized,
+            data: {
+                deviceId: '',
+                accessToken: '',
+                refreshToken: ''
+            },
+            errors: { errorsMessages: [] }
+        }
+
+        const foundUser = await this.getUserByToken(refreshToken)
 
         if (foundUser === null) {
             return response
         }
 
-        response.data = foundUser
-        const result = await jwtService.createExpiredToken(refreshToken)
+        const playLoad = await jwtService.tokenVerify(refreshToken)
+
+        const currentSession = await sessionService.getCurrentSession(playLoad as TokenPlayLoadType)
+
+        if (currentSession === null) {
+            return response
+        }
+
+        const foundBDUser = await usersQueryService.getUserById(foundUser.userId)
+
+        if (foundBDUser === null) {
+            return response
+        }
+
+        const deviceId = currentSession.device_id
+        const newAccessToken = await jwtService.createAccsessJWT(foundBDUser)
+        const newRefreshToken = await jwtService.createRefreshJWT(foundBDUser, deviceId)
+
+        await sessionService.updateSession(currentSession.id, newRefreshToken)
 
         response.result = true
-        response.status = 204
+        response.data = {
+            deviceId: deviceId,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken
+        }
+        response.status = HTTP_STATUS_CODE.NoContent
         return response
     }
 

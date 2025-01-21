@@ -1,13 +1,13 @@
 import { Router } from "express"
 import { authRegistrationValidators, authLoginValidators } from "./middlewares/auth-validators"
-import { jwtService } from "../../application-services/JWT-service"
 import { authService } from "./services/auth-service"
 import { HTTP_STATUS_CODE } from "../../input-output-types/types"
-import { UserViewModel } from "../../input-output-types/users-moduls"
+import { refteshTokenValidator } from "./middlewares/refreshToken-validator"
+import { incomingRequestsCheckMiddleware } from "../../global-middlewares/sessions-middleware"
 
 export const authRouter = Router({})
 
-authRouter.post('/registration', ...authRegistrationValidators, async (req, res) => {
+authRouter.post('/registration', incomingRequestsCheckMiddleware, ...authRegistrationValidators, async (req, res) => {
 
     const serviceRes = await authService.registerNewUser(req.body)
     if (serviceRes.result) {
@@ -17,7 +17,7 @@ authRouter.post('/registration', ...authRegistrationValidators, async (req, res)
     res.status(serviceRes.status).json(serviceRes.errors)
 })
 
-authRouter.post('/registration-confirmation', async (req, res) => {
+authRouter.post('/registration-confirmation', incomingRequestsCheckMiddleware, async (req, res) => {
 
     const serviceRes = await authService.confirmEmail(req.body)
     if (serviceRes.result) {
@@ -27,7 +27,7 @@ authRouter.post('/registration-confirmation', async (req, res) => {
     res.status(serviceRes.status).json(serviceRes.errors)
 })
 
-authRouter.post('/registration-email-resending', async (req, res) => {
+authRouter.post('/registration-email-resending', incomingRequestsCheckMiddleware, async (req, res) => {
 
     const serviceRes = await authService.resendRegistrationEmail(req.body)
     if (serviceRes.result) {
@@ -37,7 +37,7 @@ authRouter.post('/registration-email-resending', async (req, res) => {
     res.status(serviceRes.status).json(serviceRes.errors)
 })
 
-authRouter.post('/login', ...authLoginValidators, async (req, res) => {
+authRouter.post('/login', incomingRequestsCheckMiddleware, ...authLoginValidators, async (req, res) => {
 
     const foundUser = await authService.checkUserCredintails(req.body)
 
@@ -46,10 +46,25 @@ authRouter.post('/login', ...authLoginValidators, async (req, res) => {
         return
     }
 
-    const accessToken = await jwtService.createAccsessJWT(foundUser)
-    const refreshToken = await jwtService.createRefreshJWT(foundUser)
+    if (!req.context) {
+        res.sendStatus(502)
+        return
+    }
+
+    const serviceRes = await authService.loginUser(foundUser, req.context.userDeviceInfo)
+
+    if (!serviceRes.result) {
+        res.status(serviceRes.status).json(serviceRes.errors)
+        return
+    }
+
+    const accessToken = serviceRes.data.accessToken
+    const refreshToken = serviceRes.data.refreshToken
+    const ssid = serviceRes.data.deviceId
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, })
+    res.cookie('ssid', ssid, { httpOnly: true, secure: true, })
+
     res.status(200).send({ accessToken: accessToken })
 })
 
@@ -69,30 +84,35 @@ authRouter.post('/logout', async (req, res) => {
         return
     }
 
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, })
+    res.clearCookie('ssid', { httpOnly: true, secure: true, })
     res.sendStatus(HTTP_STATUS_CODE.NoContent)
 })
 
-authRouter.post('/refresh-token', async (req, res) => {
+authRouter.post('/refresh-token', refteshTokenValidator, async (req, res) => {
 
     const refreshToken = req.cookies.refreshToken
-    if (refreshToken === undefined) {
-        res.sendStatus(HTTP_STATUS_CODE.Unauthorized)
+
+    if (!req.context) {
+        res.sendStatus(502)
         return
     }
 
-    const serviceRes = await authService.refreshToken(refreshToken)
+    const serviceRes = await authService.refreshTokens(refreshToken, req.context.userDeviceInfo)
 
     if (!serviceRes.result) {
-        res.status(serviceRes.status).json(serviceRes.data)
+        res.status(serviceRes.status).json(serviceRes.errors)
         return
     }
 
-    const foundUser = serviceRes.data as UserViewModel
-    const accessToken = await jwtService.createAccsessJWT(foundUser)
-    const newRefreshToken = await jwtService.createRefreshJWT(foundUser)
+    const ssid = serviceRes.data.deviceId
+    const newAccessToken = serviceRes.data.accessToken
+    const newRefreshToken = serviceRes.data.refreshToken
 
     res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true, })
-    res.status(HTTP_STATUS_CODE.OK).send({ accessToken: accessToken })
+    res.cookie('ssid', ssid, { httpOnly: true, secure: true, })
+
+    res.status(HTTP_STATUS_CODE.OK).send({ accessToken: newAccessToken })
 
 })
 
@@ -114,7 +134,6 @@ authRouter.get('/login/me', async (req, res) => {
         return
     }
 
-    console.log(foundUser)
     res.status(HTTP_STATUS_CODE.OK).send(foundUser)
 
 })
