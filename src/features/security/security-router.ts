@@ -2,13 +2,13 @@ import { Router } from "express"
 import { HTTP_STATUS_CODE } from "../../input-output-types/types"
 import { securityService } from "./services/security-service"
 import { sessionService } from "../../application-services/sessions-service"
-import { authMiddleware } from "../../global-middlewares/jwt-auth-middleware"
 import { refteshTokenValidator } from "../auth/middlewares/accessToken-validator"
 
 
 export const securityRouter = Router({})
 
 securityRouter.get('/devices', refteshTokenValidator, async (req, res) => {
+
     const refreshToken = req.cookies.refreshToken
 
     const allDevices = await securityService.getAllDevices(refreshToken)
@@ -54,4 +54,5 @@ securityRouter.delete('/devices/:deviceId', refteshTokenValidator, async (req, r
     }
 
     res.status(serviceResponse.status).json(serviceResponse.data)
+
 })

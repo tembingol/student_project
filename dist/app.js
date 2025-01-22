@@ -19,32 +19,6 @@ exports.app = (0, express_1.default)(); // создать приложение
 exports.app.set('trust proxy', true);
 exports.app.use(express_1.default.json()); // создание свойств-объектов body и query во всех реквестах
 exports.app.use((0, cookie_parser_1.default)());
-// app.use(session({
-//   secret: SETTINGS.SESSION_SECRET,
-//   resave: false,
-//   saveUninitialized: true,
-//   genid: function (req) {
-//     return sessionService.genSessionUID(req)
-//   },
-//   cookie: {
-//     secure: true,
-//     httpOnly: true,
-//     maxAge: 60 * 60 * 24 * 1000, // 1 day
-//   },
-//   name: 'sessionID',
-//   store: new MongoStore(
-//     {
-//       mongoUrl: SETTINGS.MONGO_URL,
-//       dbName: SETTINGS.DB_NAME,
-//       collectionName: 'express-session',
-//       ttl: 60 * 60 * 24 // 1 day
-//     }
-//   )
-// }))
-// genSessionUID(req: Request) {
-//     const sessionID = this.createJWT({ sessionID: uuidv4() });
-//     return sessionID
-// },
 // session Counter Middleware
 exports.app.use((req, res, next) => {
     (0, sessions_middleware_1.sessionMetadataMiddleware)(req, res, next);

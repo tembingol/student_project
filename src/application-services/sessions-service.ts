@@ -4,7 +4,7 @@ import { jwtService } from './JWT-service';
 import { sessionsRepository } from './sessions-repository';
 import { SessionDataBaseModel, SessionViewModel } from '../input-output-types/sessions-models';
 import { HTTP_STATUS_CODE, ServicesResponseNew, TokenPlayLoadType, UserDeviceInfoType } from '../input-output-types/types';
-import { subSeconds, format, compareAsc, } from "date-fns";
+import { subSeconds, format } from "date-fns";
 const jwt = Jwt;
 
 export const sessionService = {
@@ -21,7 +21,6 @@ export const sessionService = {
             exp: new Date(tokenData.exp * 1000),
         }
 
-        console.log('newSession', newSession)
         const sessionId = await sessionsRepository.addSession(newSession)
 
         return sessionId
@@ -41,7 +40,6 @@ export const sessionService = {
     },
 
     async getCurrentSession(tokenPlayLoad: TokenPlayLoadType) {
-
         const filter = {
             $and: [
                 { user_id: tokenPlayLoad.userId },
@@ -58,8 +56,7 @@ export const sessionService = {
         return sessionEntityMapper(foundSession)
     },
 
-    async getSessionById(sessionId: string,) {
-
+    async getSessionByDeviceId(sessionId: string,) {
         const filter: Partial<SessionDataBaseModel> = {
             device_id: sessionId
         }
@@ -74,7 +71,6 @@ export const sessionService = {
     },
 
     async deleteSession(refreshToken: string) {
-
         const tokenPlayLoad = await jwtService.decodeToken(refreshToken)
 
         const userSession = await sessionService.getCurrentSession(tokenPlayLoad)
@@ -83,7 +79,6 @@ export const sessionService = {
         }
         const result = await sessionsRepository.deleteSession(userSession.id)
         return result
-
     },
 
     async getInconingRequestsAmount(ip: string, url: string) {
@@ -93,7 +88,7 @@ export const sessionService = {
         return await sessionsRepository.getIncomingRequestsCount(filter)
     },
 
-    async deleteDeviceByID(refreshToken: string, deviceId: string) {
+    async deleteDeviceByID(refreshToken: string, deviceIdURL: string) {
         const serviceResponse: ServicesResponseNew<{}> = {
             result: false,
             status: HTTP_STATUS_CODE.NoContent,
@@ -101,8 +96,8 @@ export const sessionService = {
             errors: { errorsMessages: [] }
         }
 
-        const session = await sessionService.getSessionById(deviceId)
-        if (session === null) {
+        const sessionToDelete = await sessionService.getSessionByDeviceId(deviceIdURL)
+        if (sessionToDelete === null) {
             serviceResponse.status = HTTP_STATUS_CODE.NotFound
             return serviceResponse
         }
@@ -112,28 +107,26 @@ export const sessionService = {
             return serviceResponse
         }
 
-        const userSession = await sessionService.getCurrentSession(tokenPlayLoad)
+        const userCurrentSession = await sessionService.getCurrentSession(tokenPlayLoad)
 
-        if (userSession === null) {
+        if (userCurrentSession === null) {
             serviceResponse.status = HTTP_STATUS_CODE.NotFound
             return serviceResponse
         }
 
-        if (tokenPlayLoad.deviceId !== deviceId) {
+        if (tokenPlayLoad.deviceId === deviceIdURL) {
             serviceResponse.status = HTTP_STATUS_CODE.Forbidden
             return serviceResponse
         }
 
-        if (tokenPlayLoad.userId !== userSession.user_id) {
+        if (tokenPlayLoad.userId !== sessionToDelete.user_id) {
             serviceResponse.status = HTTP_STATUS_CODE.Forbidden
             return serviceResponse
         }
 
-        serviceResponse.result = await sessionsRepository.deleteSession(userSession.id)
+        serviceResponse.result = await sessionsRepository.deleteSession(sessionToDelete.id)
         return serviceResponse
-
     }
-
 
 };
 
