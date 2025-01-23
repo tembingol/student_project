@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsQueryRepository = void 0;
-const mongodb_1 = require("../../db/mongodb");
+const db_1 = require("../../db/db");
 exports.blogsQueryRepository = {
     getAllBlogs: function (pageNumber, pageSize, sortBy, sortDirection, filter) {
         return __awaiter(this, void 0, void 0, function* () {
             const _pageNumber = +pageNumber;
             const _pageSize = +pageSize;
             const _sortDirection = sortDirection === 'asc' ? 1 : -1;
-            const allBlogs = yield mongodb_1.blogCollection.find(filter)
+            const allBlogs = yield db_1.db.getCollections().blogCollection.find(filter)
                 .skip((_pageNumber - 1) * _pageSize)
                 .limit(_pageSize)
                 .sort({ [sortBy]: _sortDirection })
@@ -27,13 +27,13 @@ exports.blogsQueryRepository = {
     },
     getBlogByID: function (filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            const foundUser = yield mongodb_1.blogCollection.findOne(filter);
+            const foundUser = yield db_1.db.getCollections().blogCollection.findOne(filter);
             return foundUser;
         });
     },
     getDocumetnsCount: function (filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            const retult = yield mongodb_1.blogCollection.countDocuments(filter);
+            const retult = yield db_1.db.getCollections().blogCollection.countDocuments(filter);
             return retult;
         });
     },

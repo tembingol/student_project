@@ -1,5 +1,5 @@
-import { CommentDataBaseModel, CommentInputModel, CommentViewModel } from "../../input-output-types/comments-models"
-import { commentsCollection } from "../../db/mongodb"
+import { CommentDataBaseModel, CommentViewModel } from "../../input-output-types/comments-models"
+import { db } from "../../db/db"
 import { ObjectId } from "mongodb"
 
 
@@ -12,21 +12,21 @@ export const commentsRepository = {
             postId: postId
         }
 
-        const insertResult = await commentsCollection.insertOne(newComment)
+        const insertResult = await db.getCollections().commentsCollection.insertOne(newComment)
 
         return insertResult.insertedId.toString()
     },
 
     updateComment: async function (id: string, action: {}) {
         const filter = { _id: new ObjectId(id) }
-        const result = await commentsCollection.updateOne(filter, action)
+        const result = await db.getCollections().commentsCollection.updateOne(filter, action)
 
         return result.matchedCount === 1
     },
 
     deleteComment: async function (id: string) {
         const filter = { _id: new ObjectId(id) }
-        const result = await commentsCollection.deleteOne(filter)
+        const result = await db.getCollections().commentsCollection.deleteOne(filter)
 
         return result.deletedCount === 1
     },

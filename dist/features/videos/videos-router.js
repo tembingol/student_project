@@ -11,10 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.videosRouter = void 0;
 const express_1 = require("express");
-const mongodb_1 = require("../../db/mongodb");
+const db_js_1 = require("../../db/db.js");
 exports.videosRouter = (0, express_1.Router)({});
 exports.videosRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allBlogs = yield mongodb_1.videoCollection.find().toArray();
+    const allBlogs = yield db_js_1.db.getCollections().videoCollection.find().toArray();
     return allBlogs;
 }));
 // videosRouter.get('/:id', (req, res) => {

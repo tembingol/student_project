@@ -9,36 +9,64 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectMongoDB = exports.incomingRequestsCollection = exports.sessionssCollection = exports.expiredTokensCollection = exports.commentsCollection = exports.usersCredentialsCollection = exports.usersCollection = exports.videoCollection = exports.postCollection = exports.blogCollection = exports.db = exports.client = void 0;
+exports.db = exports.incomingRequestsCollection = exports.sessionssCollection = exports.expiredTokensCollection = exports.commentsCollection = exports.usersCredentialsCollection = exports.usersCollection = exports.videoCollection = exports.postCollection = exports.blogCollection = void 0;
 const mongodb_1 = require("mongodb");
 const settings_1 = require("../settings");
-// проверка подключения к бд
-const connectMongoDB = (MONGO_URL) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // получение доступа к бд
-        exports.client = new mongodb_1.MongoClient(MONGO_URL);
-        exports.db = yield exports.client.db(settings_1.SETTINGS.DB_NAME);
-        yield exports.client.connect();
-        yield exports.client.db().command({ ping: 1 });
-        // получение доступа к коллекциям
-        exports.blogCollection = exports.db.collection(settings_1.SETTINGS.BLOG_COLLECTION_NAME);
-        exports.postCollection = exports.db.collection(settings_1.SETTINGS.POST_COLLECTION_NAME);
-        exports.videoCollection = exports.db.collection(settings_1.SETTINGS.VIDEO_COLLECTION_NAME);
-        exports.usersCollection = exports.db.collection(settings_1.SETTINGS.USERS_COLLECTION_NAME);
-        exports.usersCredentialsCollection = exports.db.collection(settings_1.SETTINGS.USERSCREDENTIALS_COLLECTION_NAME);
-        exports.commentsCollection = exports.db.collection(settings_1.SETTINGS.COMMENTS_COLLECTION_NAME);
-        exports.expiredTokensCollection = exports.db.collection(settings_1.SETTINGS.EXPIREDTOKENS_COLLECTION_NAME);
-        exports.sessionssCollection = exports.db.collection(settings_1.SETTINGS.SESSIONS_COLLECTION_NAME);
-        exports.incomingRequestsCollection = exports.db.collection(settings_1.SETTINGS.INCOMINGREQUESTS_COLLECTION_NAME);
-        // все ок
-        console.log('connected to mongo');
-        return true;
+exports.db = {
+    client: {},
+    getDbName() {
+        return this.client.db(settings_1.SETTINGS.DB_NAME);
+    },
+    run(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                this.client = new mongodb_1.MongoClient(url);
+                yield this.client.connect();
+                yield this.getDbName().command({ ping: 1 });
+                console.log("Connected successfully to mongo server");
+                return true;
+            }
+            catch (e) {
+                console.error("Can't connect to mongo server", e);
+                yield this.client.close();
+                return false;
+            }
+        });
+    },
+    stop() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.client.close();
+            console.log("Connection successful closed");
+        });
+    },
+    drop() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                //await this.getDbName().dropDatabase()
+                const collections = yield this.getDbName().listCollections().toArray();
+                for (const collection of collections) {
+                    const collectionName = collection.name;
+                    yield this.getDbName().collection(collectionName).deleteMany({});
+                }
+            }
+            catch (e) {
+                console.error('Error in drop db:', e);
+                yield this.stop();
+            }
+        });
+    },
+    getCollections() {
+        return {
+            usersCollection: this.getDbName().collection("users"),
+            blogCollection: this.getDbName().collection(settings_1.SETTINGS.BLOG_COLLECTION_NAME),
+            postCollection: this.getDbName().collection(settings_1.SETTINGS.POST_COLLECTION_NAME),
+            videoCollection: this.getDbName().collection(settings_1.SETTINGS.VIDEO_COLLECTION_NAME),
+            usersCredentialsCollection: this.getDbName().collection(settings_1.SETTINGS.USERSCREDENTIALS_COLLECTION_NAME),
+            commentsCollection: this.getDbName().collection(settings_1.SETTINGS.COMMENTS_COLLECTION_NAME),
+            expiredTokensCollection: this.getDbName().collection(settings_1.SETTINGS.EXPIREDTOKENS_COLLECTION_NAME),
+            sessionssCollection: this.getDbName().collection(settings_1.SETTINGS.SESSIONS_COLLECTION_NAME),
+            incomingRequestsCollection: this.getDbName().collection(settings_1.SETTINGS.INCOMINGREQUESTS_COLLECTION_NAME),
+            //blogsCollection:
+        };
     }
-    catch (e) {
-        console.log('can not connected to mongo');
-        console.log(e);
-        yield exports.client.close();
-        return false;
-    }
-});
-exports.connectMongoDB = connectMongoDB;
+};

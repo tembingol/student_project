@@ -7,7 +7,6 @@ import { HTTP_STATUS_CODE } from "../input-output-types/types";
 
 // Middleware to add session metadata
 export const sessionMetadataMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-
     const deviceInfo = getDeviceInfo(req)
 
     if (req.context === undefined) {
@@ -24,7 +23,6 @@ export const sessionMetadataMiddleware = async (req: Request, res: Response, nex
 
 // Middleware to add sessionCounter
 export const incomingRequestsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-
     const deviceInfo = getDeviceInfo(req)
 
     const newIncomingRequest: IncomingRequestsModel = {
@@ -40,7 +38,6 @@ export const incomingRequestsMiddleware = async (req: Request, res: Response, ne
 
 // Middleware to add sessionCounter
 export const incomingRequestsCheckMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-
     const deviceInfo = getDeviceInfo(req)
     const url = req.baseUrl + req.url
     const reqAmount = await sessionService.getInconingRequestsAmount(deviceInfo.deviceIp, url)

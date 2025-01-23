@@ -1,12 +1,11 @@
 import { Router } from "express";
-import { videoCollection } from "../../db/mongodb";
-import { VideoInputModel, VideoViewModel } from "../../input-output-types/videos-models";
-import { OutputErrorsType } from "../../input-output-types/otput-errors-model";
+import { db } from "../../db/db.js";
+
 
 export const videosRouter = Router({})
 
 videosRouter.get('/', async (req, res) => {
-    const allBlogs = await videoCollection.find().toArray()
+    const allBlogs = await db.getCollections().videoCollection.find().toArray()
     return allBlogs
 })
 

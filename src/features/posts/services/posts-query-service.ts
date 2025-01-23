@@ -1,4 +1,4 @@
-import { postCollection } from "../../../db/mongodb"
+import { postCollection } from "../../../db/db.js"
 import { PostDataBaseModel, PostViewModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"

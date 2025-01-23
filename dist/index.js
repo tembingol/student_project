@@ -11,18 +11,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const process_1 = require("process");
 const app_1 = require("./app");
-const mongodb_1 = require("./db/mongodb");
 const settings_1 = require("./settings");
+const db_1 = require("./db/db");
+const app = (0, app_1.initApp)();
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
-    const mongoConneted = yield (0, mongodb_1.connectMongoDB)(settings_1.SETTINGS.MONGO_URL);
-    if (mongoConneted) {
-        app_1.app.listen(settings_1.SETTINGS.PORT, () => {
-            console.log('...server started in port ' + settings_1.SETTINGS.PORT);
-        });
-    }
-    else {
+    const bdConneted = yield db_1.db.run(settings_1.SETTINGS.MONGO_URL);
+    if (!bdConneted) {
         console.log('App not started... ');
         (0, process_1.exit)();
     }
+    app.listen(settings_1.SETTINGS.PORT, () => {
+        console.log(`Example app listening on port ${settings_1.SETTINGS.PORT}`);
+    });
+    return app;
 });
 startApp();

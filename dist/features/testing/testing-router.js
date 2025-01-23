@@ -11,16 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testingRouter = void 0;
 const express_1 = require("express");
-const mongodb_1 = require("../../db/mongodb");
+const db_1 = require("../../db/db");
 exports.testingRouter = (0, express_1.Router)({});
 exports.testingRouter.delete('/all-data', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield mongodb_1.blogCollection.drop();
-    yield mongodb_1.postCollection.drop();
-    yield mongodb_1.videoCollection.drop();
-    yield mongodb_1.usersCollection.drop();
-    yield mongodb_1.usersCredentialsCollection.drop();
-    yield mongodb_1.commentsCollection.drop();
-    yield mongodb_1.sessionssCollection.drop();
-    yield mongodb_1.incomingRequestsCollection.drop();
+    db_1.db.drop();
     res.sendStatus(204);
 }));

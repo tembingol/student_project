@@ -11,17 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
 const mongodb_1 = require("mongodb");
-const mongodb_2 = require("../../db/mongodb");
+const db_js_1 = require("../../db/db.js");
 exports.postsRepository = {
     getAllVideos: function () {
         return __awaiter(this, void 0, void 0, function* () {
-            const allVideos = yield mongodb_2.videoCollection.find();
+            const allVideos = yield db_js_1.db.getCollections().videoCollection.find();
             return allVideos.toArray();
         });
     },
     getVideoByID: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const foundVideo = yield mongodb_2.videoCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const foundVideo = yield db_js_1.db.getCollections().videoCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!foundVideo) {
                 return false;
             }
@@ -41,7 +41,7 @@ exports.postsRepository = {
                 "title": reqBody.title,
             };
             try {
-                const result = yield mongodb_2.videoCollection.insertOne(newVideo);
+                const result = yield db_js_1.db.getCollections().videoCollection.insertOne(newVideo);
                 //if (!result.insertedId) {
                 return result.insertedId.toString();
                 //}
@@ -55,7 +55,7 @@ exports.postsRepository = {
     updateVideo: function (id, reqBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield mongodb_2.videoCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
+                const result = yield db_js_1.db.getCollections().videoCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                     $set: {
                         id: reqBody.id,
                         author: reqBody.author,
@@ -80,7 +80,7 @@ exports.postsRepository = {
     deleteVideo: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield mongodb_2.videoCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+                const result = yield db_js_1.db.getCollections().videoCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
                 if (result.deletedCount > 0) {
                     return true;
                 }

@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb"
-import { blogCollection } from "../../db/mongodb"
+import { db } from "../../db/db"
 import { BlogDataBaseModel, BlogInputModel, BlogViewModel } from "../../input-output-types/blogs-models"
 
 export const blogsRepository = {
@@ -12,13 +12,13 @@ export const blogsRepository = {
             id: newObjectId.toString(),
         }
 
-        const insertResult = await blogCollection.insertOne(newBlog)
+        const insertResult = await db.getCollections().blogCollection.insertOne(newBlog)
 
         return insertResult.insertedId.toString()
     },
 
     updateBlog: async function (id: string, blogBody: BlogInputModel) {
-        const result = await blogCollection.updateOne({ id: id }, {
+        const result = await db.getCollections().blogCollection.updateOne({ id: id }, {
             $set: {
                 name: blogBody.name,
                 description: blogBody.description,
@@ -30,7 +30,7 @@ export const blogsRepository = {
     },
 
     deleteBlog: async function (id: string) {
-        const result = await blogCollection.deleteOne({ id: id })
+        const result = await db.getCollections().blogCollection.deleteOne({ id: id })
         return result.deletedCount === 1
     },
 

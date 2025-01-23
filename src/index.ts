@@ -1,19 +1,24 @@
 import { exit } from 'process'
-import { app } from './app'
-import { connectMongoDB } from './db/mongodb'
+import { initApp } from './app'
 import { SETTINGS } from './settings'
+import { db } from './db/db'
+
+const app = initApp()
 
 const startApp = async () => {
 
-    const mongoConneted = await connectMongoDB(SETTINGS.MONGO_URL)
-    if (mongoConneted) {
-        app.listen(SETTINGS.PORT, () => {
-            console.log('...server started in port ' + SETTINGS.PORT)
-        })
-    } else {
+    const bdConneted = await db.run(SETTINGS.MONGO_URL)
+    if (!bdConneted) {
         console.log('App not started... ')
         exit()
     }
+
+    app.listen(SETTINGS.PORT, () => {
+        console.log(`Example app listening on port ${SETTINGS.PORT}`)
+    })
+
+    return app
+
 }
 
 startApp()

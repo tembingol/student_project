@@ -1,4 +1,4 @@
-import { postCollection } from "../../db/mongodb"
+import { db } from "../../db/db"
 
 export const postsQueryRepository = {
 
@@ -7,7 +7,7 @@ export const postsQueryRepository = {
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
 
-        const allPosts = await postCollection.find(filter)
+        const allPosts = await db.getCollections().postCollection.find(filter)
             .skip((_pageNumber - 1) * _pageSize)
             .limit(_pageSize)
             .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })
@@ -17,11 +17,11 @@ export const postsQueryRepository = {
     },
 
     getPostByID: async function (filter: {}) {
-        const foundUser = await postCollection.findOne(filter)
+        const foundUser = await db.getCollections().postCollection.findOne(filter)
         return foundUser
     },
 
     getDocumetnsCount: async function (filter: {}) {
-        return await postCollection.countDocuments(filter)
+        return await db.getCollections().postCollection.countDocuments(filter)
     },
 }

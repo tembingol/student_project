@@ -1,19 +1,22 @@
 import { ObjectId } from "mongodb"
-import { videoCollection } from "../../db/mongodb"
+import { db } from "../../db/db.js"
 import { VideoInputModel, VideoViewModel } from "../../input-output-types/videos-models"
 
 export const postsRepository = {
+
     getAllVideos: async function () {
-        const allVideos = await videoCollection.find()
+        const allVideos = await db.getCollections().videoCollection.find()
         return allVideos.toArray()
     },
+
     getVideoByID: async function (id: string) {
-        const foundVideo = await videoCollection.findOne({ _id: new ObjectId(id) })
+        const foundVideo = await db.getCollections().videoCollection.findOne({ _id: new ObjectId(id) })
         if (!foundVideo) {
             return false
         }
         return foundVideo
     },
+
     createVideo: async function (reqBody: VideoInputModel) {
         const newVideo: VideoViewModel = {
             "author": reqBody.author,
@@ -26,7 +29,7 @@ export const postsRepository = {
             "title": reqBody.title,
         }
         try {
-            const result = await videoCollection.insertOne(newVideo)
+            const result = await db.getCollections().videoCollection.insertOne(newVideo)
             //if (!result.insertedId) {
             return result.insertedId.toString()
             //}
@@ -35,9 +38,10 @@ export const postsRepository = {
         }
         return false
     },
+
     updateVideo: async function (id: string, reqBody: VideoViewModel) {
         try {
-            const result = await videoCollection.updateOne({ _id: new ObjectId(id) }, {
+            const result = await db.getCollections().videoCollection.updateOne({ _id: new ObjectId(id) }, {
                 $set: {
                     id: reqBody.id,
                     author: reqBody.author,
@@ -60,9 +64,10 @@ export const postsRepository = {
         }
         return false
     },
+
     deleteVideo: async function (id: string) {
         try {
-            const result = await videoCollection.deleteOne({ _id: new ObjectId(id) })
+            const result = await db.getCollections().videoCollection.deleteOne({ _id: new ObjectId(id) })
 
             if (result.deletedCount > 0) {
                 return true
@@ -72,4 +77,5 @@ export const postsRepository = {
         }
         return false
     }
+
 }

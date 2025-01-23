@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb"
-import { postCollection } from "../../db/mongodb"
+import { db } from "../../db/db"
 import { PostDataBaseModel, PostInputModel, PostViewModel } from "../../input-output-types/posts-models"
 
 export const postsRepository = {
@@ -12,12 +12,12 @@ export const postsRepository = {
             id: newObjectId.toString(),
         }
 
-        const insertResult = await postCollection.insertOne(newPost)
+        const insertResult = await db.getCollections().postCollection.insertOne(newPost)
         return insertResult.insertedId.toString()
     },
 
     updatePost: async function (id: string, postBody: PostInputModel) {
-        const result = await postCollection.updateOne({ id: id }, {
+        const result = await db.getCollections().postCollection.updateOne({ id: id }, {
             $set: {
                 title: postBody.title,
                 shortDescription: postBody.shortDescription,
@@ -31,7 +31,7 @@ export const postsRepository = {
     },
 
     deletePost: async function (id: string) {
-        const result = await postCollection.deleteOne({ id: id })
+        const result = await db.getCollections().postCollection.deleteOne({ id: id })
         return result.deletedCount === 1
     },
 

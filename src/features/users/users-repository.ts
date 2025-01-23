@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb"
-import { usersCollection, usersCredentialsCollection } from "../../db/mongodb"
+import { db } from "../../db/db.js"
 import { UserCredentialsModel, UserDataBaseModel } from "../../input-output-types/users-moduls"
 
 export const usersRepository = {
@@ -13,31 +13,31 @@ export const usersRepository = {
         }
 
         //toDo transaction {
-        const insetrCredentials = usersCredentialsCollection.insertOne({
+        const insetrCredentials = db.getCollections().usersCredentialsCollection.insertOne({
             ...usersCredentials,
             userId: newObjectId.toString()
         })
 
-        const insertResult = await usersCollection.insertOne(newUser)
+        const insertResult = await db.getCollections().usersCollection.insertOne(newUser)
         //toDo transaction }
 
         return insertResult.insertedId.toString()
     },
 
     deleteUser: async function (useriD: string) {
-        const result = await usersCollection.deleteOne({ id: useriD })
+        const result = await db.getCollections().usersCollection.deleteOne({ id: useriD })
         return result.deletedCount === 1
     },
 
     updateConfirmation: async function (useriD: string) {
         const filter = { _id: new ObjectId(useriD) }
-        const result = await usersCollection.updateOne(filter, { $set: { 'emailConfirmation.isConfirmed': true } })
+        const result = await db.getCollections().usersCollection.updateOne(filter, { $set: { 'emailConfirmation.isConfirmed': true } })
         return result.modifiedCount === 1
     },
 
     updateConfirmationCode: async function (useriD: string, confirmationCode: string) {
         const filter = { _id: new ObjectId(useriD) }
-        const result = await usersCollection.updateOne(filter, { $set: { 'emailConfirmation.confirmationCode': confirmationCode } })
+        const result = await db.getCollections().usersCollection.updateOne(filter, { $set: { 'emailConfirmation.confirmationCode': confirmationCode } })
         return result.modifiedCount === 1
     },
 }
