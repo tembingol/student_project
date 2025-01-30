@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb"
-import { db } from "../../db/db.js"
+import { db } from "../../db/db"
 
 export const usersQueryRepository = {
 

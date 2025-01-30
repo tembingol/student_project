@@ -1,8 +1,8 @@
-import { postCollection } from "../../../db/db.js"
 import { PostDataBaseModel, PostViewModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { postsQueryRepository } from "../posts-query-repository"
+import { db } from "../../../db/db"
 
 export const postsQueryService = {
 
@@ -92,7 +92,7 @@ export const postsQueryService = {
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
 
-        const allPosts = await postCollection.find({ "blogId": blogId })
+        const allPosts = await db.getCollections().postCollection.find({ "blogId": blogId })
             .skip((_pageNumber - 1) * _pageSize)
             .limit(_pageSize)
             .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })

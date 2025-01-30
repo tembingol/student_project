@@ -1,6 +1,7 @@
 import { BlogInputModel, BlogViewModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
+import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { postsService } from "../../posts/services/posts-service"
 import { blogsQueryRepository } from "../blogs-query-repository"
 import { blogsRepository } from "../blogs-repository"
@@ -12,7 +13,7 @@ export const blogsService = {
     createBlog: async function (blogBody: BlogInputModel) {
         const response: ServicesResponse = {
             result: false,
-            status: 400,
+            status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -35,7 +36,7 @@ export const blogsService = {
 
         if (foundCreatedBlog) {
             response.result = true
-            response.status = 201
+            response.status = HTTP_STATUS_CODE.Created
             response.data = blogEntityMapper(foundCreatedBlog)
         }
 
@@ -52,7 +53,7 @@ export const blogsService = {
     updateBlog: async function (id: string, blogBody: BlogInputModel) {
         const response: ServicesResponse = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -61,7 +62,7 @@ export const blogsService = {
 
         if (isBlogUpdated) {
             response.result = true
-            response.status = 204
+            response.status = HTTP_STATUS_CODE.NoContent
         }
 
         return response
@@ -70,7 +71,7 @@ export const blogsService = {
     deleteBlog: async function (id: string) {
         const response: ServicesResponse = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -78,7 +79,7 @@ export const blogsService = {
         const isBlogDeleted = await blogsRepository.deleteBlog(id)
         if (isBlogDeleted) {
             response.result = true
-            response.status = 204
+            response.status = HTTP_STATUS_CODE.NoContent
         }
 
         return response

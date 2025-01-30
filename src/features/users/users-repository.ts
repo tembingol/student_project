@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb"
-import { db } from "../../db/db.js"
+import { db } from "../../db/db"
 import { UserCredentialsModel, UserDataBaseModel } from "../../input-output-types/users-moduls"
 
 export const usersRepository = {
@@ -25,7 +25,7 @@ export const usersRepository = {
     },
 
     deleteUser: async function (useriD: string) {
-        const result = await db.getCollections().usersCollection.deleteOne({ id: useriD })
+        const result = await db.getCollections().usersCollection.deleteOne({ _id: new ObjectId(useriD) })
         return result.deletedCount === 1
     },
 

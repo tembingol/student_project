@@ -1,5 +1,6 @@
 import { PostInputModel, PostViewModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
+import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { postsQueryRepository } from "../posts-query-repository"
 import { postsRepository } from "../posts-repository"
 import { postEntityMapper } from "./posts-query-service"
@@ -11,7 +12,7 @@ export const postsService = {
     createPost: async function (postBody: PostInputModel) {
         const response: ServicesResponse = {
             result: false,
-            status: 400,
+            status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -35,7 +36,7 @@ export const postsService = {
 
         if (foundCreatedPost) {
             response.result = true
-            response.status = 201
+            response.status = HTTP_STATUS_CODE.Created
             response.data = postEntityMapper(foundCreatedPost)
         }
 

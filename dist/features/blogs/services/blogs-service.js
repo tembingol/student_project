@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsService = void 0;
+const types_1 = require("../../../input-output-types/types");
 const posts_service_1 = require("../../posts/services/posts-service");
 const blogs_query_repository_1 = require("../blogs-query-repository");
 const blogs_repository_1 = require("../blogs-repository");
@@ -19,7 +20,7 @@ exports.blogsService = {
         return __awaiter(this, void 0, void 0, function* () {
             const response = {
                 result: false,
-                status: 400,
+                status: types_1.HTTP_STATUS_CODE.BadRequest,
                 data: {},
                 errors: { errorsMessages: [] }
             };
@@ -38,7 +39,7 @@ exports.blogsService = {
             const foundCreatedBlog = yield blogs_query_repository_1.blogsQueryRepository.getBlogByID({ id: newBblogId });
             if (foundCreatedBlog) {
                 response.result = true;
-                response.status = 201;
+                response.status = types_1.HTTP_STATUS_CODE.Created;
                 response.data = (0, blogs_query_service_1.blogEntityMapper)(foundCreatedBlog);
             }
             return response;
@@ -55,14 +56,14 @@ exports.blogsService = {
         return __awaiter(this, void 0, void 0, function* () {
             const response = {
                 result: false,
-                status: 404,
+                status: types_1.HTTP_STATUS_CODE.NotFound,
                 data: {},
                 errors: { errorsMessages: [] }
             };
             const isBlogUpdated = yield blogs_repository_1.blogsRepository.updateBlog(id, blogBody);
             if (isBlogUpdated) {
                 response.result = true;
-                response.status = 204;
+                response.status = types_1.HTTP_STATUS_CODE.NoContent;
             }
             return response;
         });
@@ -71,14 +72,14 @@ exports.blogsService = {
         return __awaiter(this, void 0, void 0, function* () {
             const response = {
                 result: false,
-                status: 404,
+                status: types_1.HTTP_STATUS_CODE.NotFound,
                 data: {},
                 errors: { errorsMessages: [] }
             };
             const isBlogDeleted = yield blogs_repository_1.blogsRepository.deleteBlog(id);
             if (isBlogDeleted) {
                 response.result = true;
-                response.status = 204;
+                response.status = types_1.HTTP_STATUS_CODE.NoContent;
             }
             return response;
         });
