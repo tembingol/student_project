@@ -3,25 +3,35 @@ import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { jwtService } from "../../../application-services/JWT-service"
 
 
-// Middleware to validate refreshToken
-export const refteshTokenValidator = async (req: Request, res: Response, next: NextFunction) => {
+// Middleware to validate accessToken
+export const accessTokenValidator = async (req: Request, res: Response, next: NextFunction) => {
 
-    const refreshToken = req.cookies.refreshToken
+    const authorization = req.headers.authorization
 
-    if (refreshToken === undefined) {
+    if (!authorization) {
         res.status(HTTP_STATUS_CODE.Unauthorized).json({
-            errorsMessages: { message: 'refreshToken is missing', field: 'refreshToken' }
+            errorsMessages: [
+                { message: 'accessToken is not valid ', field: 'accessToken' }
+            ]
         })
         return
     }
 
-    const playLoad = await jwtService.tokenVerify(refreshToken)
+    const accessToken = authorization.split(' ')[1]
 
-    if (!playLoad || playLoad.userId === undefined) {
+    const playLoad = await jwtService.tokenVerify(accessToken)
+
+    if (playLoad === null || playLoad.userId === undefined) {
         res.status(HTTP_STATUS_CODE.Unauthorized).json({
-            errorsMessages: { message: 'refreshToken is not valid ', field: 'refreshToken' }
+            errorsMessages: [
+                { message: 'accessToken is not valid ', field: 'accessToken' }
+            ]
         })
         return
+    }
+
+    if (req.context) {
+        req.context.currentUser = { userId: playLoad.userId, userLogin: playLoad.userLogin }
     }
 
     next()
