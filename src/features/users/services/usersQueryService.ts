@@ -1,10 +1,32 @@
-import { ServicesResponseNew, PaginationResponseType, HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
-import { usersQueryRepository } from "../users-query-repo"
+import { HTTP_STATUS_CODE, PaginationResponseType, ServicesResponseNew } from "../../../input-output-types/types"
+import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../../input-output-types/users-moduls"
+import { UsersQueryRepository } from "../repo/UsersQueryRepo"
 
-export const usersQueryService = {
+export class UsersQueryService {
 
-    findUsers: async function (queryParams: any) {
+    constructor(
+        private usersQueryRepository: UsersQueryRepository
+    ) { }
+
+    async getUserById(id: string) {
+        const foundUser = await this.usersQueryRepository.getUserById(id)
+        if (foundUser === null) {
+            return foundUser
+        }
+        return userEntityMapper(foundUser)
+
+    }
+
+    async getUserCredentials(userId: string) {
+        const filter = { userId: userId }
+        const foundUser = await this.usersQueryRepository.getUserCredentials(userId)
+        if (foundUser) {
+            return userCredentialsMapper(foundUser)
+        }
+        return foundUser
+    }
+
+    async findUsers(queryParams: any) {
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
@@ -18,7 +40,7 @@ export const usersQueryService = {
                 { email: { $regex: searchEmailTerm, $options: 'i' } }]
         }
 
-        const allUsers = await usersQueryRepository.getAllUsers(
+        const allUsers = await this.usersQueryRepository.getAllUsers(
             pageNumber,
             pageSize,
             sortBy,
@@ -28,7 +50,7 @@ export const usersQueryService = {
 
         const mappedAllUsers = allUsers.map((el) => userEntityMapper(el))
 
-        const totalCount = await usersQueryRepository.getDocumetnsCount(filter)
+        const totalCount = await this.usersQueryRepository.getDocumetnsCount(filter)
 
         const result: ServicesResponseNew<PaginationResponseType<UserViewModel>> = {
             result: true,
@@ -43,17 +65,17 @@ export const usersQueryService = {
             errors: { errorsMessages: [] }
         }
         return result
-    },
+    }
 
-    getUserByEmail: async function (email: string) {
-        const foundUser = await usersQueryRepository.getUserByEmail(email)
+    async getUserByEmail(email: string) {
+        const foundUser = await this.usersQueryRepository.getUserByEmail(email)
         if (foundUser) {
             return userEntityMapper(foundUser)
         }
         return foundUser
-    },
+    }
 
-    getUserByEmailServicesResponse: async function (email: string) {
+    async getUserByEmailServicesResponse(email: string) {
         const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
@@ -61,7 +83,7 @@ export const usersQueryService = {
             errors: { errorsMessages: [] }
         }
 
-        const foundUser = await usersQueryRepository.getUserByEmail(email)
+        const foundUser = await this.usersQueryRepository.getUserByEmail(email)
 
         if (foundUser === null) {
             return response
@@ -72,33 +94,15 @@ export const usersQueryService = {
         response.data = userEntityMapper(foundUser)
 
         return response
-    },
+    }
 
-    getUserByLogin: async function (login: string) {
-        const foundUser = await usersQueryRepository.getUserByLogin(login)
+    async getUserByLogin(login: string) {
+        const foundUser = await this.usersQueryRepository.getUserByLogin(login)
         if (foundUser) {
             return userEntityMapper(foundUser)
         }
         return foundUser
-    },
-
-    getUserById: async function (id: string) {
-        const foundUser = await usersQueryRepository.getUserById(id)
-        if (foundUser === null) {
-            return foundUser
-        }
-        return userEntityMapper(foundUser)
-
-    },
-
-    getUserCredentials: async function (userId: string) {
-        const filter = { userId: userId }
-        const foundUser = await usersQueryRepository.getUserCredentials(userId)
-        if (foundUser) {
-            return userCredentialsMapper(foundUser)
-        }
-        return foundUser
-    },
+    }
 }
 
 export function userEntityMapper(user: UserDataBaseModel): UserViewModel {

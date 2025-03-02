@@ -1,39 +1,39 @@
 import { ObjectId } from "mongodb"
-import { db } from "../../db/db"
+import { db } from "../../../db/db"
 
-export const usersQueryRepository = {
+export class UsersQueryRepository {
 
-    getUserCredentials: async function (userId: string) {
+    async getUserCredentials(userId: string) {
         const filter = { userId: userId }
         const foundUser = await db.getCollections().usersCredentialsCollection.findOne(filter)
         return foundUser
-    },
+    }
 
-    getUserByLogin: async function (login: string) {
+    async getUserByLogin(login: string) {
         const filter = { login: login }
         const foundUser = await db.getCollections().usersCollection.findOne(filter)
         return foundUser
-    },
+    }
 
-    getUserByEmail: async function (email: string) {
+    async getUserByEmail(email: string) {
         const filter = { email: email }
         const foundUser = await db.getCollections().usersCollection.findOne(filter)
         return foundUser
-    },
+    }
 
-    getUserById: async function (id: string) {
+    async getUserById(id: string) {
         const filter = { _id: new ObjectId(id) }
         const foundUser = await db.getCollections().usersCollection.findOne(filter)
         return foundUser
-    },
+    }
 
-    getUserByConfirmationCode: async function (code: string) {
+    async getUserByConfirmationCode(code: string) {
         const filter = { 'emailConfirmation.confirmationCode': code }
         const foundUser = await db.getCollections().usersCollection.findOne(filter)
         return foundUser
-    },
+    }
 
-    getAllUsers: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
+    async getAllUsers(pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
@@ -45,9 +45,9 @@ export const usersQueryRepository = {
             .toArray()
 
         return allUsers
-    },
+    }
 
-    getDocumetnsCount: async function (filter: {}) {
+    async getDocumetnsCount(filter: {}) {
         return await db.getCollections().usersCollection.countDocuments(filter)
     }
 }

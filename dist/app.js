@@ -9,12 +9,12 @@ const settings_1 = require("./settings");
 const blogs_router_1 = require("./features/blogs/blogs-router");
 const posts_router_1 = require("./features/posts/posts-router");
 const testing_router_1 = require("./features/testing/testing-router");
-const users_router_1 = require("./features/users/users-router");
-const auth_router_1 = require("./features/auth/auth-router");
 const comments_router_1 = require("./features/comments/comments-router");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const sessions_middleware_1 = require("./global-middlewares/sessions-middleware");
 const security_router_1 = require("./features/security/security-router");
+const authRouter_1 = require("./features/auth/authRouter");
+const usersRouter_1 = require("./features/users/usersRouter");
 const initApp = () => {
     const app = (0, express_1.default)(); // создать приложение
     app.set('trust proxy', true);
@@ -34,17 +34,12 @@ const initApp = () => {
         console.log({ method: req.method, body: req.body, query: req.query });
         next();
     });
-    // // Middleware to log session data
-    // app.use((req, res, next) => {
-    //   console.log('Context:', req.context);
-    //   next();
-    // });
     app.get(settings_1.SETTINGS.PATH.ROOT, (req, res) => {
         // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита
         res.status(200).json({ version: '1.1' });
     });
-    app.use(settings_1.SETTINGS.PATH.USERS, users_router_1.usersRouter);
-    app.use(settings_1.SETTINGS.PATH.AUTH, auth_router_1.authRouter);
+    app.use(settings_1.SETTINGS.PATH.USERS, usersRouter_1.usersRouter);
+    app.use(settings_1.SETTINGS.PATH.AUTH, authRouter_1.authRouter);
     app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
     app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postRouter);
     app.use(settings_1.SETTINGS.PATH.COMMENTS, comments_router_1.commentsRouter);

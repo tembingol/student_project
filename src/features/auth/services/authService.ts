@@ -3,33 +3,40 @@ import { jwtService } from "../../../application-services/JWT-service"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { LoginInputModel, UserCredentialsModel, UserDataBaseModel, UserInputModel, UserViewModel } from "../../../input-output-types/users-moduls"
 import { emailManager } from "../../../managers/emailManager"
-import { usersQueryService } from "../../users/services/users-query-service"
-import { usersQueryRepository } from "../../users/users-query-repo"
 import bcrypt from "bcrypt"
 import { add, format, compareAsc } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
-import { usersRepository } from "../../users/users-repository"
-import { usersService } from "../../users/services/users-service"
 import { HTTP_STATUS_CODE, ServicesResponseNew, TokenPlayLoadType, UserDeviceInfoType } from "../../../input-output-types/types"
 import { sessionService } from "../../../application-services/sessions-service"
 import { sessionsRepository } from "../../../application-services/sessions-repository"
 import { SessionResponseMetadataModel } from "../../../input-output-types/sessions-models"
+import { UsersQueryService } from "../../users/services/usersQueryService"
+import { UsersQueryRepository } from "../../users/repo/UsersQueryRepo"
+import { UsersService } from "../../users/services/usersService"
+import { UsersRepository } from "../../users/repo/UserRepo"
 
 
-export const authService = {
+export class AuthService {
+
+    constructor(
+        private usersQueryService: UsersQueryService,
+        private usersQueryRepository: UsersQueryRepository,
+        private usersService: UsersService,
+        private usersRepository: UsersRepository
+    ) { }
 
     async checkUserCredintails(loginData: LoginInputModel) {
-        let foundUser = await usersQueryService.getUserByLogin(loginData.loginOrEmail.trim())
+        let foundUser = await this.usersQueryService.getUserByLogin(loginData.loginOrEmail.trim())
 
         if (foundUser == null) {
-            foundUser = await usersQueryService.getUserByEmail(loginData.loginOrEmail.trim())
+            foundUser = await this.usersQueryService.getUserByEmail(loginData.loginOrEmail.trim())
         }
 
         if (foundUser === null) {
             return foundUser
         }
 
-        const userCredentials = await usersQueryRepository.getUserCredentials(foundUser.id)
+        const userCredentials = await this.usersQueryRepository.getUserCredentials(foundUser.id)
 
         if (userCredentials === null) {
             return userCredentials
@@ -42,24 +49,7 @@ export const authService = {
         }
 
         return foundUser
-    },
-
-    async getUserByToken(userToken: string) {
-
-        let foundUserFromToken = await jwtService.tokenVerify(userToken)
-
-        if (foundUserFromToken === null) {
-            return null
-        }
-
-        const foundUser = await usersQueryService.getUserByLogin(foundUserFromToken.userLogin)
-
-        if (foundUser === null) {
-            return null
-        }
-
-        return userMapper(foundUser)
-    },
+    }
 
     async confirmEmail(reqBody: any) {
         const response: ServicesResponseNew<{}> = {
@@ -74,7 +64,7 @@ export const authService = {
             return response
         }
 
-        const DBUser = await usersService.getUserByConfirmationCode(reqBody.code)
+        const DBUser = await this.usersService.getUserByConfirmationCode(reqBody.code)
 
         if (!DBUser.result) {
             return DBUser
@@ -83,7 +73,7 @@ export const authService = {
         const userData = DBUser.data as UserViewModel
         let userId = userData.id
 
-        const confirmResult = await usersRepository.updateConfirmation(userId)
+        const confirmResult = await this.usersRepository.updateConfirmation(userId)
 
         if (confirmResult) {
             response.result = true
@@ -91,7 +81,7 @@ export const authService = {
         }
 
         return response
-    },
+    }
 
     async resendRegistrationEmail(reqBody: any) {
         const response: ServicesResponseNew<{}> = {
@@ -107,7 +97,7 @@ export const authService = {
             response.errors.errorsMessages.push({ message: "not an email", field: "email" })
         }
 
-        const foundUser = await usersQueryRepository.getUserByEmail(reqBody.email)
+        const foundUser = await this.usersQueryRepository.getUserByEmail(reqBody.email)
 
         if (foundUser === null) {
             response.result = false
@@ -127,7 +117,7 @@ export const authService = {
 
         const confirmationCode = uuidv4()
 
-        const confirmResult = await usersRepository.updateConfirmationCode(foundUser._id.toString(), confirmationCode)
+        const confirmResult = await this.usersRepository.updateConfirmationCode(foundUser._id.toString(), confirmationCode)
 
         if (!confirmResult) {
             return response
@@ -142,7 +132,7 @@ export const authService = {
         response.result = true
         response.status = 204
         return response
-    },
+    }
 
     async registerNewUser(user: UserInputModel) {
 
@@ -153,7 +143,7 @@ export const authService = {
             errors: { errorsMessages: [] }
         }
 
-        const isEmailAvalible = await usersQueryService.getUserByEmail(user.email)
+        const isEmailAvalible = await this.usersQueryService.getUserByEmail(user.email)
 
         if (isEmailAvalible !== null) {
             response.result = false
@@ -163,7 +153,7 @@ export const authService = {
             return response
         }
 
-        const isLoginAvalible = await usersQueryRepository.getUserByLogin(user.login)
+        const isLoginAvalible = await this.usersQueryRepository.getUserByLogin(user.login)
 
         if (isLoginAvalible !== null) {
             response.result = false
@@ -204,7 +194,7 @@ export const authService = {
             hash: hash
         }
 
-        const isCreated = await usersRepository.createUser(newDBUser, usersCredentials)
+        const isCreated = await this.usersRepository.createUser(newDBUser, usersCredentials)
         if (isCreated === "") {
             return response
         }
@@ -218,7 +208,7 @@ export const authService = {
         response.result = true
         response.status = 204
         return response
-    },
+    }
 
     async logoutUser(token: string) {
 
@@ -245,7 +235,7 @@ export const authService = {
         response.result = true
         response.status = HTTP_STATUS_CODE.NoContent
         return response
-    },
+    }
 
     async loginUser(foundUser: UserViewModel, userDeviceInfo: UserDeviceInfoType) {
         const response: ServicesResponseNew<SessionResponseMetadataModel> = {
@@ -278,7 +268,7 @@ export const authService = {
         response.status = HTTP_STATUS_CODE.NoContent
 
         return response
-    },
+    }
 
     async refreshTokenVerify(refreshToken: string) {
 
@@ -296,9 +286,9 @@ export const authService = {
 
         return true
 
-    },
+    }
 
-    async refreshTokens(refreshToken: string, userDeviceInfo: UserDeviceInfoType) {
+    async refreshTokens(refreshToken: string, userId: string) {
 
         const response: ServicesResponseNew<SessionResponseMetadataModel> = {
             result: false,
@@ -311,12 +301,6 @@ export const authService = {
             errors: { errorsMessages: [] }
         }
 
-        const foundUser = await this.getUserByToken(refreshToken)
-
-        if (foundUser === null) {
-            return response
-        }
-
         const playLoad = await jwtService.tokenVerify(refreshToken)
 
         const currentSession = await sessionService.getCurrentSession(playLoad as TokenPlayLoadType)
@@ -325,7 +309,7 @@ export const authService = {
             return response
         }
 
-        const foundBDUser = await usersQueryService.getUserById(foundUser.userId)
+        const foundBDUser = await this.usersQueryService.getUserById(userId)
 
         if (foundBDUser === null) {
             return response

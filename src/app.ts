@@ -3,12 +3,12 @@ import { SETTINGS } from './settings'
 import { blogsRouter } from './features/blogs/blogs-router'
 import { postRouter } from './features/posts/posts-router'
 import { testingRouter } from './features/testing/testing-router'
-import { usersRouter } from './features/users/users-router'
-import { authRouter } from './features/auth/auth-router'
 import { commentsRouter } from './features/comments/comments-router'
 import cookieParser from 'cookie-parser'
 import { incomingRequestsMiddleware, sessionMetadataMiddleware } from './global-middlewares/sessions-middleware'
 import { securityRouter } from './features/security/security-router'
+import { authRouter } from './features/auth/authRouter'
+import { usersRouter } from './features/users/usersRouter'
 
 
 export const initApp = () => {
@@ -35,11 +35,6 @@ export const initApp = () => {
     next()
   });
 
-  // // Middleware to log session data
-  // app.use((req, res, next) => {
-  //   console.log('Context:', req.context);
-  //   next();
-  // });
 
   app.get(SETTINGS.PATH.ROOT, (req, res) => {
     // эндпоинт, который будет показывать на верселе какая версия бэкэнда сейчас залита

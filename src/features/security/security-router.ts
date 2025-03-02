@@ -2,8 +2,7 @@ import { Router } from "express"
 import { HTTP_STATUS_CODE } from "../../input-output-types/types"
 import { securityService } from "./services/security-service"
 import { sessionService } from "../../application-services/sessions-service"
-import { refteshTokenValidator } from "../auth/middlewares/accessToken-validator"
-
+import { refteshTokenValidator } from "../auth/middlewares/refreshToken-validator"
 
 export const securityRouter = Router({})
 

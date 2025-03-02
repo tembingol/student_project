@@ -1,15 +1,19 @@
-import { UserInputModel, UserCredentialsModel, UserViewModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
-import { ServicesResponseNew, HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { usersRepository } from "../users-repository"
-import { usersQueryRepository } from "../users-query-repo"
+import { HTTP_STATUS_CODE, ServicesResponseNew } from "../../../input-output-types/types"
+import { UserCredentialsModel, UserDataBaseModel, UserInputModel, UserViewModel } from "../../../input-output-types/users-moduls"
+import { UsersRepository } from "../repo/UserRepo"
+import { UsersQueryRepository } from "../repo/UsersQueryRepo"
+import { userEntityMapper, UsersQueryService } from "./usersQueryService"
 import bcrypt from "bcrypt"
-import { userEntityMapper, usersQueryService } from "./users-query-service"
 
+export class UsersService {
 
+    constructor(
+        private usersQueryService: UsersQueryService,
+        private usersQueryRepository: UsersQueryRepository,
+        private usersRepository: UsersRepository
+    ) { }
 
-export const usersService = {
-
-    createUser: async function (user: UserInputModel, isConfirmed: boolean = false) {
+    async createUser(user: UserInputModel, isConfirmed: boolean = false) {
         const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
@@ -41,14 +45,14 @@ export const usersService = {
             return response
         }
 
-        const isEmailAvalible = await usersQueryService.getUserByEmail(user.email)
+        const isEmailAvalible = await this.usersQueryService.getUserByEmail(user.email)
 
         if (isEmailAvalible !== null) {
             response.errors.errorsMessages.push({ message: "email should be unique", field: "email" })
             return response
         }
 
-        const isLoginAvalible = await usersQueryRepository.getUserByLogin(user.login)
+        const isLoginAvalible = await this.usersQueryRepository.getUserByLogin(user.login)
 
         if (isLoginAvalible !== null) {
             response.errors.errorsMessages.push({ message: "login should be unique", field: "login" })
@@ -84,9 +88,9 @@ export const usersService = {
             hash: hash
         }
 
-        const newUserId = await usersRepository.createUser(newUser, usersCredentials)
+        const newUserId = await this.usersRepository.createUser(newUser, usersCredentials)
 
-        const createdUser = await usersQueryRepository.getUserById(newUserId)
+        const createdUser = await this.usersQueryRepository.getUserById(newUserId)
 
         if (createdUser !== null) {
             response.result = true
@@ -95,9 +99,9 @@ export const usersService = {
         }
 
         return response
-    },
+    }
 
-    deleteUser: async function (useriD: string) {
+    async deleteUser(useriD: string) {
         const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
@@ -105,7 +109,7 @@ export const usersService = {
             errors: { errorsMessages: [] }
         }
 
-        const isDeleted = await usersRepository.deleteUser(useriD)
+        const isDeleted = await this.usersRepository.deleteUser(useriD)
 
         if (isDeleted) {
             response.result = true
@@ -113,16 +117,16 @@ export const usersService = {
         }
 
         return response
-    },
+    }
 
-    getUserByConfirmationCode: async function (confirmCode: string) {
+    async getUserByConfirmationCode(confirmCode: string) {
         const response: ServicesResponseNew<UserViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
-        const foundUser = await usersQueryRepository.getUserByConfirmationCode(confirmCode)
+        const foundUser = await this.usersQueryRepository.getUserByConfirmationCode(confirmCode)
 
         if (foundUser === null) {
             response.errors.errorsMessages.push({ message: "confirmation code is wrong", field: "code" })
@@ -145,5 +149,4 @@ export const usersService = {
 
         return response
     }
-
 }
