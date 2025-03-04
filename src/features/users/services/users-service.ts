@@ -1,16 +1,16 @@
 import { HTTP_STATUS_CODE, ServicesResponseNew } from "../../../input-output-types/types"
 import { UserCredentialsModel, UserDataBaseModel, UserInputModel, UserViewModel } from "../../../input-output-types/users-moduls"
-import { UsersRepository } from "../repo/UserRepo"
-import { UsersQueryRepository } from "../repo/UsersQueryRepo"
-import { userEntityMapper, UsersQueryService } from "./usersQueryService"
+import { UsersRepository } from "../repo/Users-repository"
+import { UsersQueryRepository } from "../repo/UsersQuery-repository"
+import { userEntityMapper, UsersQueryService } from "./usersQuery-service"
 import bcrypt from "bcrypt"
 
 export class UsersService {
 
     constructor(
-        private usersQueryService: UsersQueryService,
-        private usersQueryRepository: UsersQueryRepository,
-        private usersRepository: UsersRepository
+        protected usersQueryService: UsersQueryService,
+        protected usersQueryRepository: UsersQueryRepository,
+        protected usersRepository: UsersRepository
     ) { }
 
     async createUser(user: UserInputModel, isConfirmed: boolean = false) {

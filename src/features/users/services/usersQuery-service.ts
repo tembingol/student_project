@@ -1,11 +1,11 @@
 import { HTTP_STATUS_CODE, PaginationResponseType, ServicesResponseNew } from "../../../input-output-types/types"
 import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../../input-output-types/users-moduls"
-import { UsersQueryRepository } from "../repo/UsersQueryRepo"
+import { UsersQueryRepository } from "../repo/UsersQuery-repository"
 
 export class UsersQueryService {
 
     constructor(
-        private usersQueryRepository: UsersQueryRepository
+        protected usersQueryRepository: UsersQueryRepository
     ) { }
 
     async getUserById(id: string) {

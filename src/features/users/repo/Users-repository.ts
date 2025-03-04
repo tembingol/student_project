@@ -42,4 +42,9 @@ export class UsersRepository {
         return result.modifiedCount === 1
     }
 
+    async updatePasswordRecoveryCode(useriD: string, passwordRecoveryCode: string) {
+        const filter = { _id: new ObjectId(useriD) }
+        const result = await db.getCollections().usersCredentialsCollection.updateOne(filter, { $set: { passwordRecoveryCode: passwordRecoveryCode } })
+        return result.modifiedCount === 1
+    }
 }

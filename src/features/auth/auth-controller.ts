@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
-import { AuthService } from "./services/authService"
+import { AuthService } from "./services/auth-service"
 import { HTTP_STATUS_CODE } from "../../input-output-types/types"
-import { UsersQueryService } from "../users/services/usersQueryService"
+import { UsersQueryService } from "../users/services/usersQuery-service"
 
 export class AuthController {
 
@@ -130,4 +130,27 @@ export class AuthController {
 
     }
 
+    async passwordRecovery(req: Request, res: Response) {
+
+        const serviceRes = await this.authService.passwordRecovery(req.body)
+
+        if (!serviceRes.result) {
+            res.status(serviceRes.status).json(serviceRes.errors)
+            return
+        }
+
+        res.sendStatus(HTTP_STATUS_CODE.NoContent)
+    }
+
+    async setNewPassword(req: Request, res: Response) {
+
+        const serviceRes = await this.authService.setNewPassword(req.body)
+
+        if (!serviceRes.result) {
+            res.status(serviceRes.status).json(serviceRes.errors)
+            return
+        }
+
+        res.status(serviceRes.status).json(serviceRes.data)
+    }
 }

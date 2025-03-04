@@ -10,10 +10,11 @@ import { HTTP_STATUS_CODE, ServicesResponseNew, TokenPlayLoadType, UserDeviceInf
 import { sessionService } from "../../../application-services/sessions-service"
 import { sessionsRepository } from "../../../application-services/sessions-repository"
 import { SessionResponseMetadataModel } from "../../../input-output-types/sessions-models"
-import { UsersQueryService } from "../../users/services/usersQueryService"
-import { UsersQueryRepository } from "../../users/repo/UsersQueryRepo"
-import { UsersService } from "../../users/services/usersService"
-import { UsersRepository } from "../../users/repo/UserRepo"
+import { UsersQueryService } from "../../users/services/usersQuery-service"
+import { UsersService } from "../../users/services/users-service"
+import { AuthRepository } from "../repo/auth-repository"
+import { UsersQueryRepository } from "../../users/repo/UsersQuery-repository"
+import { UsersRepository } from "../../users/repo/Users-repository"
 
 
 export class AuthService {
@@ -22,7 +23,8 @@ export class AuthService {
         private usersQueryService: UsersQueryService,
         private usersQueryRepository: UsersQueryRepository,
         private usersService: UsersService,
-        private usersRepository: UsersRepository
+        private usersRepository: UsersRepository,
+        private authRepository: AuthRepository
     ) { }
 
     async checkUserCredintails(loginData: LoginInputModel) {
@@ -54,7 +56,7 @@ export class AuthService {
     async confirmEmail(reqBody: any) {
         const response: ServicesResponseNew<{}> = {
             result: false,
-            status: 400,
+            status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -77,7 +79,7 @@ export class AuthService {
 
         if (confirmResult) {
             response.result = true
-            response.status = 204
+            response.status = HTTP_STATUS_CODE.NoContent
         }
 
         return response
@@ -86,7 +88,7 @@ export class AuthService {
     async resendRegistrationEmail(reqBody: any) {
         const response: ServicesResponseNew<{}> = {
             result: false,
-            status: 400,
+            status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -130,7 +132,7 @@ export class AuthService {
         }
 
         response.result = true
-        response.status = 204
+        response.status = HTTP_STATUS_CODE.NoContent
         return response
     }
 
@@ -138,7 +140,7 @@ export class AuthService {
 
         const response: ServicesResponse = {
             result: false,
-            status: 400,
+            status: HTTP_STATUS_CODE.BadRequest,
             data: {},
             errors: { errorsMessages: [] }
         }
@@ -147,7 +149,7 @@ export class AuthService {
 
         if (isEmailAvalible !== null) {
             response.result = false
-            response.status = 400
+            response.status = HTTP_STATUS_CODE.BadRequest
             response.data = {}
             response.errors.errorsMessages.push({ message: "email should be unique", field: "email" })
             return response
@@ -157,7 +159,7 @@ export class AuthService {
 
         if (isLoginAvalible !== null) {
             response.result = false
-            response.status = 400
+            response.status = HTTP_STATUS_CODE.BadRequest
             response.data = {}
             response.errors.errorsMessages.push({ message: "login should be unique", field: "login" })
             return response
@@ -191,7 +193,8 @@ export class AuthService {
         const usersCredentials: UserCredentialsModel = {
             userId: "",
             salt: salt,
-            hash: hash
+            hash: hash,
+            passwordRecoveryCode: ""
         }
 
         const isCreated = await this.usersRepository.createUser(newDBUser, usersCredentials)
@@ -206,7 +209,7 @@ export class AuthService {
         }
 
         response.result = true
-        response.status = 204
+        response.status = HTTP_STATUS_CODE.NoContent
         return response
     }
 
@@ -331,6 +334,76 @@ export class AuthService {
         return response
     }
 
+    async passwordRecovery(reqBody: Partial<UserViewModel>) {
+        const response: ServicesResponseNew<{}> = {
+            result: false,
+            status: HTTP_STATUS_CODE.BadRequest,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+
+        let email = ""
+        if (!reqBody.email) {
+            response.errors.errorsMessages.push({ message: "email should be string", field: "email" })
+        } else if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(reqBody.email.trim()) == false) {
+            response.errors.errorsMessages.push({ message: "not an email", field: "email" })
+        } else {
+            email = reqBody.email
+        }
+
+        if (response.errors.errorsMessages.length > 0) {
+            return response
+        }
+
+        const currentUser = await this.usersQueryService.getUserByEmail(email)
+
+        if (currentUser === null) {
+            response.result = true
+            response.status = HTTP_STATUS_CODE.NoContent
+            return response
+        }
+        const recoveryCode = uuidv4()
+
+        await this.usersRepository.updatePasswordRecoveryCode(currentUser.id, recoveryCode)
+
+        await emailManager.sendPasswordRecovery([currentUser.email], recoveryCode)
+
+        response.result = true
+        response.status = HTTP_STATUS_CODE.NoContent
+        return response
+
+    }
+
+    async setNewPassword(reqBody: any) {
+        const response: ServicesResponseNew<{}> = {
+            result: false,
+            status: HTTP_STATUS_CODE.BadRequest,
+            data: {},
+            errors: { errorsMessages: [] }
+        }
+
+        if (!reqBody.newPassword) {
+            response.errors.errorsMessages.push({ message: "not a newPassword", field: "newPassword" })
+        }
+
+        if (!reqBody.recoveryCode) {
+            response.errors.errorsMessages.push({ message: "not a recoveryCode", field: "recoveryCode" })
+        }
+
+        if (response.errors.errorsMessages.length > 0) {
+            return response
+        }
+
+        // {
+        //     "newPassword": "string",
+        //     "recoveryCode": "string"
+        //   }
+
+        response.result = true
+        response.status = HTTP_STATUS_CODE.NoContent
+        return response
+
+    }
 }
 
 function userMapper(user: UserViewModel) {

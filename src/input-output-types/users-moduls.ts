@@ -3,7 +3,8 @@ import { ObjectId } from "mongodb"
 export type UserCredentialsModel = {
     userId: string
     salt: string,
-    hash: string
+    hash: string,
+    passwordRecoveryCode: string
 }
 
 export type LoginInputModel = {

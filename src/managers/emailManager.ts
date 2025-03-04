@@ -50,6 +50,23 @@ export const emailManager = {
         return result
     },
 
+    async sendPasswordRecovery(receiversArray: string[], confirmationCode: string) {
+
+        const recoveryLink = `https://8fdc6ffba3c499c27ea034bdbffe323d.serveo.net/password-recovery?recoveryCode=${confirmationCode}`
+        const emailText = `<h1>Password recovery</h1> <p>To finish password recovery please follow the link below: <a href=${recoveryLink}>recovery password</a></p>`
+        const mailOptions: MailOptions = {
+            from: '"service app" <stud2025@vk.com>', // sender address
+            to: receiversArray.join(','),// list of receivers,
+            subject: 'Hello! this is password recovery',// Subject line,
+            text: emailText,// plain text body
+            html: "<b>" + emailText + "</b>",// html body,
+        };
+
+        const result = this.sendEmail(mailOptions)
+
+        return result
+    },
+
     async resendRegistrationConfirmation(receiversArray: string[]) {
 
         const mailOptions: MailOptions = {

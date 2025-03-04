@@ -7,8 +7,8 @@ import { commentsRouter } from './features/comments/comments-router'
 import cookieParser from 'cookie-parser'
 import { incomingRequestsMiddleware, sessionMetadataMiddleware } from './global-middlewares/sessions-middleware'
 import { securityRouter } from './features/security/security-router'
-import { authRouter } from './features/auth/authRouter'
-import { usersRouter } from './features/users/usersRouter'
+import { authRouter } from './features/auth/auth-router'
+import { usersRouter } from './features/users/users-router'
 
 
 export const initApp = () => {

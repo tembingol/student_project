@@ -1,12 +1,12 @@
 import { Request, Response } from "express"
-import { UsersService } from "./services/usersService"
-import { UsersQueryService } from "./services/usersQueryService"
+import { UsersService } from "./services/users-service"
+import { UsersQueryService } from "./services/usersQuery-service"
 
 export class UsersController {
 
     constructor(
-        private usersService: UsersService,
-        private usersQueryService: UsersQueryService
+        protected usersService: UsersService,
+        protected usersQueryService: UsersQueryService
     ) { }
 
 
