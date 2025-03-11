@@ -1,12 +1,13 @@
 import { ObjectId } from "mongodb"
 import { db } from "../../../db/db"
+import { injectable } from "inversify"
 
+@injectable()
 export class UsersQueryRepository {
 
-    async getUserCredentials(userId: string) {
-        const filter = { userId: userId }
-        const foundUser = await db.getCollections().usersCredentialsCollection.findOne(filter)
-        return foundUser
+    async getUserCredentials(filter: any) {
+        const fresult = await db.getCollections().usersCredentialsCollection.findOne(filter)
+        return fresult
     }
 
     async getUserByLogin(login: string) {

@@ -1,11 +1,14 @@
 import { Router } from "express"
-import { authRegistrationValidators, authLoginValidators } from "./middlewares/auth-validators"
+import { authRegistrationValidators, authLoginValidators, authNewPasswordValidators } from "./middlewares/auth-validators"
 import { refteshTokenValidator } from "./middlewares/refreshToken-validator"
 import { incomingRequestsCheckMiddleware } from "../../global-middlewares/sessions-middleware"
 import { accessTokenValidator } from "./middlewares/accessToken-validator"
-import { authController } from "../../composition-root"
+import { AuthController } from "./auth-controller"
+import { container } from "../../composition-root"
 
 export const authRouter = Router({})
+
+const authController = container.get(AuthController)
 
 authRouter.post('/registration', incomingRequestsCheckMiddleware, ...authRegistrationValidators, authController.registration.bind(authController))
 
@@ -25,4 +28,4 @@ authRouter.get('/me', accessTokenValidator, authController.getMe.bind(authContro
 
 authRouter.post('/password-recovery', incomingRequestsCheckMiddleware, authController.passwordRecovery.bind(authController))
 
-authRouter.post('/new-password', incomingRequestsCheckMiddleware, authController.setNewPassword.bind(authController))
+authRouter.post('/new-password', incomingRequestsCheckMiddleware, authNewPasswordValidators, authController.setNewPassword.bind(authController))

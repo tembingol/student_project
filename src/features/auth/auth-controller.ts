@@ -2,12 +2,14 @@ import { Request, Response } from "express"
 import { AuthService } from "./services/auth-service"
 import { HTTP_STATUS_CODE } from "../../input-output-types/types"
 import { UsersQueryService } from "../users/services/usersQuery-service"
+import { inject, injectable } from "inversify"
 
+@injectable()
 export class AuthController {
 
     constructor(
-        private authService: AuthService,
-        private usersQueryService: UsersQueryService
+        @inject(AuthService) private authService: AuthService,
+        @inject(UsersQueryService) private usersQueryService: UsersQueryService
     ) { }
 
     async registration(req: Request, res: Response) {

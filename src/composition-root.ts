@@ -1,4 +1,6 @@
 
+import 'reflect-metadata';
+import { Container, inject, injectable } from 'inversify';
 import { AuthController } from "./features/auth/auth-controller"
 import { AuthRepository } from "./features/auth/repo/auth-repository"
 import { AuthService } from "./features/auth/services/auth-service"
@@ -8,18 +10,33 @@ import { UsersQueryService } from "./features/users/services/usersQuery-service"
 import { UsersService } from "./features/users/services/users-service"
 import { UsersController } from "./features/users/users-controller"
 
-//Users + 
-const usersQueryRepository = new UsersQueryRepository()
-const usersRepository = new UsersRepository()
-const usersQueryService = new UsersQueryService(usersQueryRepository)
-const usersService = new UsersService(usersQueryService, usersQueryRepository, usersRepository)
+// //Users + 
+// const usersQueryRepository = new UsersQueryRepository()
+// const usersRepository = new UsersRepository()
+// const usersQueryService = new UsersQueryService(usersQueryRepository)
+// const usersService = new UsersService(usersQueryService, usersQueryRepository, usersRepository)
 
-export const usersController = new UsersController(usersService, usersQueryService)
+// export const usersController = new UsersController(usersService, usersQueryService)
+// //Users -
+
+// //Auth +
+// const authRepository = new AuthRepository()
+// const authService = new AuthService(usersQueryService, usersQueryRepository, usersService, usersRepository, authRepository)
+
+// export const authController = new AuthController(authService, usersQueryService)
+// //Auth -
+
+export const container: Container = new Container();
+//Users +
+container.bind(UsersService).to(UsersService)
+container.bind(UsersQueryService).to(UsersQueryService)
+container.bind(UsersQueryRepository).to(UsersQueryRepository)
+container.bind(UsersRepository).to(UsersRepository)
+container.bind(UsersController).to(UsersController)
 //Users -
 
 //Auth +
-const authRepository = new AuthRepository()
-const authService = new AuthService(usersQueryService, usersQueryRepository, usersService, usersRepository, authRepository)
-
-export const authController = new AuthController(authService, usersQueryService)
+container.bind(AuthService).to(AuthService)
+container.bind(AuthRepository).to(AuthRepository)
+container.bind(AuthController).to(AuthController)
 //Auth -

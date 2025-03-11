@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authHeaderValidator = exports.authRegistrationValidators = exports.authLoginValidators = exports.registrationEmailValidator = exports.registrationPasswordValidator = exports.registrationLoinValidator = exports.passwordValidator = exports.loginOrEmailValidator = void 0;
+exports.authNewPasswordValidators = exports.authRegistrationValidators = exports.authLoginValidators = exports.authHeaderValidator = exports.newPasswordValidator = exports.recoveryCodeValidator = exports.registrationEmailValidator = exports.registrationPasswordValidator = exports.registrationLoinValidator = exports.passwordValidator = exports.loginOrEmailValidator = void 0;
 const express_validator_1 = require("express-validator");
 const input_Check_Errors_Middleware_1 = require("../../../global-middlewares/input-Check-Errors-Middleware");
 exports.loginOrEmailValidator = (0, express_validator_1.body)('loginOrEmail')
@@ -17,6 +17,14 @@ exports.registrationPasswordValidator = (0, express_validator_1.body)('password'
 exports.registrationEmailValidator = (0, express_validator_1.body)('email')
     .isString().withMessage('not string')
     .isEmail().withMessage('not valid email');
+exports.recoveryCodeValidator = (0, express_validator_1.body)('recoveryCode')
+    .isString().withMessage('not string');
+exports.newPasswordValidator = (0, express_validator_1.body)('newPassword')
+    .isString().withMessage('not string')
+    .trim()
+    .isLength({ min: 6, max: 20 }).withMessage('more then 20 or less than 6');
+exports.authHeaderValidator = (0, express_validator_1.header)('Authorization'.toLowerCase())
+    .isString().withMessage('not string');
 exports.authLoginValidators = [
     exports.loginOrEmailValidator,
     exports.passwordValidator,
@@ -28,5 +36,8 @@ exports.authRegistrationValidators = [
     exports.registrationEmailValidator,
     input_Check_Errors_Middleware_1.inputCheckErrorsMiddleware,
 ];
-exports.authHeaderValidator = (0, express_validator_1.header)('Authorization'.toLowerCase())
-    .isString().withMessage('not string');
+exports.authNewPasswordValidators = [
+    exports.newPasswordValidator,
+    exports.recoveryCodeValidator,
+    input_Check_Errors_Middleware_1.inputCheckErrorsMiddleware,
+];

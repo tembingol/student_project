@@ -1,7 +1,9 @@
 import { HTTP_STATUS_CODE, PaginationResponseType, ServicesResponseNew } from "../../../input-output-types/types"
 import { UserCredentialsModel, UserDataBaseModel, UserViewModel } from "../../../input-output-types/users-moduls"
 import { UsersQueryRepository } from "../repo/UsersQuery-repository"
+import { injectable } from "inversify"
 
+@injectable()
 export class UsersQueryService {
 
     constructor(
@@ -19,7 +21,7 @@ export class UsersQueryService {
 
     async getUserCredentials(userId: string) {
         const filter = { userId: userId }
-        const foundUser = await this.usersQueryRepository.getUserCredentials(userId)
+        const foundUser = await this.usersQueryRepository.getUserCredentials(filter)
         if (foundUser) {
             return userCredentialsMapper(foundUser)
         }
@@ -103,6 +105,16 @@ export class UsersQueryService {
         }
         return foundUser
     }
+
+    async getUserIdByPasswordRecoveryCode(recoveryCode: string) {
+        const filter = { recoveryCode: recoveryCode }
+        const foundUser = await this.usersQueryRepository.getUserCredentials(filter)
+        if (foundUser) {
+            return userCredentialsMapper(foundUser)
+        }
+        return foundUser
+    }
+
 }
 
 export function userEntityMapper(user: UserDataBaseModel): UserViewModel {
@@ -119,5 +131,6 @@ export function userCredentialsMapper(userCredential: UserCredentialsModel): Use
         userId: userCredential.userId,
         salt: userCredential.salt,
         hash: userCredential.hash,
+        passwordRecoveryCode: userCredential.passwordRecoveryCode
     }
 }

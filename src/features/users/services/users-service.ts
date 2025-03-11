@@ -4,7 +4,9 @@ import { UsersRepository } from "../repo/Users-repository"
 import { UsersQueryRepository } from "../repo/UsersQuery-repository"
 import { userEntityMapper, UsersQueryService } from "./usersQuery-service"
 import bcrypt from "bcrypt"
+import { injectable } from "inversify"
 
+@injectable()
 export class UsersService {
 
     constructor(
@@ -85,7 +87,8 @@ export class UsersService {
         const usersCredentials: UserCredentialsModel = {
             userId: "",
             salt: salt,
-            hash: hash
+            hash: hash,
+            passwordRecoveryCode: ""
         }
 
         const newUserId = await this.usersRepository.createUser(newUser, usersCredentials)

@@ -1,7 +1,9 @@
 import { Request, Response } from "express"
 import { UsersService } from "./services/users-service"
 import { UsersQueryService } from "./services/usersQuery-service"
+import { injectable } from "inversify"
 
+@injectable()
 export class UsersController {
 
     constructor(

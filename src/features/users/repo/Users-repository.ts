@@ -1,8 +1,9 @@
 import { ObjectId } from "mongodb"
 import { UserCredentialsModel, UserDataBaseModel } from "../../../input-output-types/users-moduls"
 import { db } from "../../../db/db"
+import { injectable } from "inversify"
 
-
+@injectable()
 export class UsersRepository {
 
     async createUser(user: UserDataBaseModel, usersCredentials: UserCredentialsModel) {
@@ -42,9 +43,15 @@ export class UsersRepository {
         return result.modifiedCount === 1
     }
 
-    async updatePasswordRecoveryCode(useriD: string, passwordRecoveryCode: string) {
-        const filter = { _id: new ObjectId(useriD) }
-        const result = await db.getCollections().usersCredentialsCollection.updateOne(filter, { $set: { passwordRecoveryCode: passwordRecoveryCode } })
+    async updatePasswordRecoveryCode(useriD: string, recoveryCode: string) {
+        const filter = { userId: useriD }
+        const result = await db.getCollections().usersCredentialsCollection.updateOne(filter, { $set: { passwordRecoveryCode: recoveryCode } })
+        return result.modifiedCount === 1
+    }
+
+    async updateUserCredentials(useriD: string, salt: string, hash: string) {
+        const filter = { userId: useriD }
+        const result = await db.getCollections().usersCredentialsCollection.updateOne(filter, { $set: { salt: salt, hash: hash } })
         return result.modifiedCount === 1
     }
 }

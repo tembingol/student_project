@@ -15,8 +15,9 @@ import { UsersService } from "../../users/services/users-service"
 import { AuthRepository } from "../repo/auth-repository"
 import { UsersQueryRepository } from "../../users/repo/UsersQuery-repository"
 import { UsersRepository } from "../../users/repo/Users-repository"
+import { injectable } from "inversify"
 
-
+@injectable()
 export class AuthService {
 
     constructor(
@@ -38,7 +39,7 @@ export class AuthService {
             return foundUser
         }
 
-        const userCredentials = await this.usersQueryRepository.getUserCredentials(foundUser.id)
+        const userCredentials = await this.usersQueryRepository.getUserCredentials({ userId: foundUser.id })
 
         if (userCredentials === null) {
             return userCredentials
@@ -382,9 +383,6 @@ export class AuthService {
             errors: { errorsMessages: [] }
         }
 
-        if (!reqBody.newPassword) {
-            response.errors.errorsMessages.push({ message: "not a newPassword", field: "newPassword" })
-        }
 
         if (!reqBody.recoveryCode) {
             response.errors.errorsMessages.push({ message: "not a recoveryCode", field: "recoveryCode" })
@@ -394,10 +392,17 @@ export class AuthService {
             return response
         }
 
-        // {
-        //     "newPassword": "string",
-        //     "recoveryCode": "string"
-        //   }
+        const userCredentials = await this.usersQueryRepository.getUserCredentials({ passwordRecoveryCode: reqBody.recoveryCode })
+
+        if (!userCredentials) {
+            response.errors.errorsMessages.push({ message: "incorrect recovery code", field: "recoveryCode" })
+            return response
+        }
+
+        const salt = bcrypt.genSaltSync(10)
+        const hash = bcrypt.hashSync(reqBody.newPassword, salt)
+
+        const isUpdated = await this.usersRepository.updateUserCredentials(userCredentials.userId, salt, hash)
 
         response.result = true
         response.status = HTTP_STATUS_CODE.NoContent

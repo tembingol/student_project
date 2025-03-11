@@ -17,6 +17,17 @@ export const registrationEmailValidator = body('email')
     .isString().withMessage('not string')
     .isEmail().withMessage('not valid email')
 
+export const recoveryCodeValidator = body('recoveryCode')
+    .isString().withMessage('not string')
+
+export const newPasswordValidator = body('newPassword')
+    .isString().withMessage('not string')
+    .trim()
+    .isLength({ min: 6, max: 20 }).withMessage('more then 20 or less than 6')
+
+export const authHeaderValidator = header('Authorization'.toLowerCase())
+    .isString().withMessage('not string')
+
 export const authLoginValidators = [
 
     loginOrEmailValidator,
@@ -34,6 +45,10 @@ export const authRegistrationValidators = [
     inputCheckErrorsMiddleware,
 ]
 
+export const authNewPasswordValidators = [
 
-export const authHeaderValidator = header('Authorization'.toLowerCase())
-    .isString().withMessage('not string')
+    newPasswordValidator,
+    recoveryCodeValidator,
+
+    inputCheckErrorsMiddleware,
+]
