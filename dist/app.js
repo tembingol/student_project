@@ -16,9 +16,9 @@ const security_router_1 = require("./features/security/security-router");
 const auth_router_1 = require("./features/auth/auth-router");
 const users_router_1 = require("./features/users/users-router");
 const initApp = () => {
-    const app = (0, express_1.default)(); // создать приложение
+    const app = (0, express_1.default)();
     app.set('trust proxy', true);
-    app.use(express_1.default.json()); // создание свойств-объектов body и query во всех реквестах
+    app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
     // session Metadata Middleware
     app.use((req, res, next) => {

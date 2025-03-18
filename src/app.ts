@@ -12,10 +12,11 @@ import { usersRouter } from './features/users/users-router'
 
 
 export const initApp = () => {
-  const app = express() // создать приложение
+
+  const app = express()
 
   app.set('trust proxy', true)
-  app.use(express.json()) // создание свойств-объектов body и query во всех реквестах
+  app.use(express.json())
   app.use(cookieParser())
 
   // session Metadata Middleware

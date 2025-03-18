@@ -1,4 +1,4 @@
-import { db } from "../../db/db"
+import { BlogModel } from "../../input-output-types/blogs-models"
 
 export const blogsQueryRepository = {
 
@@ -7,22 +7,22 @@ export const blogsQueryRepository = {
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
 
-        const allBlogs = await db.getCollections().blogCollection.find(filter)
+        const allBlogs = await BlogModel.find(filter)
             .skip((_pageNumber - 1) * _pageSize)
             .limit(_pageSize)
             .sort({ [sortBy]: _sortDirection })
-            .toArray()
+            .lean()
 
         return allBlogs
     },
 
-    getBlogByID: async function (filter: {}) {
-        const foundUser = await db.getCollections().blogCollection.findOne(filter)
+    getBlogByID: async function (id: string) {
+        const foundUser = await BlogModel.findOne({ _id: id })
         return foundUser
     },
 
     getDocumetnsCount: async function (filter: {}) {
-        const retult = await db.getCollections().blogCollection.countDocuments(filter)
+        const retult = await BlogModel.countDocuments(filter)
         return retult
     },
 

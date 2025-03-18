@@ -8,10 +8,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = void 0;
+exports.runDb = runDb;
 const mongodb_1 = require("mongodb");
 const settings_1 = require("../settings");
+const mongoose_1 = __importDefault(require("mongoose"));
+function runDb(mongoURI) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield mongoose_1.default.connect(mongoURI);
+            console.log('Connected successfully to mongo server mongoose');
+        }
+        catch (e) {
+            console.log("Can't connect to mongo server mongoose", e);
+            yield mongoose_1.default.disconnect();
+        }
+    });
+}
 exports.db = {
     client: {},
     getDbName() {
@@ -58,7 +75,7 @@ exports.db = {
     getCollections() {
         return {
             usersCollection: this.getDbName().collection("users"),
-            blogCollection: this.getDbName().collection(settings_1.SETTINGS.BLOG_COLLECTION_NAME),
+            //blogCollection: this.getDbName().collection<BlogDataBaseModel>(SETTINGS.BLOG_COLLECTION_NAME),
             postCollection: this.getDbName().collection(settings_1.SETTINGS.POST_COLLECTION_NAME),
             videoCollection: this.getDbName().collection(settings_1.SETTINGS.VIDEO_COLLECTION_NAME),
             usersCredentialsCollection: this.getDbName().collection(settings_1.SETTINGS.USERSCREDENTIALS_COLLECTION_NAME),

@@ -1,37 +1,35 @@
-import { ObjectId } from "mongodb"
-import { db } from "../../db/db"
-import { BlogDataBaseModel, BlogInputModel, BlogViewModel } from "../../input-output-types/blogs-models"
+import { BlogInputModel, BlogModel } from "../../input-output-types/blogs-models"
 
 export const blogsRepository = {
 
-    createBlog: async function (blog: BlogViewModel) {
-        const newObjectId = new ObjectId()
-        const newBlog: BlogDataBaseModel = {
-            ...blog,
-            _id: newObjectId,
-            id: newObjectId.toString(),
-        }
+    createBlog: async function (blog: BlogInputModel) {
+        const newBlog = new BlogModel(blog)
 
-        const insertResult = await db.getCollections().blogCollection.insertOne(newBlog)
+        await newBlog.save()
 
-        return insertResult.insertedId.toString()
+        return newBlog.toObject()
     },
 
     updateBlog: async function (id: string, blogBody: BlogInputModel) {
-        const result = await db.getCollections().blogCollection.updateOne({ id: id }, {
-            $set: {
-                name: blogBody.name,
-                description: blogBody.description,
-                websiteUrl: blogBody.websiteUrl
-            }
-        })
+        const foundBlog = await BlogModel.findOne({ _id: id })
+        if (!foundBlog) {
+            return false
+        }
+        foundBlog.name = blogBody.name
+        foundBlog.description = blogBody.description
+        foundBlog.websiteUrl = blogBody.websiteUrl
+        await foundBlog.save()
 
-        return result.matchedCount === 1
+        return true
     },
 
     deleteBlog: async function (id: string) {
-        const result = await db.getCollections().blogCollection.deleteOne({ id: id })
-        return result.deletedCount === 1
+        const foundBlog = await BlogModel.findOne({ _id: id })
+        if (!foundBlog) {
+            return false
+        }
+        await foundBlog.deleteOne()
+        return true
     },
 
 }

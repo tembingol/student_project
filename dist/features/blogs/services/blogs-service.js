@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsService = void 0;
 const types_1 = require("../../../input-output-types/types");
 const posts_service_1 = require("../../posts/services/posts-service");
-const blogs_query_repository_1 = require("../blogs-query-repository");
 const blogs_repository_1 = require("../blogs-repository");
 const blogs_query_service_1 = require("./blogs-query-service");
 exports.blogsService = {
@@ -24,23 +23,18 @@ exports.blogsService = {
                 data: {},
                 errors: { errorsMessages: [] }
             };
-            const newBlog = {
-                id: "",
-                name: blogBody.name,
-                description: blogBody.description,
-                websiteUrl: blogBody.websiteUrl,
-                createdAt: new Date().toISOString(),
-                isMembership: false,
-            };
-            const newBblogId = yield blogs_repository_1.blogsRepository.createBlog(newBlog);
-            if (newBblogId === "") {
+            const newBblogId = yield blogs_repository_1.blogsRepository.createBlog(blogBody);
+            if (!newBblogId) {
                 return response;
             }
-            const foundCreatedBlog = yield blogs_query_repository_1.blogsQueryRepository.getBlogByID({ id: newBblogId });
-            if (foundCreatedBlog) {
+            // const foundCreatedBlog = await blogsQueryRepository.getBlogByID(newBblogId.id);
+            // if (!foundCreatedBlog) {
+            //     return response
+            // }
+            if (newBblogId) {
                 response.result = true;
                 response.status = types_1.HTTP_STATUS_CODE.Created;
-                response.data = (0, blogs_query_service_1.blogEntityMapper)(foundCreatedBlog);
+                response.data = (0, blogs_query_service_1.blogEntityMapper)(newBblogId);
             }
             return response;
         });

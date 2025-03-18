@@ -1,4 +1,5 @@
-import { ObjectId } from "mongodb"
+import { WithId } from "mongodb"
+import mongoose from 'mongoose'
 
 export type BlogInputModel = {
     name: string // max 15
@@ -15,12 +16,13 @@ export type BlogViewModel = {
     isMembership: boolean
 }
 
-export type BlogDataBaseModel = {
-    _id: ObjectId
-    id: string
-    name: string
-    description: string
-    websiteUrl: string
-    createdAt: string
-    isMembership: boolean
-}
+export const BlogSchema = new mongoose.Schema<WithId<BlogViewModel>>({
+    id: { type: String, require: true },
+    name: { type: String, require: true, max: 15 },
+    description: { type: String, require: false, default: '', max: 500 },
+    websiteUrl: { type: String, require: true, default: '', max: 100 },
+    createdAt: { type: String, require: true, default: new Date().toISOString() },
+    isMembership: { type: Boolean, require: false, default: false }
+})
+
+export const BlogModel = mongoose.model<WithId<BlogViewModel>>('blogs', BlogSchema)

@@ -1,5 +1,6 @@
-import { BlogDataBaseModel, BlogViewModel } from "../../../input-output-types/blogs-models"
+import { BlogViewModel } from "../../../input-output-types/blogs-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
+import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { postsQueryService } from "../../posts/services/posts-query-service"
 import { blogsQueryRepository } from "../blogs-query-repository"
 
@@ -31,7 +32,7 @@ export const blogsQueryService = {
 
         const result: ServicesResponse = {
             result: true,
-            status: 200,
+            status: HTTP_STATUS_CODE.OK,
             data: {
                 pagesCount: Math.ceil(totalCount / pageSize),
                 page: pageNumber,
@@ -48,17 +49,16 @@ export const blogsQueryService = {
     findBlogById: async function (id: string) {
         const result: ServicesResponse = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
             errors: { errorsMessages: ["Not found"] }
         }
 
-        const filter = { id: id }
-        const foundBlog = await blogsQueryRepository.getBlogByID(filter);
+        const foundBlog = await blogsQueryRepository.getBlogByID(id);
 
         if (foundBlog) {
             result.result = true
-            result.status = 200
+            result.status = HTTP_STATUS_CODE.OK
             result.data = blogEntityMapper(foundBlog)
             result.errors = { errorsMessages: [] }
         }
@@ -95,7 +95,7 @@ export const blogsQueryService = {
 
         const result: ServicesResponse = {
             result: true,
-            status: 200,
+            status: HTTP_STATUS_CODE.OK,
             data: {
                 pagesCount: Math.ceil(_totalCount / pageSize),
                 page: pageNumber,
@@ -111,7 +111,7 @@ export const blogsQueryService = {
 
 }
 
-export function blogEntityMapper(blog: BlogDataBaseModel): BlogViewModel {
+export function blogEntityMapper(blog: any): BlogViewModel {
     return {
         id: blog._id.toString(),
         name: blog.name,

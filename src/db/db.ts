@@ -1,12 +1,26 @@
 import { Db, MongoClient } from "mongodb";
 import { SETTINGS } from "../settings";
 import { UserCredentialsModel, UserDataBaseModel } from "../input-output-types/users-moduls";
-import { BlogDataBaseModel } from "../input-output-types/blogs-models";
+//import { BlogDataBaseModel } from "../input-output-types/blogs-models";
 import { PostDataBaseModel } from "../input-output-types/posts-models";
 import { VideoViewModel } from "../input-output-types/videos-models";
 import { CommentDataBaseModel } from "../input-output-types/comments-models";
 import { ExpiredTokensModel } from "../input-output-types/expired-tokens-models";
 import { IncomingRequestsModel, SessionDataBaseModel } from "../input-output-types/sessions-models";
+import mongoose from 'mongoose'
+
+export async function runDb(mongoURI: string) {
+
+    try {
+        await mongoose.connect(mongoURI)
+        console.log('Connected successfully to mongo server mongoose')
+    } catch (e) {
+        console.log("Can't connect to mongo server mongoose", e)
+        await mongoose.disconnect()
+    }
+
+}
+
 
 export const db = {
     client: {} as MongoClient,
@@ -52,7 +66,7 @@ export const db = {
     getCollections() {
         return {
             usersCollection: this.getDbName().collection<UserDataBaseModel>("users"),
-            blogCollection: this.getDbName().collection<BlogDataBaseModel>(SETTINGS.BLOG_COLLECTION_NAME),
+            //blogCollection: this.getDbName().collection<BlogDataBaseModel>(SETTINGS.BLOG_COLLECTION_NAME),
             postCollection: this.getDbName().collection<PostDataBaseModel>(SETTINGS.POST_COLLECTION_NAME),
             videoCollection: this.getDbName().collection<VideoViewModel>(SETTINGS.VIDEO_COLLECTION_NAME),
             usersCredentialsCollection: this.getDbName().collection<UserCredentialsModel>(SETTINGS.USERSCREDENTIALS_COLLECTION_NAME),

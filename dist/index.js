@@ -15,6 +15,9 @@ const settings_1 = require("./settings");
 const db_1 = require("./db/db");
 const app = (0, app_1.initApp)();
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
+    //start monguse connection
+    const mongoDbURI = `${settings_1.SETTINGS.MONGO_URL}/${settings_1.SETTINGS.DB_NAME}`;
+    yield (0, db_1.runDb)(mongoDbURI);
     const bdConneted = yield db_1.db.run(settings_1.SETTINGS.MONGO_URL);
     if (!bdConneted) {
         console.log('App not started... ');

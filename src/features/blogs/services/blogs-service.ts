@@ -1,9 +1,8 @@
-import { BlogInputModel, BlogViewModel } from "../../../input-output-types/blogs-models"
+import { BlogInputModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { postsService } from "../../posts/services/posts-service"
-import { blogsQueryRepository } from "../blogs-query-repository"
 import { blogsRepository } from "../blogs-repository"
 import { blogEntityMapper } from "./blogs-query-service"
 
@@ -18,26 +17,22 @@ export const blogsService = {
             errors: { errorsMessages: [] }
         }
 
-        const newBlog: BlogViewModel = {
-            id: "",
-            name: blogBody.name,
-            description: blogBody.description,
-            websiteUrl: blogBody.websiteUrl,
-            createdAt: new Date().toISOString(),
-            isMembership: false,
-        }
+        const newBblogId = await blogsRepository.createBlog(blogBody);
 
-        const newBblogId = await blogsRepository.createBlog(newBlog);
-        if (newBblogId === "") {
+        if (!newBblogId) {
             return response
         }
 
-        const foundCreatedBlog = await blogsQueryRepository.getBlogByID({ id: newBblogId });
+        // const foundCreatedBlog = await blogsQueryRepository.getBlogByID(newBblogId.id);
 
-        if (foundCreatedBlog) {
+        // if (!foundCreatedBlog) {
+        //     return response
+        // }
+
+        if (newBblogId) {
             response.result = true
             response.status = HTTP_STATUS_CODE.Created
-            response.data = blogEntityMapper(foundCreatedBlog)
+            response.data = blogEntityMapper(newBblogId)
         }
 
         return response

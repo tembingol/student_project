@@ -1,11 +1,15 @@
 import { exit } from 'process'
 import { initApp } from './app'
 import { SETTINGS } from './settings'
-import { db } from './db/db'
+import { db, runDb } from './db/db'
 
 const app = initApp()
 
 const startApp = async () => {
+
+    //start monguse connection
+    const mongoDbURI = `${SETTINGS.MONGO_URL}/${SETTINGS.DB_NAME}`
+    await runDb(mongoDbURI)
 
     const bdConneted = await db.run(SETTINGS.MONGO_URL)
     if (!bdConneted) {
