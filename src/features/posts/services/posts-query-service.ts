@@ -1,12 +1,19 @@
+import { injectable } from "inversify"
 import { PostDataBaseModel, PostViewModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { postsQueryRepository } from "../posts-query-repository"
 import { db } from "../../../db/db"
+import { PostsQueryRepository } from "../repo/posts-query-repository"
 
-export const postsQueryService = {
+@injectable()
+export class PostsQueryService {
 
-    findPosts: async function (queryParams: any) {
+    constructor(
+        protected postsQueryRepository: PostsQueryRepository,
+
+    ) { }
+
+    async findPosts(queryParams: any) {
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
@@ -18,7 +25,7 @@ export const postsQueryService = {
             filter[sortBy] = { $regex: searchNameTerm, $options: 'i' }
         }
 
-        const allPosts = await postsQueryRepository.getAllPosts(
+        const allPosts = await this.postsQueryRepository.getAllPosts(
             pageNumber,
             pageSize,
             sortBy,
@@ -28,7 +35,7 @@ export const postsQueryService = {
 
         const mappedPosts = allPosts.map((el) => postEntityMapper(el))
 
-        const totalCount = await postsQueryService.getDocumetnsCount(searchNameTerm)
+        const totalCount = await this.getDocumetnsCount(searchNameTerm)
 
         const result: ServicesResponse = {
             result: true,
@@ -44,28 +51,28 @@ export const postsQueryService = {
         }
 
         return result
-    },
+    }
 
-    getDocumetnsCount: async function (searchNameTerm: string) {
+    async getDocumetnsCount(searchNameTerm: string) {
         const filter: any = {}
         if (searchNameTerm) {
             filter.name = { $regex: searchNameTerm, $options: 'i' }
         }
 
-        return await postsQueryRepository.getDocumetnsCount(filter)
-    },
+        return await this.postsQueryRepository.getDocumetnsCount(filter)
+    }
 
-    getDocumetnsCountBlog: async function (blogId: string, searchNameTerm: string) {
+    async getDocumetnsCountBlog(blogId: string, searchNameTerm: string) {
         const filter: any = {}
         filter.blogId = blogId
         if (searchNameTerm) {
             filter.title = { $regex: searchNameTerm, $options: 'i' }
         }
 
-        return await postsQueryRepository.getDocumetnsCount(filter)
-    },
+        return await this.postsQueryRepository.getDocumetnsCount(filter)
+    }
 
-    findPostById: async function (id: string) {
+    async findPostById(id: string) {
         const result: ServicesResponse = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
@@ -75,7 +82,7 @@ export const postsQueryService = {
 
         const filter = { id: id }
 
-        const foundPost = await postsQueryRepository.getPostByID(filter)
+        const foundPost = await this.postsQueryRepository.getPostByID(filter)
 
         if (foundPost !== null) {
             result.result = true
@@ -84,10 +91,10 @@ export const postsQueryService = {
         }
 
         return result
-    },
+    }
 
 
-    findPostsOfBlog: async function (blogId: string, pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, searchNameTerm: string,) {
+    async findPostsOfBlog(blogId: string, pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, searchNameTerm: string,) {
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
@@ -101,7 +108,7 @@ export const postsQueryService = {
         const mappedPosts = allPosts.map((el) => postEntityMapper(el))
 
         return mappedPosts
-    },
+    }
 
 }
 

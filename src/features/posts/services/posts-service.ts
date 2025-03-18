@@ -1,15 +1,21 @@
+import { injectable } from "inversify"
 import { PostInputModel, PostViewModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { postsQueryRepository } from "../posts-query-repository"
-import { postsRepository } from "../posts-repository"
+import { PostsQueryRepository } from "../repo/posts-query-repository"
+import { PostsRepository } from "../repo/posts-repository"
 import { postEntityMapper } from "./posts-query-service"
 
 
+@injectable()
+export class PostsService {
 
-export const postsService = {
+    constructor(
+        protected postsRepository: PostsRepository,
+        protected postsQueryRepository: PostsQueryRepository
+    ) { }
 
-    createPost: async function (postBody: PostInputModel) {
+    async createPost(postBody: PostInputModel) {
         const response: ServicesResponse = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
@@ -27,12 +33,12 @@ export const postsService = {
             createdAt: new Date().toISOString(),
         }
 
-        const newPostId = await postsRepository.createPost(newPost);
+        const newPostId = await this.postsRepository.createPost(newPost);
         if (newPostId === "") {
             return response
         }
 
-        let foundCreatedPost = await postsQueryRepository.getPostByID({ id: newPostId });
+        let foundCreatedPost = await this.postsQueryRepository.getPostByID({ id: newPostId });
 
         if (foundCreatedPost) {
             response.result = true
@@ -41,41 +47,41 @@ export const postsService = {
         }
 
         return response
-    },
+    }
 
-    updatePost: async function (id: string, postBody: PostInputModel) {
+    async updatePost(id: string, postBody: PostInputModel) {
         const response: ServicesResponse = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
             errors: { errorsMessages: [] }
         }
 
-        const isPostUpdated = await postsRepository.updatePost(id, postBody);
+        const isPostUpdated = await this.postsRepository.updatePost(id, postBody);
 
         if (isPostUpdated) {
             response.result = true
-            response.status = 204
+            response.status = HTTP_STATUS_CODE.NoContent
         }
 
         return response
-    },
+    }
 
-    deletePost: async function (id: string) {
+    async deletePost(id: string) {
         const response: ServicesResponse = {
             result: false,
-            status: 404,
+            status: HTTP_STATUS_CODE.NotFound,
             data: {},
             errors: { errorsMessages: [] }
         }
 
-        const isPostDeleted = await postsRepository.deletePost(id)
+        const isPostDeleted = await this.postsRepository.deletePost(id)
         if (isPostDeleted) {
             response.result = true
-            response.status = 204
+            response.status = HTTP_STATUS_CODE.NoContent
         }
 
         return response
-    },
+    }
 
 }

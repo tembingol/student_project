@@ -1,84 +1,94 @@
 import { Router } from "express";
 import { baseAuthMiddleware } from "../../global-middlewares/base-auth-middleware";
 import { postValidators } from "./middlewares/post-validators";
-import { postsService } from "./services/posts-service";
-import { postsQueryService } from "./services/posts-query-service";
-import { commentsQueryService } from "../comments/services/comments-query-service";
-import { commentsService } from "../comments/services/comments-service";
 import { commentValidators } from "../comments/middlewares/comments-validators";
 import { authMiddleware } from "../../global-middlewares/jwt-auth-middleware";
+import { PostsController } from "./posts-controller";
+import { container } from "../../composition-root";
 
 export const postRouter = Router({})
 
-postRouter.get('/', async (req, res) => {
-    const serviceRes = await postsQueryService.findPosts(req.query)
-    res.status(serviceRes.status).json(serviceRes.data)
-})
 
-postRouter.get('/:id', async (req, res) => {
-    const serviceRes = await postsQueryService.findPostById(req.params.id)
-    if (!serviceRes.result) {
-        res.sendStatus(serviceRes.status)
-        return
-    }
+const commentsController = container.get(PostsController)
 
-    res.status(serviceRes.status).json(serviceRes.data)
-})
+postRouter.get('/', commentsController.getAllPosts.bind(commentsController))
 
-postRouter.get('/:id/comments', async (req, res) => {
+postRouter.get('/:id', commentsController.getPostById.bind(commentsController))
 
-    const foundPost = await postsQueryService.findPostById(req.params.id);
-    if (!foundPost.result) {
-        res.sendStatus(foundPost.status)
-        return
-    }
+// postRouter.get('/:id', async (req, res) => {
+//     const serviceRes = await postsQueryService.findPostById(req.params.id)
+//     if (!serviceRes.result) {
+//         res.sendStatus(serviceRes.status)
+//         return
+//     }
 
-    const foundCommentsOfPost = await commentsQueryService.findCommentsOfPost(req.params.id, req.query);
-    res.status(foundCommentsOfPost.status).json(foundCommentsOfPost.data)
-})
+//     res.status(serviceRes.status).json(serviceRes.data)
+// })
 
-postRouter.post('/:id/comments', authMiddleware, ...commentValidators, async (req, res) => {
+postRouter.get('/:id/comments', commentsController.getCommentsOfPost.bind(commentsController))
 
-    const content = req.body.content
+// postRouter.get('/:id/comments', async (req, res) => {
 
-    const foundPost = await postsQueryService.findPostById(req.params.id);
-    if (!foundPost.result) {
-        res.sendStatus(foundPost.status)
-        return
-    }
+//     const foundPost = await postsQueryService.findPostById(req.params.id);
+//     if (!foundPost.result) {
+//         res.sendStatus(foundPost.status)
+//         return
+//     }
 
-    const loginedUser = req.context!.currentUser
+//     const foundCommentsOfPost = await commentsQueryService.findCommentsOfPost(req.params.id, req.query);
+//     res.status(foundCommentsOfPost.status).json(foundCommentsOfPost.data)
+// })
 
-    const newCommentResult = await commentsService.addCommentToPost(req.params.id, content, loginedUser);
+postRouter.post('/:id/comments', authMiddleware, ...commentValidators, commentsController.addCommentToPost.bind(commentsController))
 
-    if (!newCommentResult.result) {
-        res.sendStatus(newCommentResult.status)
-        return
-    }
-    res.status(newCommentResult.status).json(newCommentResult.data)
-})
+// postRouter.post('/:id/comments', authMiddleware, ...commentValidators, async (req, res) => {
 
-postRouter.post('/', ...postValidators, async (req, res) => {
-    const serviceRes = await postsService.createPost(req.body);
-    res.status(serviceRes.status).json(serviceRes.data)
-})
+//     const content = req.body.content
 
-postRouter.put('/:id', ...postValidators, async (req, res) => {
-    const serviceRes = await postsService.updatePost(req.params.id, req.body);
-    if (!serviceRes.result) {
-        res.sendStatus(serviceRes.status)
-        return
-    }
+//     const foundPost = await postsQueryService.findPostById(req.params.id);
+//     if (!foundPost.result) {
+//         res.sendStatus(foundPost.status)
+//         return
+//     }
 
-    res.status(serviceRes.status).json(serviceRes.data)
-})
+//     const loginedUser = req.context!.currentUser
 
-postRouter.delete('/:id', baseAuthMiddleware, async (req, res) => {
-    const serviceRes = await postsService.deletePost(req.params.id)
-    if (!serviceRes.result) {
-        res.sendStatus(serviceRes.status)
-        return
-    }
+//     const newCommentResult = await commentsService.addCommentToPost(req.params.id, content, loginedUser);
 
-    res.status(serviceRes.status).json(serviceRes.data)
-})
+//     if (!newCommentResult.result) {
+//         res.sendStatus(newCommentResult.status)
+//         return
+//     }
+//     res.status(newCommentResult.status).json(newCommentResult.data)
+// })
+
+postRouter.post('/', ...postValidators, commentsController.createPost.bind(commentsController))
+
+// postRouter.post('/', ...postValidators, async (req, res) => {
+//     const serviceRes = await postsService.createPost(req.body);
+//     res.status(serviceRes.status).json(serviceRes.data)
+// })
+
+postRouter.put('/', ...postValidators, commentsController.updatePost.bind(commentsController))
+
+// postRouter.put('/:id', ...postValidators, async (req, res) => {
+//     const serviceRes = await postsService.updatePost(req.params.id, req.body);
+//     if (!serviceRes.result) {
+//         res.sendStatus(serviceRes.status)
+//         return
+//     }
+
+//     res.status(serviceRes.status).json(serviceRes.data)
+// })
+
+postRouter.delete('/', baseAuthMiddleware, commentsController.deletePost.bind(commentsController))
+
+// postRouter.delete('/:id', baseAuthMiddleware, async (req, res) => {
+//     const serviceRes = await postsService.deletePost(req.params.id)
+//     if (!serviceRes.result) {
+//         res.sendStatus(serviceRes.status)
+//         return
+//     }
+
+//     res.status(serviceRes.status).json(serviceRes.data)
+// })

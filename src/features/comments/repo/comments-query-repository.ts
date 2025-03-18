@@ -1,21 +1,23 @@
 import { ObjectId } from "mongodb"
-import { db } from "../../db/db"
-import { commentEntityMapper } from "./services/comments-query-service"
+import { injectable } from "inversify"
+import { db } from "../../../db/db"
+import { commentEntityMapper } from "../services/comments-query-service"
 
-export const commentsQueryRepository = {
+@injectable()
+export class CommentsQueryRepository {
 
-    getCommentByID: async function (id: string) {
+    async getCommentByID(id: string) {
         const filter = { _id: new ObjectId(id) }
         const retult = await db.getCollections().commentsCollection.findOne(filter)
         return retult
-    },
+    }
 
-    getCommentByFilter: async function (filter: {}) {
+    async getCommentByFilter(filter: {}) {
         const retult = await db.getCollections().commentsCollection.findOne(filter)
         return retult
-    },
+    }
 
-    getCommentsOfPost: async function (postId: string, pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, searchNameTerm: string,) {
+    async getCommentsOfPost(postId: string, pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, searchNameTerm: string,) {
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
@@ -29,10 +31,10 @@ export const commentsQueryRepository = {
         const mappedPosts = allPosts.map((el) => commentEntityMapper(el))
 
         return mappedPosts
-    },
+    }
 
-    getDocumetnsCountOfPost: async function (filter: {}) {
+    async getDocumetnsCountOfPost(filter: {}) {
         const retult = await db.getCollections().commentsCollection.countDocuments(filter)
         return retult
-    },
+    }
 }

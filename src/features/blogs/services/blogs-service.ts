@@ -2,9 +2,14 @@ import { BlogInputModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { postsService } from "../../posts/services/posts-service"
+import { PostsQueryRepository } from "../../posts/repo/posts-query-repository"
+import { PostsRepository } from "../../posts/repo/posts-repository"
+import { PostsService } from "../../posts/services/posts-service"
 import { blogsRepository } from "../blogs-repository"
 import { blogEntityMapper } from "./blogs-query-service"
+
+//ToDo: rewrite to use dependency injection
+const postsService = new PostsService(new PostsRepository(), new PostsQueryRepository())
 
 
 export const blogsService = {

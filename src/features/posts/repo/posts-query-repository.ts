@@ -1,8 +1,11 @@
-import { db } from "../../db/db"
 
-export const postsQueryRepository = {
+import { injectable } from "inversify"
+import { db } from "../../../db/db"
 
-    getAllPosts: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
+@injectable()
+export class PostsQueryRepository {
+
+    async getAllPosts(pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
@@ -14,14 +17,14 @@ export const postsQueryRepository = {
             .toArray()
 
         return allPosts
-    },
+    }
 
-    getPostByID: async function (filter: {}) {
+    async getPostByID(filter: {}) {
         const foundUser = await db.getCollections().postCollection.findOne(filter)
         return foundUser
-    },
+    }
 
-    getDocumetnsCount: async function (filter: {}) {
+    async getDocumetnsCount(filter: {}) {
         return await db.getCollections().postCollection.countDocuments(filter)
-    },
+    }
 }

@@ -1,8 +1,12 @@
 import { BlogViewModel } from "../../../input-output-types/blogs-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { postsQueryService } from "../../posts/services/posts-query-service"
+import { PostsQueryRepository } from "../../posts/repo/posts-query-repository"
+import { PostsQueryService } from "../../posts/services/posts-query-service"
 import { blogsQueryRepository } from "../blogs-query-repository"
+
+//ToDo: rewrite to use dependency injection
+const postsQueryService = new PostsQueryService(new PostsQueryRepository())
 
 export const blogsQueryService = {
 

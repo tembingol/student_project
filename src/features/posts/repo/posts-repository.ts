@@ -1,10 +1,12 @@
 import { ObjectId } from "mongodb"
-import { db } from "../../db/db"
-import { PostDataBaseModel, PostInputModel, PostViewModel } from "../../input-output-types/posts-models"
+import { injectable } from "inversify"
+import { PostDataBaseModel, PostInputModel, PostViewModel } from "../../../input-output-types/posts-models"
+import { db } from "../../../db/db"
 
-export const postsRepository = {
+@injectable()
+export class PostsRepository {
 
-    createPost: async function (post: PostViewModel) {
+    async createPost(post: PostViewModel) {
         const newObjectId = new ObjectId()
         const newPost: PostDataBaseModel = {
             ...post,
@@ -14,9 +16,9 @@ export const postsRepository = {
 
         const insertResult = await db.getCollections().postCollection.insertOne(newPost)
         return insertResult.insertedId.toString()
-    },
+    }
 
-    updatePost: async function (id: string, postBody: PostInputModel) {
+    async updatePost(id: string, postBody: PostInputModel) {
         const result = await db.getCollections().postCollection.updateOne({ id: id }, {
             $set: {
                 title: postBody.title,
@@ -28,11 +30,11 @@ export const postsRepository = {
         })
 
         return result.matchedCount === 1
-    },
+    }
 
-    deletePost: async function (id: string) {
+    async deletePost(id: string) {
         const result = await db.getCollections().postCollection.deleteOne({ id: id })
         return result.deletedCount === 1
-    },
+    }
 
 }

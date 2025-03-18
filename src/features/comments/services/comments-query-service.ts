@@ -1,18 +1,23 @@
 import { CommentDataBaseModel, CommentViewModel } from "../../../input-output-types/comments-models"
 import { ServicesResponseNew, HTTP_STATUS_CODE, PaginationResponseType } from "../../../input-output-types/types"
-import { commentsQueryRepository } from "../comments-query-repository"
+import { injectable } from "inversify"
+import { CommentsQueryRepository } from "../repo/comments-query-repository";
 
+@injectable()
+export class CommentsQueryService {
 
-export const commentsQueryService = {
+    constructor(
+        protected commentsQueryRepository: CommentsQueryRepository
+    ) { }
 
-    findCommentById: async function (id: string) {
+    async findCommentById(id: string) {
         const result: ServicesResponseNew<CommentViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
             data: {},
             errors: { errorsMessages: [] }
         }
-        const foundComment = await commentsQueryRepository.getCommentByID(id);
+        const foundComment = await this.commentsQueryRepository.getCommentByID(id);
 
         if (foundComment) {
             result.result = true
@@ -22,16 +27,16 @@ export const commentsQueryService = {
         }
 
         return result
-    },
+    }
 
-    findCommentsOfPost: async function (postId: string, queryParams: any) {
+    async findCommentsOfPost(postId: string, queryParams: any) {
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
         const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
         const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
 
-        const foundComments = await commentsQueryRepository.getCommentsOfPost(
+        const foundComments = await this.commentsQueryRepository.getCommentsOfPost(
             postId,
             pageNumber,
             pageSize,
@@ -39,7 +44,7 @@ export const commentsQueryService = {
             sortDirection,
             searchNameTerm)
 
-        const _totalCount = await commentsQueryRepository.getDocumetnsCountOfPost({ postId: postId })
+        const _totalCount = await this.commentsQueryRepository.getDocumetnsCountOfPost({ postId: postId })
 
         const result: ServicesResponseNew<PaginationResponseType<CommentViewModel>> = {
             result: true,
@@ -55,7 +60,7 @@ export const commentsQueryService = {
         }
 
         return result
-    },
+    }
 
 }
 

@@ -1,14 +1,21 @@
+import { injectable } from "inversify"
 import { CommentInputModel, CommentViewModel } from "../../../input-output-types/comments-models"
 import { ServicesResponseNew, HTTP_STATUS_CODE, PaginationResponseType } from "../../../input-output-types/types"
-import { postsQueryService } from "../../posts/services/posts-query-service"
-import { commentsQueryRepository } from "../comments-query-repository"
-import { commentsRepository } from "../comments-repository"
+import { PostsQueryService } from "../../posts/services/posts-query-service"
+import { CommentsQueryRepository } from "../repo/comments-query-repository"
+import { CommentsRepository } from "../repo/comments-repository"
 import { commentEntityMapper } from "./comments-query-service"
 
+@injectable()
+export class CommentsService {
 
-export const commentsService = {
+    constructor(
+        protected commentsRepository: CommentsRepository,
+        protected commentsQueryRepository: CommentsQueryRepository,
+        protected postsQueryService: PostsQueryService,
+    ) { }
 
-    addCommentToPost: async function (postId: string, content: any, commentatorInfo: any) {
+    async addCommentToPost(postId: string, content: any, commentatorInfo: any) {
         const response: ServicesResponseNew<CommentViewModel | {}> = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
@@ -16,7 +23,7 @@ export const commentsService = {
             errors: { errorsMessages: [] }
         }
 
-        const foundPost = await postsQueryService.findPostById(postId);
+        const foundPost = await this.postsQueryService.findPostById(postId);
 
         if (!foundPost.result) {
             return response
@@ -32,13 +39,13 @@ export const commentsService = {
             createdAt: new Date().toISOString()
         }
 
-        const createdCommentId = await commentsRepository.createComment(postId, newCooment)
+        const createdCommentId = await this.commentsRepository.createComment(postId, newCooment)
 
         if (createdCommentId === "") {
             return { ...response, status: HTTP_STATUS_CODE.BadRequest }
         }
 
-        const foundCreatedComment = await commentsQueryRepository.getCommentByID(createdCommentId)
+        const foundCreatedComment = await this.commentsQueryRepository.getCommentByID(createdCommentId)
 
         if (foundCreatedComment) {
             response.result = true
@@ -48,9 +55,9 @@ export const commentsService = {
 
         return response
 
-    },
+    }
 
-    updateComment: async function (id: string, commentBody: CommentInputModel, currUser: any) {
+    async updateComment(id: string, commentBody: CommentInputModel, currUser: any) {
 
         const response: ServicesResponseNew<CommentViewModel | {}> = {
             result: false,
@@ -63,7 +70,7 @@ export const commentsService = {
             commentatorInfo: { userId: currUser.userId, userLogin: currUser.userLogin }
         }
 
-        const foundcomment = await commentsQueryRepository.getCommentByFilter(filter)
+        const foundcomment = await this.commentsQueryRepository.getCommentByFilter(filter)
 
         if (!foundcomment) {
             response.status = HTTP_STATUS_CODE.Forbidden
@@ -76,7 +83,7 @@ export const commentsService = {
             }
         }
 
-        const istUpdated = await commentsRepository.updateComment(id, operationAction);
+        const istUpdated = await this.commentsRepository.updateComment(id, operationAction);
 
         if (istUpdated) {
             response.result = true
@@ -84,9 +91,9 @@ export const commentsService = {
         }
 
         return response
-    },
+    }
 
-    deleteComment: async function (id: string, user: any) {
+    async deleteComment(id: string, user: any) {
 
         const response: ServicesResponseNew<CommentViewModel | {}> = {
             result: false,
@@ -99,14 +106,14 @@ export const commentsService = {
             commentatorInfo: { userId: user.userId, userLogin: user.userLogin }
         }
 
-        const foundcomment = await commentsQueryRepository.getCommentByFilter(filter)
+        const foundcomment = await this.commentsQueryRepository.getCommentByFilter(filter)
 
         if (!foundcomment) {
             response.status = HTTP_STATUS_CODE.Forbidden
             return response
         }
 
-        const isDeleted = await commentsRepository.deleteComment(id)
+        const isDeleted = await this.commentsRepository.deleteComment(id)
 
         if (isDeleted) {
             response.result = true
@@ -114,33 +121,6 @@ export const commentsService = {
         }
 
         return response
-    },
-
-
+    }
 
 }
-
-
-// export const isServerError = (error: unknown): error is TServerError =>
-//     typeof error === 'object' && error !== null && 'code' in error;
-
-
-// export type TServerError = {
-//     code?: string;
-//     message: string;
-//     name?: string;
-//     details?: { [key: string]: string };
-//     fields?: string[];
-// };
-
-// export type TResult<T = null> =
-//     | { status: Extract<TStatus, 'Success'>; data: T; errorsMessages?: never }
-//     | {
-//         status: Exclude<TStatus, 'Success'>;
-//         data?: never;
-//         errorsMessages: TErrorType[];
-//     };
-
-// export type TStatus = (typeof ResultStatus)[keyof typeof ResultStatus];
-
-// type TStatus = "Success" | "NotFound" | "Forbidden" | "Unauthorized" | "BadRequest" | "InternalError"

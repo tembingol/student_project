@@ -11,9 +11,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsService = void 0;
 const types_1 = require("../../../input-output-types/types");
+const posts_query_repository_1 = require("../../posts/repo/posts-query-repository");
+const posts_repository_1 = require("../../posts/repo/posts-repository");
 const posts_service_1 = require("../../posts/services/posts-service");
 const blogs_repository_1 = require("../blogs-repository");
 const blogs_query_service_1 = require("./blogs-query-service");
+//ToDo: rewrite to use dependency injection
+const postsService = new posts_service_1.PostsService(new posts_repository_1.PostsRepository(), new posts_query_repository_1.PostsQueryRepository());
 exports.blogsService = {
     createBlog: function (blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -42,7 +46,7 @@ exports.blogsService = {
     createBlogPost: function (id, postBody) {
         return __awaiter(this, void 0, void 0, function* () {
             postBody.blogId = id;
-            const newPost = yield posts_service_1.postsService.createPost(postBody);
+            const newPost = yield postsService.createPost(postBody);
             return newPost;
         });
     },

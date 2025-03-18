@@ -14,26 +14,32 @@ const blogs_models_1 = require("../../input-output-types/blogs-models");
 exports.blogsRepository = {
     createBlog: function (blog) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield blogs_models_1.BlogModel.insertOne(blog);
-            return result.toObject();
+            const newBlog = new blogs_models_1.BlogModel(blog);
+            yield newBlog.save();
+            return newBlog.toObject();
         });
     },
     updateBlog: function (id, blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield blogs_models_1.BlogModel.updateOne({ _id: id }, {
-                $set: {
-                    name: blogBody.name,
-                    description: blogBody.description,
-                    websiteUrl: blogBody.websiteUrl
-                }
-            });
-            return result.matchedCount === 1;
+            const foundBlog = yield blogs_models_1.BlogModel.findOne({ _id: id });
+            if (!foundBlog) {
+                return false;
+            }
+            foundBlog.name = blogBody.name;
+            foundBlog.description = blogBody.description;
+            foundBlog.websiteUrl = blogBody.websiteUrl;
+            yield foundBlog.save();
+            return true;
         });
     },
     deleteBlog: function (id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield blogs_models_1.BlogModel.deleteOne({ _id: id });
-            return result.deletedCount === 1;
+            const foundBlog = yield blogs_models_1.BlogModel.findOne({ _id: id });
+            if (!foundBlog) {
+                return false;
+            }
+            yield foundBlog.deleteOne();
+            return true;
         });
     },
 };
