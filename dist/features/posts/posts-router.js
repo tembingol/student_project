@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postRouter = void 0;
+exports.postsRouter = void 0;
 const express_1 = require("express");
 const base_auth_middleware_1 = require("../../global-middlewares/base-auth-middleware");
 const post_validators_1 = require("./middlewares/post-validators");
@@ -8,10 +8,10 @@ const comments_validators_1 = require("../comments/middlewares/comments-validato
 const jwt_auth_middleware_1 = require("../../global-middlewares/jwt-auth-middleware");
 const posts_controller_1 = require("./posts-controller");
 const composition_root_1 = require("../../composition-root");
-exports.postRouter = (0, express_1.Router)({});
-const commentsController = composition_root_1.container.get(posts_controller_1.PostsController);
-exports.postRouter.get('/', commentsController.getAllPosts.bind(commentsController));
-exports.postRouter.get('/:id', commentsController.getPostById.bind(commentsController));
+exports.postsRouter = (0, express_1.Router)({});
+const postsController = composition_root_1.container.get(posts_controller_1.PostsController);
+exports.postsRouter.get('/', postsController.getAllPosts.bind(postsController));
+exports.postsRouter.get('/:id', postsController.getPostById.bind(postsController));
 // postRouter.get('/:id', async (req, res) => {
 //     const serviceRes = await postsQueryService.findPostById(req.params.id)
 //     if (!serviceRes.result) {
@@ -20,7 +20,7 @@ exports.postRouter.get('/:id', commentsController.getPostById.bind(commentsContr
 //     }
 //     res.status(serviceRes.status).json(serviceRes.data)
 // })
-exports.postRouter.get('/:id/comments', commentsController.getCommentsOfPost.bind(commentsController));
+exports.postsRouter.get('/:id/comments', postsController.getCommentsOfPost.bind(postsController));
 // postRouter.get('/:id/comments', async (req, res) => {
 //     const foundPost = await postsQueryService.findPostById(req.params.id);
 //     if (!foundPost.result) {
@@ -30,7 +30,7 @@ exports.postRouter.get('/:id/comments', commentsController.getCommentsOfPost.bin
 //     const foundCommentsOfPost = await commentsQueryService.findCommentsOfPost(req.params.id, req.query);
 //     res.status(foundCommentsOfPost.status).json(foundCommentsOfPost.data)
 // })
-exports.postRouter.post('/:id/comments', jwt_auth_middleware_1.authMiddleware, ...comments_validators_1.commentValidators, commentsController.addCommentToPost.bind(commentsController));
+exports.postsRouter.post('/:id/comments', jwt_auth_middleware_1.authMiddleware, ...comments_validators_1.commentValidators, postsController.addCommentToPost.bind(postsController));
 // postRouter.post('/:id/comments', authMiddleware, ...commentValidators, async (req, res) => {
 //     const content = req.body.content
 //     const foundPost = await postsQueryService.findPostById(req.params.id);
@@ -46,12 +46,12 @@ exports.postRouter.post('/:id/comments', jwt_auth_middleware_1.authMiddleware, .
 //     }
 //     res.status(newCommentResult.status).json(newCommentResult.data)
 // })
-exports.postRouter.post('/', ...post_validators_1.postValidators, commentsController.createPost.bind(commentsController));
+exports.postsRouter.post('/', ...post_validators_1.postValidators, postsController.createPost.bind(postsController));
 // postRouter.post('/', ...postValidators, async (req, res) => {
 //     const serviceRes = await postsService.createPost(req.body);
 //     res.status(serviceRes.status).json(serviceRes.data)
 // })
-exports.postRouter.put('/', ...post_validators_1.postValidators, commentsController.updatePost.bind(commentsController));
+exports.postsRouter.put('/', ...post_validators_1.postValidators, postsController.updatePost.bind(postsController));
 // postRouter.put('/:id', ...postValidators, async (req, res) => {
 //     const serviceRes = await postsService.updatePost(req.params.id, req.body);
 //     if (!serviceRes.result) {
@@ -60,7 +60,7 @@ exports.postRouter.put('/', ...post_validators_1.postValidators, commentsControl
 //     }
 //     res.status(serviceRes.status).json(serviceRes.data)
 // })
-exports.postRouter.delete('/', base_auth_middleware_1.baseAuthMiddleware, commentsController.deletePost.bind(commentsController));
+exports.postsRouter.delete('/', base_auth_middleware_1.baseAuthMiddleware, postsController.deletePost.bind(postsController));
 // postRouter.delete('/:id', baseAuthMiddleware, async (req, res) => {
 //     const serviceRes = await postsService.deletePost(req.params.id)
 //     if (!serviceRes.result) {

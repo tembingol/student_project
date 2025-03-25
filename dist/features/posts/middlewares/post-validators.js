@@ -13,7 +13,6 @@ exports.postValidators = exports.blogIdValidator = exports.contentValidator = ex
 const express_validator_1 = require("express-validator");
 const input_Check_Errors_Middleware_1 = require("../../../global-middlewares/input-Check-Errors-Middleware");
 const base_auth_middleware_1 = require("../../../global-middlewares/base-auth-middleware");
-const blogs_query_service_1 = require("../../blogs/services/blogs-query-service");
 exports.blogNameValidator = (0, express_validator_1.body)('blogName')
     .isString().withMessage('not string');
 exports.titleValidator = (0, express_validator_1.body)('title')
@@ -31,10 +30,10 @@ exports.contentValidator = (0, express_validator_1.body)('content')
 exports.blogIdValidator = (0, express_validator_1.body)('blogId')
     .isString().withMessage('not string')
     .trim().custom((blogId) => __awaiter(void 0, void 0, void 0, function* () {
-    const foundBlog = yield blogs_query_service_1.blogsQueryService.findBlogById(blogId);
-    if (!foundBlog.result) {
-        throw new Error('no blog');
-    }
+    // const foundBlog = await blogsQueryService.findBlogById(blogId)
+    // if (!foundBlog.result) {
+    //     throw new Error('no blog');
+    // }
     return true;
 })).withMessage("no blog");
 exports.postValidators = [

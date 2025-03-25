@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,17 +18,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsService = void 0;
+exports.BlogsService = void 0;
+const inversify_1 = require("inversify");
 const types_1 = require("../../../input-output-types/types");
-const posts_query_repository_1 = require("../../posts/repo/posts-query-repository");
-const posts_repository_1 = require("../../posts/repo/posts-repository");
 const posts_service_1 = require("../../posts/services/posts-service");
-const blogs_repository_1 = require("../blogs-repository");
+const blogs_repository_1 = require("../repo/blogs-repository");
 const blogs_query_service_1 = require("./blogs-query-service");
-//ToDo: rewrite to use dependency injection
-const postsService = new posts_service_1.PostsService(new posts_repository_1.PostsRepository(), new posts_query_repository_1.PostsQueryRepository());
-exports.blogsService = {
-    createBlog: function (blogBody) {
+let BlogsService = class BlogsService {
+    constructor(blogsRepository, postsService) {
+        this.blogsRepository = blogsRepository;
+        this.postsService = postsService;
+    }
+    createBlog(blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = {
                 result: false,
@@ -27,7 +37,7 @@ exports.blogsService = {
                 data: {},
                 errors: { errorsMessages: [] }
             };
-            const newBblogId = yield blogs_repository_1.blogsRepository.createBlog(blogBody);
+            const newBblogId = yield this.blogsRepository.createBlog(blogBody);
             if (!newBblogId) {
                 return response;
             }
@@ -42,15 +52,15 @@ exports.blogsService = {
             }
             return response;
         });
-    },
-    createBlogPost: function (id, postBody) {
+    }
+    createBlogPost(id, postBody) {
         return __awaiter(this, void 0, void 0, function* () {
             postBody.blogId = id;
-            const newPost = yield postsService.createPost(postBody);
+            const newPost = yield this.postsService.createPost(postBody);
             return newPost;
         });
-    },
-    updateBlog: function (id, blogBody) {
+    }
+    updateBlog(id, blogBody) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = {
                 result: false,
@@ -58,15 +68,15 @@ exports.blogsService = {
                 data: {},
                 errors: { errorsMessages: [] }
             };
-            const isBlogUpdated = yield blogs_repository_1.blogsRepository.updateBlog(id, blogBody);
+            const isBlogUpdated = yield this.blogsRepository.updateBlog(id, blogBody);
             if (isBlogUpdated) {
                 response.result = true;
                 response.status = types_1.HTTP_STATUS_CODE.NoContent;
             }
             return response;
         });
-    },
-    deleteBlog: function (id) {
+    }
+    deleteBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = {
                 result: false,
@@ -74,12 +84,18 @@ exports.blogsService = {
                 data: {},
                 errors: { errorsMessages: [] }
             };
-            const isBlogDeleted = yield blogs_repository_1.blogsRepository.deleteBlog(id);
+            const isBlogDeleted = yield this.blogsRepository.deleteBlog(id);
             if (isBlogDeleted) {
                 response.result = true;
                 response.status = types_1.HTTP_STATUS_CODE.NoContent;
             }
             return response;
         });
-    },
+    }
 };
+exports.BlogsService = BlogsService;
+exports.BlogsService = BlogsService = __decorate([
+    (0, inversify_1.injectable)(),
+    __metadata("design:paramtypes", [blogs_repository_1.BlogsRepository,
+        posts_service_1.PostsService])
+], BlogsService);

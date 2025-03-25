@@ -19,22 +19,11 @@ import { PostsQueryService } from './features/posts/services/posts-query-service
 import { PostsQueryRepository } from './features/posts/repo/posts-query-repository';
 import { PostsRepository } from './features/posts/repo/posts-repository';
 import { PostsController } from './features/posts/posts-controller';
-
-// //Users + 
-// const usersQueryRepository = new UsersQueryRepository()
-// const usersRepository = new UsersRepository()
-// const usersQueryService = new UsersQueryService(usersQueryRepository)
-// const usersService = new UsersService(usersQueryService, usersQueryRepository, usersRepository)
-
-// export const usersController = new UsersController(usersService, usersQueryService)
-// //Users -
-
-// //Auth +
-// const authRepository = new AuthRepository()
-// const authService = new AuthService(usersQueryService, usersQueryRepository, usersService, usersRepository, authRepository)
-
-// export const authController = new AuthController(authService, usersQueryService)
-// //Auth -
+import { BlogsService } from './features/blogs/services/blogs-service';
+import { BlogsQueryService } from './features/blogs/services/blogs-query-service';
+import { BlogsQueryRepository } from './features/blogs/repo/blogs-query-repository';
+import { BlogsRepository } from './features/blogs/repo/blogs-repository';
+import { BlogsController } from './features/blogs/blogs-controller';
 
 export const container: Container = new Container();
 //Users +
@@ -53,12 +42,11 @@ container.bind(AuthController).to(AuthController)
 
 //Comments +
 container.bind(CommentsService).to(CommentsService)
-container.bind(CommentsQueryService).to(CommentsQueryService)
+container.bind(CommentsQueryService).toConstantValue(new CommentsQueryService(new CommentsQueryRepository()))
 container.bind(CommentsQueryRepository).to(CommentsQueryRepository)
 container.bind(CommentsRepository).to(CommentsRepository)
 container.bind(CommentsController).to(CommentsController)
 //Comments -
-
 
 //Posts +
 container.bind(PostsService).to(PostsService)
@@ -67,3 +55,11 @@ container.bind(PostsQueryRepository).to(PostsQueryRepository)
 container.bind(PostsRepository).to(PostsRepository)
 container.bind(PostsController).to(PostsController)
 //Posts -
+
+//Blogs +
+container.bind(BlogsService).to(BlogsService)
+container.bind(BlogsQueryService).to(BlogsQueryService)
+container.bind(BlogsQueryRepository).to(BlogsQueryRepository)
+container.bind(BlogsRepository).to(BlogsRepository)
+container.bind(BlogsController).to(BlogsController)
+//Blogs -

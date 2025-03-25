@@ -1,16 +1,18 @@
-import { BlogInputModel, BlogModel } from "../../input-output-types/blogs-models"
+import { injectable } from "inversify"
+import { BlogInputModel, BlogModel } from "../../../input-output-types/blogs-models"
 
-export const blogsRepository = {
+@injectable()
+export class BlogsRepository {
 
-    createBlog: async function (blog: BlogInputModel) {
+    async createBlog(blog: BlogInputModel) {
         const newBlog = new BlogModel(blog)
 
         await newBlog.save()
 
         return newBlog.toObject()
-    },
+    }
 
-    updateBlog: async function (id: string, blogBody: BlogInputModel) {
+    async updateBlog(id: string, blogBody: BlogInputModel) {
         const foundBlog = await BlogModel.findOne({ _id: id })
         if (!foundBlog) {
             return false
@@ -21,15 +23,15 @@ export const blogsRepository = {
         await foundBlog.save()
 
         return true
-    },
+    }
 
-    deleteBlog: async function (id: string) {
+    async deleteBlog(id: string) {
         const foundBlog = await BlogModel.findOne({ _id: id })
         if (!foundBlog) {
             return false
         }
         await foundBlog.deleteOne()
         return true
-    },
+    }
 
 }

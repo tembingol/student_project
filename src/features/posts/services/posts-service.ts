@@ -1,4 +1,4 @@
-import { injectable } from "inversify"
+import { inject, injectable } from "inversify"
 import { PostInputModel, PostViewModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
@@ -6,13 +6,12 @@ import { PostsQueryRepository } from "../repo/posts-query-repository"
 import { PostsRepository } from "../repo/posts-repository"
 import { postEntityMapper } from "./posts-query-service"
 
-
 @injectable()
 export class PostsService {
 
     constructor(
-        protected postsRepository: PostsRepository,
-        protected postsQueryRepository: PostsQueryRepository
+        private postsRepository: PostsRepository,
+        private postsQueryRepository: PostsQueryRepository
     ) { }
 
     async createPost(postBody: PostInputModel) {

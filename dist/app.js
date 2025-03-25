@@ -41,7 +41,7 @@ const initApp = () => {
     app.use(settings_1.SETTINGS.PATH.USERS, users_router_1.usersRouter);
     app.use(settings_1.SETTINGS.PATH.AUTH, auth_router_1.authRouter);
     app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
-    app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postRouter);
+    app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postsRouter);
     app.use(settings_1.SETTINGS.PATH.COMMENTS, comments_router_1.commentsRouter);
     app.use(settings_1.SETTINGS.PATH.SECURITY, security_router_1.securityRouter);
     app.use(settings_1.SETTINGS.PATH.TESTING, testing_router_1.testingRouter);

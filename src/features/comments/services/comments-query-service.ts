@@ -1,13 +1,12 @@
+import { inject, injectable } from "inversify"
 import { CommentDataBaseModel, CommentViewModel } from "../../../input-output-types/comments-models"
 import { ServicesResponseNew, HTTP_STATUS_CODE, PaginationResponseType } from "../../../input-output-types/types"
-import { injectable } from "inversify"
 import { CommentsQueryRepository } from "../repo/comments-query-repository";
 
 @injectable()
 export class CommentsQueryService {
-
     constructor(
-        protected commentsQueryRepository: CommentsQueryRepository
+        private commentsQueryRepository: CommentsQueryRepository
     ) { }
 
     async findCommentById(id: string) {
@@ -61,10 +60,9 @@ export class CommentsQueryService {
 
         return result
     }
-
 }
 
-export function commentEntityMapper(comment: CommentDataBaseModel,): CommentViewModel {
+export function commentEntityMapper(comment: CommentDataBaseModel): CommentViewModel {
     return {
         id: comment._id!.toString(),
         content: comment.content,

@@ -9,7 +9,7 @@ import { PostsQueryRepository } from "../repo/posts-query-repository"
 export class PostsQueryService {
 
     constructor(
-        protected postsQueryRepository: PostsQueryRepository,
+        private postsQueryRepository: PostsQueryRepository,
 
     ) { }
 

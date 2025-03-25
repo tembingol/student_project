@@ -1,19 +1,18 @@
 import { Request, Response } from "express"
-import { injectable } from "inversify"
+import { inject, injectable } from "inversify"
 import { PostsService } from "./services/posts-service"
 import { PostsQueryService } from "./services/posts-query-service"
-import { CommentsQueryService } from "../comments/services/comments-query-service"
 import { CommentsService } from "../comments/services/comments-service"
+import { CommentsQueryService } from "../comments/services/comments-query-service"
 
 @injectable()
 export class PostsController {
     constructor(
-        protected postsService: PostsService,
-        protected postsQueryService: PostsQueryService,
-        protected commentsQueryService: CommentsQueryService,
-        protected commentsService: CommentsService
+        private postsService: PostsService,
+        private postsQueryService: PostsQueryService,
+        @inject(CommentsQueryService) private commentsQueryService: CommentsQueryService,
+        private commentsService: CommentsService
     ) { }
-
 
     async getAllPosts(req: Request, res: Response) {
         const serviceRes = await this.postsQueryService.findPosts(req.query)
@@ -88,5 +87,4 @@ export class PostsController {
 
         res.status(serviceRes.status).json(serviceRes.data)
     }
-
 }

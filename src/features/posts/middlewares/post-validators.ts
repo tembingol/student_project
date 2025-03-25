@@ -1,8 +1,6 @@
 import { body } from 'express-validator'
 import { inputCheckErrorsMiddleware } from '../../../global-middlewares/input-Check-Errors-Middleware'
 import { baseAuthMiddleware } from '../../../global-middlewares/base-auth-middleware'
-import { blogsQueryService } from '../../blogs/services/blogs-query-service'
-
 
 export const blogNameValidator = body('blogName')
     .isString().withMessage('not string')
@@ -21,10 +19,10 @@ export const contentValidator = body('content')
 export const blogIdValidator = body('blogId')
     .isString().withMessage('not string')
     .trim().custom(async (blogId) => {
-        const foundBlog = await blogsQueryService.findBlogById(blogId)
-        if (!foundBlog.result) {
-            throw new Error('no blog');
-        }
+        // const foundBlog = await blogsQueryService.findBlogById(blogId)
+        // if (!foundBlog.result) {
+        //     throw new Error('no blog');
+        // }
         return true
     }).withMessage("no blog")
 

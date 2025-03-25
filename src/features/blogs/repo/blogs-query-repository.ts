@@ -1,8 +1,10 @@
-import { BlogModel } from "../../input-output-types/blogs-models"
+import { injectable } from "inversify"
+import { BlogModel } from "../../../input-output-types/blogs-models"
 
-export const blogsQueryRepository = {
+@injectable()
+export class BlogsQueryRepository {
 
-    getAllBlogs: async function (pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
+    async getAllBlogs(pageNumber: Number, pageSize: Number, sortBy: string, sortDirection: string, filter: {},) {
         const _pageNumber = +pageNumber
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
@@ -14,16 +16,16 @@ export const blogsQueryRepository = {
             .lean()
 
         return allBlogs
-    },
+    }
 
-    getBlogByID: async function (id: string) {
+    async getBlogByID(id: string) {
         const foundUser = await BlogModel.findOne({ _id: id })
         return foundUser
-    },
+    }
 
-    getDocumetnsCount: async function (filter: {}) {
+    async getDocumetnsCount(filter: {}) {
         const retult = await BlogModel.countDocuments(filter)
         return retult
-    },
+    }
 
 }

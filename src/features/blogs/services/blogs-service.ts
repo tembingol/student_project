@@ -1,20 +1,20 @@
+import { inject, injectable } from "inversify"
 import { BlogInputModel } from "../../../input-output-types/blogs-models"
 import { PostInputModel } from "../../../input-output-types/posts-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { PostsQueryRepository } from "../../posts/repo/posts-query-repository"
-import { PostsRepository } from "../../posts/repo/posts-repository"
 import { PostsService } from "../../posts/services/posts-service"
-import { blogsRepository } from "../blogs-repository"
+import { BlogsRepository } from "../repo/blogs-repository"
 import { blogEntityMapper } from "./blogs-query-service"
 
-//ToDo: rewrite to use dependency injection
-const postsService = new PostsService(new PostsRepository(), new PostsQueryRepository())
+@injectable()
+export class BlogsService {
+    constructor(
+        private blogsRepository: BlogsRepository,
+        private postsService: PostsService
+    ) { }
 
-
-export const blogsService = {
-
-    createBlog: async function (blogBody: BlogInputModel) {
+    async createBlog(blogBody: BlogInputModel) {
         const response: ServicesResponse = {
             result: false,
             status: HTTP_STATUS_CODE.BadRequest,
@@ -22,7 +22,7 @@ export const blogsService = {
             errors: { errorsMessages: [] }
         }
 
-        const newBblogId = await blogsRepository.createBlog(blogBody);
+        const newBblogId = await this.blogsRepository.createBlog(blogBody);
 
         if (!newBblogId) {
             return response
@@ -41,16 +41,16 @@ export const blogsService = {
         }
 
         return response
-    },
+    }
 
-    createBlogPost: async function (id: string, postBody: PostInputModel) {
+    async createBlogPost(id: string, postBody: PostInputModel) {
         postBody.blogId = id
-        const newPost = await postsService.createPost(postBody)
+        const newPost = await this.postsService.createPost(postBody)
 
         return newPost
-    },
+    }
 
-    updateBlog: async function (id: string, blogBody: BlogInputModel) {
+    async updateBlog(id: string, blogBody: BlogInputModel) {
         const response: ServicesResponse = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
@@ -58,7 +58,7 @@ export const blogsService = {
             errors: { errorsMessages: [] }
         }
 
-        const isBlogUpdated = await blogsRepository.updateBlog(id, blogBody);
+        const isBlogUpdated = await this.blogsRepository.updateBlog(id, blogBody);
 
         if (isBlogUpdated) {
             response.result = true
@@ -66,9 +66,9 @@ export const blogsService = {
         }
 
         return response
-    },
+    }
 
-    deleteBlog: async function (id: string) {
+    async deleteBlog(id: string) {
         const response: ServicesResponse = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
@@ -76,13 +76,12 @@ export const blogsService = {
             errors: { errorsMessages: [] }
         }
 
-        const isBlogDeleted = await blogsRepository.deleteBlog(id)
+        const isBlogDeleted = await this.blogsRepository.deleteBlog(id)
         if (isBlogDeleted) {
             response.result = true
             response.status = HTTP_STATUS_CODE.NoContent
         }
 
         return response
-    },
-
+    }
 }

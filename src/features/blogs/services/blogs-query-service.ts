@@ -1,16 +1,18 @@
+import { inject, injectable } from "inversify"
 import { BlogViewModel } from "../../../input-output-types/blogs-models"
 import { ServicesResponse } from "../../../input-output-types/services-models"
 import { HTTP_STATUS_CODE } from "../../../input-output-types/types"
-import { PostsQueryRepository } from "../../posts/repo/posts-query-repository"
 import { PostsQueryService } from "../../posts/services/posts-query-service"
-import { blogsQueryRepository } from "../blogs-query-repository"
+import { BlogsQueryRepository } from "../repo/blogs-query-repository"
 
-//ToDo: rewrite to use dependency injection
-const postsQueryService = new PostsQueryService(new PostsQueryRepository())
+@injectable()
+export class BlogsQueryService {
 
-export const blogsQueryService = {
-
-    findBlogs: async function (queryParams: any) {
+    constructor(
+        private blogsQueryRepository: BlogsQueryRepository,
+        private postsQueryService: PostsQueryService
+    ) { }
+    async findBlogs(queryParams: any) {
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
@@ -22,7 +24,7 @@ export const blogsQueryService = {
             filter.name = { $regex: searchNameTerm, $options: 'i' }
         }
 
-        const allBlogs = await blogsQueryRepository.getAllBlogs(
+        const allBlogs = await this.blogsQueryRepository.getAllBlogs(
             pageNumber,
             pageSize,
             sortBy,
@@ -32,7 +34,7 @@ export const blogsQueryService = {
 
         const mappedAllBlogs = allBlogs.map((el) => blogEntityMapper(el))
 
-        const totalCount = await blogsQueryRepository.getDocumetnsCount(filter)
+        const totalCount = await this.blogsQueryRepository.getDocumetnsCount(filter)
 
         const result: ServicesResponse = {
             result: true,
@@ -48,9 +50,9 @@ export const blogsQueryService = {
         }
 
         return result
-    },
+    }
 
-    findBlogById: async function (id: string) {
+    async findBlogById(id: string) {
         const result: ServicesResponse = {
             result: false,
             status: HTTP_STATUS_CODE.NotFound,
@@ -58,7 +60,7 @@ export const blogsQueryService = {
             errors: { errorsMessages: ["Not found"] }
         }
 
-        const foundBlog = await blogsQueryRepository.getBlogByID(id);
+        const foundBlog = await this.blogsQueryRepository.getBlogByID(id);
 
         if (foundBlog) {
             result.result = true
@@ -68,26 +70,26 @@ export const blogsQueryService = {
         }
 
         return result
-    },
+    }
 
-    getDocumetnsCount: async function (searchNameTerm: string) {
+    async getDocumetnsCount(searchNameTerm: string) {
         const filter: any = {}
         if (searchNameTerm) {
             filter.name = { $regex: searchNameTerm, $options: 'i' }
         }
-        const result = await blogsQueryRepository.getDocumetnsCount(filter)
+        const result = await this.blogsQueryRepository.getDocumetnsCount(filter)
 
         return result
-    },
+    }
 
-    findPostsOfBlog: async function (blogId: string, queryParams: any) {
+    async findPostsOfBlog(blogId: string, queryParams: any) {
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
         const sortDirection = queryParams.sortDirection ? queryParams.sortDirection : 'desc'
         const searchNameTerm = queryParams.searchNameTerm ? queryParams.searchNameTerm : ""
 
-        const foundPosts = await postsQueryService.findPostsOfBlog(
+        const foundPosts = await this.postsQueryService.findPostsOfBlog(
             blogId,
             pageNumber,
             pageSize,
@@ -95,7 +97,7 @@ export const blogsQueryService = {
             sortDirection,
             searchNameTerm)
 
-        const _totalCount = await postsQueryService.getDocumetnsCountBlog(blogId, searchNameTerm)
+        const _totalCount = await this.postsQueryService.getDocumetnsCountBlog(blogId, searchNameTerm)
 
         const result: ServicesResponse = {
             result: true,
@@ -111,7 +113,7 @@ export const blogsQueryService = {
         }
 
         return result
-    },
+    }
 
 }
 

@@ -1,6 +1,6 @@
 import { injectable } from "inversify"
 import { CommentInputModel, CommentViewModel } from "../../../input-output-types/comments-models"
-import { ServicesResponseNew, HTTP_STATUS_CODE, PaginationResponseType } from "../../../input-output-types/types"
+import { ServicesResponseNew, HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { PostsQueryService } from "../../posts/services/posts-query-service"
 import { CommentsQueryRepository } from "../repo/comments-query-repository"
 import { CommentsRepository } from "../repo/comments-repository"

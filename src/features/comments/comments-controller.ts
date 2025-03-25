@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { injectable } from "inversify"
+import { inject, injectable } from "inversify"
 import { CommentsService } from "./services/comments-service"
 import { CommentsQueryService } from "./services/comments-query-service"
 
@@ -7,8 +7,8 @@ import { CommentsQueryService } from "./services/comments-query-service"
 export class CommentsController {
 
     constructor(
-        protected commentsService: CommentsService,
-        protected commentsQueryService: CommentsQueryService
+        private commentsService: CommentsService,
+        private commentsQueryService: CommentsQueryService
     ) { }
 
     async findCommentById(req: Request, res: Response) {
