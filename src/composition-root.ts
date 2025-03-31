@@ -24,6 +24,7 @@ import { BlogsQueryService } from './features/blogs/services/blogs-query-service
 import { BlogsQueryRepository } from './features/blogs/repo/blogs-query-repository';
 import { BlogsRepository } from './features/blogs/repo/blogs-repository';
 import { BlogsController } from './features/blogs/blogs-controller';
+import { LikesService } from './features/likes/services/likes-service';
 
 export const container: Container = new Container();
 //Users +
@@ -42,10 +43,11 @@ container.bind(AuthController).to(AuthController)
 
 //Comments +
 container.bind(CommentsService).to(CommentsService)
-container.bind(CommentsQueryService).toConstantValue(new CommentsQueryService(new CommentsQueryRepository()))
+container.bind(CommentsQueryService).to(CommentsQueryService)
 container.bind(CommentsQueryRepository).to(CommentsQueryRepository)
 container.bind(CommentsRepository).to(CommentsRepository)
 container.bind(CommentsController).to(CommentsController)
+container.bind(LikesService).to(LikesService)
 //Comments -
 
 //Posts +

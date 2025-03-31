@@ -10,7 +10,6 @@ import { securityRouter } from './features/security/security-router'
 import { authRouter } from './features/auth/auth-router'
 import { usersRouter } from './features/users/users-router'
 
-
 export const initApp = () => {
 
   const app = express()

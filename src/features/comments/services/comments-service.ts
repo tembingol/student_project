@@ -1,10 +1,10 @@
 import { injectable } from "inversify"
-import { CommentInputModel, CommentViewModel } from "../../../input-output-types/comments-models"
+import { CommentInputModel, CommentModel, CommentViewModel } from "../../../input-output-types/comments-models"
 import { ServicesResponseNew, HTTP_STATUS_CODE } from "../../../input-output-types/types"
 import { PostsQueryService } from "../../posts/services/posts-query-service"
 import { CommentsQueryRepository } from "../repo/comments-query-repository"
 import { CommentsRepository } from "../repo/comments-repository"
-import { commentEntityMapper } from "./comments-query-service"
+import { LikesService } from "../../likes/services/likes-service"
 
 @injectable()
 export class CommentsService {
@@ -13,6 +13,7 @@ export class CommentsService {
         protected commentsRepository: CommentsRepository,
         protected commentsQueryRepository: CommentsQueryRepository,
         protected postsQueryService: PostsQueryService,
+        protected likesService: LikesService
     ) { }
 
     async addCommentToPost(postId: string, content: any, commentatorInfo: any) {
@@ -29,28 +30,24 @@ export class CommentsService {
             return response
         }
 
-        const newCooment: CommentViewModel = {
-            id: "",
+        const newCooment = await CommentModel.create({
             content: content,
             commentatorInfo: {
                 userId: commentatorInfo.userId,
                 userLogin: commentatorInfo.userLogin,
             },
-            createdAt: new Date().toISOString()
-        }
+            createdAt: new Date().toISOString(),
+            postId: postId
+        })
 
-        const createdCommentId = await this.commentsRepository.createComment(postId, newCooment)
+        await newCooment.save()
+        const likeInfo = await this.likesService.getLikesInfo(commentatorInfo.userId, postId)
+        newCooment.likesInfo = likeInfo
 
-        if (createdCommentId === "") {
-            return { ...response, status: HTTP_STATUS_CODE.BadRequest }
-        }
-
-        const foundCreatedComment = await this.commentsQueryRepository.getCommentByID(createdCommentId)
-
-        if (foundCreatedComment) {
+        if (newCooment) {
             response.result = true
             response.status = HTTP_STATUS_CODE.Created
-            response.data = commentEntityMapper(foundCreatedComment)
+            response.data = newCooment
         }
 
         return response
@@ -77,13 +74,9 @@ export class CommentsService {
             return response
         }
 
-        const operationAction = {
-            $set: {
-                content: commentBody.content,
-            }
-        }
+        const content = commentBody.content
 
-        const istUpdated = await this.commentsRepository.updateComment(id, operationAction);
+        const istUpdated = await this.commentsRepository.updateComment(id, content);
 
         if (istUpdated) {
             response.result = true

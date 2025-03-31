@@ -1,19 +1,16 @@
-import { ObjectId } from "mongodb"
 import { injectable } from "inversify"
-import { db } from "../../../db/db"
-import { commentEntityMapper } from "../services/comments-query-service"
+import { CommentModel } from "../../../input-output-types/comments-models"
 
 @injectable()
 export class CommentsQueryRepository {
 
     async getCommentByID(id: string) {
-        const filter = { _id: new ObjectId(id) }
-        const retult = await db.getCollections().commentsCollection.findOne(filter)
+        const retult = await CommentModel.findOne({ _id: id }).exec()
         return retult
     }
 
     async getCommentByFilter(filter: {}) {
-        const retult = await db.getCollections().commentsCollection.findOne(filter)
+        const retult = await CommentModel.findOne(filter).exec()
         return retult
     }
 
@@ -22,19 +19,27 @@ export class CommentsQueryRepository {
         const _pageSize = +pageSize
         const _sortDirection = sortDirection === 'asc' ? 1 : -1
 
-        const allPosts = await db.getCollections().commentsCollection.find({ "postId": postId })
+        const allCommentsofPost = await CommentModel.find({ postId: postId })
             .skip((_pageNumber - 1) * _pageSize)
             .limit(_pageSize)
             .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })
-            .toArray()
+            .exec()
 
-        const mappedPosts = allPosts.map((el) => commentEntityMapper(el))
+        // const allCommentsofPost2 = await CommentModel.aggregate([
+        //     { $match: { postId: postId } },
+        //     { $lookup: { from: "likes", localField: "_id", foreignField: "objectId", as: "likesInfo" } },
+        //     { $unionWith: { coll: "likes", pipeline: [] } },
+        //     { $sort: { createdAt: _sortDirection, [sortBy]: _sortDirection } },
+        //     { $skip: (_pageNumber - 1) * _pageSize },
+        //     { $limit: _pageSize }
+        // ]).exec()
+        // console.log('allCommentsofPost2', allCommentsofPost2)
 
-        return mappedPosts
+        return allCommentsofPost
     }
 
     async getDocumetnsCountOfPost(filter: {}) {
-        const retult = await db.getCollections().commentsCollection.countDocuments(filter)
+        const retult = await CommentModel.countDocuments(filter).exec()
         return retult
     }
 }

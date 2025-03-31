@@ -1,12 +1,14 @@
-import { inject, injectable } from "inversify"
-import { CommentDataBaseModel, CommentViewModel } from "../../../input-output-types/comments-models"
+import { injectable } from "inversify"
+import { CommentModel, CommentViewModel } from "../../../input-output-types/comments-models"
 import { ServicesResponseNew, HTTP_STATUS_CODE, PaginationResponseType } from "../../../input-output-types/types"
 import { CommentsQueryRepository } from "../repo/comments-query-repository";
+import { LikesService } from "../../likes/services/likes-service";
 
 @injectable()
 export class CommentsQueryService {
     constructor(
-        private commentsQueryRepository: CommentsQueryRepository
+        protected commentsQueryRepository: CommentsQueryRepository,
+        protected likeService: LikesService,
     ) { }
 
     async findCommentById(id: string) {
@@ -16,19 +18,22 @@ export class CommentsQueryService {
             data: {},
             errors: { errorsMessages: [] }
         }
-        const foundComment = await this.commentsQueryRepository.getCommentByID(id);
 
-        if (foundComment) {
-            result.result = true
-            result.status = HTTP_STATUS_CODE.OK
-            result.data = commentEntityMapper(foundComment)
-            result.errors = { errorsMessages: [] }
-        }
+        const foundComment = await this.commentsQueryRepository.getCommentByID(id)
+
+        if (!foundComment) {
+            return result
+        };
+
+        result.result = true
+        result.status = HTTP_STATUS_CODE.OK
+        result.data = foundComment.toJSON()
+        result.errors = { errorsMessages: [] }
 
         return result
     }
 
-    async findCommentsOfPost(postId: string, queryParams: any) {
+    async findCommentsOfPost(postId: string, queryParams: any, loginedUserId: string) {
         const pageNumber = queryParams.pageNumber ? +queryParams.pageNumber : 1
         const pageSize = queryParams.pageSize ? +queryParams.pageSize : 10
         const sortBy = queryParams.sortBy ? queryParams.sortBy : "createdAt"
@@ -42,6 +47,10 @@ export class CommentsQueryService {
             sortBy,
             sortDirection,
             searchNameTerm)
+
+        for (const el of foundComments) {
+            el.likesInfo = await this.likeService.getLikesInfo(loginedUserId, el.id)
+        }
 
         const _totalCount = await this.commentsQueryRepository.getDocumetnsCountOfPost({ postId: postId })
 
@@ -59,14 +68,5 @@ export class CommentsQueryService {
         }
 
         return result
-    }
-}
-
-export function commentEntityMapper(comment: CommentDataBaseModel): CommentViewModel {
-    return {
-        id: comment._id!.toString(),
-        content: comment.content,
-        commentatorInfo: comment.commentatorInfo,
-        createdAt: comment.createdAt,
     }
 }

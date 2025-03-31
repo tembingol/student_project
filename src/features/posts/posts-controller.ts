@@ -8,10 +8,10 @@ import { CommentsQueryService } from "../comments/services/comments-query-servic
 @injectable()
 export class PostsController {
     constructor(
-        private postsService: PostsService,
-        private postsQueryService: PostsQueryService,
-        @inject(CommentsQueryService) private commentsQueryService: CommentsQueryService,
-        private commentsService: CommentsService
+        protected postsService: PostsService,
+        protected postsQueryService: PostsQueryService,
+        protected commentsQueryService: CommentsQueryService,
+        protected commentsService: CommentsService
     ) { }
 
     async getAllPosts(req: Request, res: Response) {
@@ -31,13 +31,16 @@ export class PostsController {
 
     async getCommentsOfPost(req: Request, res: Response) {
 
+        const loginedUser = req.context!.currentUser
+        // console.log('req.context', req.context)
+
         const foundPost = await this.postsQueryService.findPostById(req.params.id);
         if (!foundPost.result) {
             res.sendStatus(foundPost.status)
             return
         }
 
-        const foundCommentsOfPost = await this.commentsQueryService.findCommentsOfPost(req.params.id, req.query);
+        const foundCommentsOfPost = await this.commentsQueryService.findCommentsOfPost(req.params.id, req.query, loginedUser.userId);
         res.status(foundCommentsOfPost.status).json(foundCommentsOfPost.data)
     }
 
@@ -61,7 +64,6 @@ export class PostsController {
         }
         res.status(newCommentResult.status).json(newCommentResult.data)
     }
-
 
     async createPost(req: Request, res: Response) {
         const serviceRes = await this.postsService.createPost(req.body);

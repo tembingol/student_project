@@ -97,3 +97,9 @@ export type TokenPlayLoadType = {
     userLogin: string,
     deviceId: string
 }
+
+export enum LikeStatus {
+    NONE = 'None',
+    LIKE = 'Like',
+    DISLIKE = 'Dislike'
+}
