@@ -25,7 +25,7 @@ export class CommentsQueryRepository {
             .sort({ createdAt: _sortDirection, [sortBy]: _sortDirection })
             .exec()
 
-        // const allCommentsofPost2 = await CommentModel.aggregate([
+        // const allCommentsofPostAggregate = await CommentModel.aggregate([
         //     { $match: { postId: postId } },
         //     { $lookup: { from: "likes", localField: "_id", foreignField: "objectId", as: "likesInfo" } },
         //     { $unionWith: { coll: "likes", pipeline: [] } },

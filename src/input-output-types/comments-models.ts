@@ -2,6 +2,7 @@ import { WithId } from "mongodb"
 import { LikesInfoModel } from "./likes-models"
 import mongoose from "mongoose"
 import { LikeStatus } from "./types"
+import { SETTINGS } from "../settings"
 
 export type CommentatorInfo = {
     userId: string
@@ -48,4 +49,4 @@ CommentSchema.set('toJSON', {
     }
 })
 
-export const CommentModel = mongoose.model<WithId<CommentViewModel>>('comments', CommentSchema)
+export const CommentModel = mongoose.model<WithId<CommentViewModel>>(SETTINGS.COMMENTS_COLLECTION_NAME, CommentSchema)

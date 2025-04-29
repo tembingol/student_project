@@ -16,6 +16,7 @@ export const SETTINGS = {
     POST_COLLECTION_NAME: 'posts',
     VIDEO_COLLECTION_NAME: 'videos',
     USERS_COLLECTION_NAME: 'users',
+    LIKES_COLLECTION_NAME: 'likes',
     COMMENTS_COLLECTION_NAME: "comments",
     USERSCREDENTIALS_COLLECTION_NAME: 'usersCredentials',
     EXPIREDTOKENS_COLLECTION_NAME: 'expiredTokens',

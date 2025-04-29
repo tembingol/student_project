@@ -1,4 +1,6 @@
-import { ObjectId } from "mongodb"
+import { ObjectId, WithId } from "mongodb"
+import mongoose from "mongoose"
+import { SETTINGS } from "../settings"
 
 export type UserCredentialsModel = {
     userId: string
@@ -41,3 +43,12 @@ export type UserDataBaseModel = {
         isConfirmed: boolean
     }
 }
+
+const UserSchema = new mongoose.Schema<WithId<UserViewModel>>({
+    id: { type: String, require: true },
+    login: { type: String, require: true },
+    email: { type: String, require: true },
+    createdAt: { type: Date, require: true, default: new Date() },
+})
+
+export const UserModel = mongoose.model<WithId<UserViewModel>>(SETTINGS.USERS_COLLECTION_NAME, UserSchema)

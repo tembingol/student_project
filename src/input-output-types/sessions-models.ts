@@ -1,4 +1,6 @@
-import { ObjectId } from "mongodb"
+import { ObjectId, WithId } from "mongodb"
+import mongoose from "mongoose"
+import { SETTINGS } from "../settings"
 
 export type SessionViewModel = {
     id: string,
@@ -39,3 +41,11 @@ export type IncomingRequestsDataBaseModel = {
     URL: string,
     Date: Date
 }
+
+const IncomingRequestsSchema = new mongoose.Schema<WithId<IncomingRequestsModel>>({
+    Ip: { type: String, required: true },
+    URL: { type: String, required: true },
+    Date: { type: Date, required: true, default: new Date() }
+})
+
+export const IncomingRequestsModel12 = mongoose.model<WithId<IncomingRequestsModel>>(SETTINGS.INCOMINGREQUESTS_COLLECTION_NAME, IncomingRequestsSchema)

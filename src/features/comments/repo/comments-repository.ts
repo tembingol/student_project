@@ -1,8 +1,6 @@
 
-import { ObjectId } from "mongodb"
 import { injectable } from "inversify"
 import { CommentModel, CommentViewModel } from "../../../input-output-types/comments-models"
-import { db } from "../../../db/db"
 
 @injectable()
 export class CommentsRepository {

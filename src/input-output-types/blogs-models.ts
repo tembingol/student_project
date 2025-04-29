@@ -1,5 +1,6 @@
 import { WithId } from "mongodb"
 import mongoose from 'mongoose'
+import { SETTINGS } from "../settings"
 
 export type BlogInputModel = {
     name: string // max 15
@@ -16,7 +17,7 @@ export type BlogViewModel = {
     isMembership: boolean
 }
 
-export const BlogSchema = new mongoose.Schema<WithId<BlogViewModel>>({
+const BlogSchema = new mongoose.Schema<WithId<BlogViewModel>>({
     id: { type: String, require: true },
     name: { type: String, require: true, max: 15 },
     description: { type: String, require: false, default: '', max: 500 },
@@ -25,4 +26,4 @@ export const BlogSchema = new mongoose.Schema<WithId<BlogViewModel>>({
     isMembership: { type: Boolean, require: false, default: false }
 })
 
-export const BlogModel = mongoose.model<WithId<BlogViewModel>>('blogs', BlogSchema)
+export const BlogModel = mongoose.model<WithId<BlogViewModel>>(SETTINGS.BLOG_COLLECTION_NAME, BlogSchema)
